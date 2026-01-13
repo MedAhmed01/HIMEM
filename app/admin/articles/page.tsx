@@ -52,11 +52,19 @@ export default function AdminArticlesPage() {
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: formDataUpload })
       const data = await res.json()
+      
+      if (!res.ok) {
+        alert(`Erreur d'upload: ${data.error}`)
+        return
+      }
+      
       if (data.url) {
         setFormData({ ...formData, image: data.url })
+        alert('Image uploadée avec succès!')
       }
     } catch (err) {
       console.error('Upload error:', err)
+      alert('Erreur lors de l\'upload de l\'image')
     }
     setUploading(false)
   }
