@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { 
   User, 
   FileText, 
@@ -25,6 +26,8 @@ interface ProfileData {
   subscription_expiry: string | null
   sponsorships_count: number
   status: string
+  is_admin: boolean
+  profile_image_url?: string
 }
 
 export default function TableauDeBordPage() {
@@ -80,17 +83,24 @@ export default function TableauDeBordPage() {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <User className="w-8 h-8 text-white" />
-            </div>
+          <Link href="/profil" className="flex items-center gap-4 group cursor-pointer">
+            <Avatar className="w-16 h-16 border-4 border-white shadow-xl ring-2 ring-indigo-100 group-hover:ring-indigo-300 transition-all">
+              <AvatarImage 
+                src={profile?.profile_image_url} 
+                alt={profile?.full_name || 'User'}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xl font-bold">
+                {profile?.full_name.split(' ').map(n => n[0]).join('').slice(0, 2) || 'U'}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <h1 className="text-3xl font-bold">
-                <span className="gradient-text">Bienvenue{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}</span>
+              <h1 className="text-3xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                Bienvenue{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}
               </h1>
-              <p className="text-slate-500">Votre espace personnel OMIGEC</p>
+              <p className="text-slate-500 group-hover:text-slate-600 transition-colors">Votre espace personnel OMIGEC</p>
             </div>
-          </div>
+          </Link>
           
           <div className="flex items-center gap-3">
             <Button variant="outline" size="icon" className="rounded-xl border-2">
@@ -247,12 +257,14 @@ export default function TableauDeBordPage() {
         </Card>
 
         {/* Admin Link */}
-        <div className="text-center">
-          <Link href="/admin" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
-            <Settings className="w-4 h-4" />
-            Accéder au panneau admin
-          </Link>
-        </div>
+        {profile?.is_admin && (
+          <div className="text-center">
+            <Link href="/admin" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+              <Settings className="w-4 h-4" />
+              Accéder au panneau admin
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
