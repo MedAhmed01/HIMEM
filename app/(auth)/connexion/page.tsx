@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,7 @@ import { Mail, Lock, LogIn, Sparkles, ArrowLeft, Eye, EyeOff, Building2, User } 
 
 type UserType = 'ingenieur' | 'entreprise'
 
-export default function ConnexionPage() {
+function ConnexionForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [userType, setUserType] = useState<UserType>('ingenieur')
@@ -252,5 +252,25 @@ export default function ConnexionPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function ConnexionPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="w-full max-w-md">
+          <Card className="border-0 shadow-2xl overflow-hidden">
+            <div className="h-2 bg-blue-600"></div>
+            <CardContent className="py-16 text-center">
+              <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="mt-4 text-slate-600">Chargement...</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <ConnexionForm />
+    </Suspense>
   )
 }
