@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Users, Check, X, Search, Filter, Sparkles, Calendar, Mail, Phone, Key, AlertCircle, CheckCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
 
 interface Engineer {
   id: string
@@ -23,8 +24,16 @@ export default function IngenieursPage() {
   const [engineers, setEngineers] = useState<Engineer[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [resetLoading, setResetLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [changePasswordModal, setChangePasswordModal] = useState<{
+    isOpen: boolean
+    userId: string
+    userName: string
+  }>({
+    isOpen: false,
+    userId: '',
+    userName: ''
+  })
 
   const loadEngineers = async () => {
     const res = await fetch('/api/admin/engineers')
@@ -51,33 +60,20 @@ export default function IngenieursPage() {
     }
   }
 
-  const handleResetPassword = async (engineerId: string) => {
-    if (!confirm('Envoyer un email de réinitialisation de mot de passe à cet ingénieur ?')) {
-      return
-    }
+  const handleChangePassword = (engineerId: string, engineerName: string) => {
+    setChangePasswordModal({
+      isOpen: true,
+      userId: engineerId,
+      userName: engineerName
+    })
+  }
 
-    setResetLoading(engineerId)
-    setMessage(null)
+  const handlePasswordChangeSuccess = (message: string) => {
+    setMessage({ type: 'success', text: message })
+  }
 
-    try {
-      const res = await fetch('/api/admin/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: engineerId, userType: 'ingenieur' })
-      })
-
-      const data = await res.json()
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: data.message })
-      } else {
-        setMessage({ type: 'error', text: data.error })
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors de l\'envoi de l\'email' })
-    } finally {
-      setResetLoading(null)
-    }
+  const handlePasswordChangeError = (error: string) => {
+    setMessage({ type: 'error', text: error })
   }
 
   // Clear message after 5 seconds
@@ -285,20 +281,15 @@ export default function IngenieursPage() {
                         </Badge>
                       )}
 
-                      {/* Reset Password Button */}
+                      {/* Change Password Button */}
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-xl border-2 border-orange-200 text-orange-600 hover:bg-orange-50"
-                        onClick={() => handleResetPassword(engineer.id)}
-                        disabled={resetLoading === engineer.id}
-                        title="Réinitialiser le mot de passe"
+                        className="rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                        onClick={() => handleChangePassword(engineer.id, engineer.full_name)}
+                        title="Modifier le mot de passe"
                       >
-                        {resetLoading === engineer.id ? (
-                          <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Key className="w-4 h-4" />
-                        )}
+                        <Key className="w-4 h-4" />
                       </Button>
 
                       {/* Action Button */}
@@ -330,6 +321,17 @@ export default function IngenieursPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={changePasswordModal.isOpen}
+        onClose={() => setChangePasswordModal({ isOpen: false, userId: '', userName: '' })}
+        userId={changePasswordModal.userId}
+        userType="ingenieur"
+        userName={changePasswordModal.userName}
+        onSuccess={handlePasswordChangeSuccess}
+        onError={handlePasswordChangeError}
+      />
     </div>
   )
 }

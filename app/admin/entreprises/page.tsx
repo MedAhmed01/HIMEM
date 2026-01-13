@@ -9,6 +9,7 @@ import {
   Building2, CheckCircle, XCircle, Clock, 
   Filter, Mail, Phone, AlertCircle, Key
 } from 'lucide-react'
+import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
 
 const STATUS_CONFIG: Record<EntrepriseStatus, { label: string; color: string; icon: any }> = {
   en_attente: { label: 'En attente', color: 'amber', icon: Clock },
@@ -22,8 +23,16 @@ export default function AdminEntreprisesPage() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<EntrepriseStatus | ''>('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [resetLoading, setResetLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [changePasswordModal, setChangePasswordModal] = useState<{
+    isOpen: boolean
+    userId: string
+    userName: string
+  }>({
+    isOpen: false,
+    userId: '',
+    userName: ''
+  })
 
   useEffect(() => {
     fetchEntreprises()
@@ -83,33 +92,20 @@ export default function AdminEntreprisesPage() {
     }
   }
 
-  const handleResetPassword = async (entrepriseId: string) => {
-    if (!confirm('Envoyer un email de réinitialisation de mot de passe à cette entreprise ?')) {
-      return
-    }
+  const handleChangePassword = (entrepriseId: string, entrepriseName: string) => {
+    setChangePasswordModal({
+      isOpen: true,
+      userId: entrepriseId,
+      userName: entrepriseName
+    })
+  }
 
-    setResetLoading(entrepriseId)
-    setMessage(null)
+  const handlePasswordChangeSuccess = (message: string) => {
+    setMessage({ type: 'success', text: message })
+  }
 
-    try {
-      const res = await fetch('/api/admin/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: entrepriseId, userType: 'entreprise' })
-      })
-
-      const data = await res.json()
-
-      if (res.ok) {
-        setMessage({ type: 'success', text: data.message })
-      } else {
-        setMessage({ type: 'error', text: data.error })
-      }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors de l\'envoi de l\'email' })
-    } finally {
-      setResetLoading(null)
-    }
+  const handlePasswordChangeError = (error: string) => {
+    setMessage({ type: 'error', text: error })
   }
 
   // Clear message after 5 seconds
@@ -265,20 +261,15 @@ export default function AdminEntreprisesPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {/* Reset Password Button */}
+                      {/* Change Password Button */}
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleResetPassword(entreprise.id)}
-                        disabled={resetLoading === entreprise.id}
-                        className="text-orange-600 hover:bg-orange-50 border-orange-200"
-                        title="Réinitialiser le mot de passe"
+                        onClick={() => handleChangePassword(entreprise.id, entreprise.name)}
+                        className="text-blue-600 hover:bg-blue-50 border-blue-200"
+                        title="Modifier le mot de passe"
                       >
-                        {resetLoading === entreprise.id ? (
-                          <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Key className="w-4 h-4" />
-                        )}
+                        <Key className="w-4 h-4" />
                       </Button>
 
                       {/* Status Action Buttons */}
@@ -320,6 +311,17 @@ export default function AdminEntreprisesPage() {
           })
         )}
       </div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={changePasswordModal.isOpen}
+        onClose={() => setChangePasswordModal({ isOpen: false, userId: '', userName: '' })}
+        userId={changePasswordModal.userId}
+        userType="entreprise"
+        userName={changePasswordModal.userName}
+        onSuccess={handlePasswordChangeSuccess}
+        onError={handlePasswordChangeError}
+      />
     </div>
   )
 }

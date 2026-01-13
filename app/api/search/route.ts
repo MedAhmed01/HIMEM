@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Search by NNI or name (case insensitive)
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('nni, full_name, diploma, grad_year, domain, exercise_mode, status, subscription_expiry')
+      .select('nni, full_name, diploma, grad_year, university, country, domain, exercise_mode, status, subscription_expiry, profile_image_url')
       .eq('is_admin', false)
       .or(`nni.eq.${searchTerm},full_name.ilike.%${searchTerm}%`)
 
@@ -74,6 +74,9 @@ export async function GET(request: NextRequest) {
       full_name: eng.full_name,
       diploma: eng.diploma,
       grad_year: eng.grad_year,
+      university: eng.university,
+      country: eng.country,
+      profile_image_url: eng.profile_image_url,
       domains: eng.domain?.map((d: string) => domainLabels[d] || d) || [],
       exercise_mode: exerciseModeLabels[eng.exercise_mode] || eng.exercise_mode
     }))
