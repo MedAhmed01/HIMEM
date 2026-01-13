@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "title": "Nouvelle réglementation pour les ingénieurs en génie civil",
+    "description": "L'OMIGEC annonce de nouvelles directives concernant les normes de construction et les certifications professionnelles pour 2026.",
+    "image": "/articles/1768337193505-69241271_9685306.jpg",
+    "date": "2026-01-10",
+    "published": true
+  },
+  {
+    "id": "2",
+    "title": "Formation continue: Inscriptions ouvertes",
+    "description": "Les inscriptions pour la session de formation continue du premier trimestre sont maintenant ouvertes. Places limitées.",
+    "image": "/articles/article2.jpg",
+    "date": "2026-01-08",
+    "published": true
+  },
+  {
+    "id": "3",
+    "title": "Assemblée générale annuelle 2026",
+    "description": "L'assemblée générale annuelle de l'OMIGEC se tiendra le 15 février 2026 à Nouakchott. Tous les membres sont conviés.",
+    "image": "/articles/article3.jpg",
+    "date": "2026-01-05",
+    "published": true
+  }
+]
