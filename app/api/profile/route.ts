@@ -31,7 +31,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Profil non trouvé' }, { status: 404 })
     }
 
-    return NextResponse.json({ profile })
+    // Compter les parrainages effectués (verifications confirmées où cet ingénieur est la référence)
+    const { count: sponsorshipsCount } = await adminClient
+      .from('verifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('reference_id', user.id)
+      .eq('status', 'confirmed')
+
+    return NextResponse.json({ 
+      profile: {
+        ...profile,
+        sponsorships_count: sponsorshipsCount || 0
+      }
+    })
   } catch (error) {
     console.error('Profile GET error:', error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })

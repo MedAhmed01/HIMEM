@@ -45,6 +45,7 @@ interface ProfileData {
   status: string
   subscription_expiry: string | null
   profile_image_url?: string
+  sponsorships_count?: number
 }
 
 const DOMAINS = [
@@ -119,6 +120,10 @@ export default function ProfilPage() {
       const data = await res.json()
       
       if (res.ok) {
+        console.log('Profile data loaded:', data.profile)
+        console.log('grad_year:', data.profile.grad_year)
+        console.log('sponsorships_count:', data.profile.sponsorships_count)
+        console.log('subscription_expiry:', data.profile.subscription_expiry)
         setProfile(data.profile)
       } else {
         setMessage({ type: 'error', text: data.error })
@@ -393,10 +398,10 @@ export default function ProfilPage() {
               
               <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100">
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Building className="w-6 h-6 text-white" />
+                  <User className="w-6 h-6 text-white" />
                 </div>
-                <p className="text-2xl font-bold text-slate-900">{profile.domain.length}</p>
-                <p className="text-sm text-slate-600">Domaines d'expertise</p>
+                <p className="text-2xl font-bold text-slate-900">{profile.sponsorships_count || 0}</p>
+                <p className="text-sm text-slate-600">Parrainages effectués</p>
               </div>
               
               <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100">

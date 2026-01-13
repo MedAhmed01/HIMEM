@@ -16,7 +16,7 @@ function ConnexionForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [userType, setUserType] = useState<UserType>('ingenieur')
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('') // Email ou téléphone
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -36,13 +36,34 @@ function ConnexionForm() {
 
     try {
       const supabase = createClient()
+      let loginEmail = identifier
+
+      // Si l'identifiant ne contient pas @, c'est probablement un numéro de téléphone
+      if (!identifier.includes('@')) {
+        // Appeler l'API pour obtenir l'email à partir du téléphone
+        const phoneRes = await fetch('/api/auth/phone-to-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: identifier, userType })
+        })
+
+        if (!phoneRes.ok) {
+          const phoneData = await phoneRes.json()
+          setError(phoneData.error || 'Numéro de téléphone non trouvé')
+          return
+        }
+
+        const phoneData = await phoneRes.json()
+        loginEmail = phoneData.email
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: loginEmail,
         password,
       })
 
       if (error) {
-        setError('Email ou mot de passe incorrect')
+        setError('Identifiant ou mot de passe incorrect')
         return
       }
 
@@ -164,15 +185,17 @@ function ConnexionForm() {
           <CardContent className="pb-8">
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-700 font-medium">Email</Label>
+                <Label htmlFor="identifier" className="text-slate-700 font-medium">Email ou Téléphone</Label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="identifier"
+                    name="identifier"
+                    type="text"
+                    autoComplete="username"
+                    placeholder="votre@email.com ou 06XXXXXXXX"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     required
                     disabled={isLoading}
                     className="pl-12 h-12 rounded-xl border-2 border-slate-200 focus:border-blue-500 transition-colors"

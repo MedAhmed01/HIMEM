@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,7 +19,62 @@ import {
   Calendar
 } from 'lucide-react'
 
+interface ProfileData {
+  full_name: string
+  grad_year: number
+  subscription_expiry: string | null
+  sponsorships_count: number
+  status: string
+}
+
 export default function TableauDeBordPage() {
+  const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadProfile()
+  }, [])
+
+  const loadProfile = async () => {
+    try {
+      const res = await fetch('/api/profile')
+      const data = await res.json()
+      
+      if (res.ok) {
+        setProfile(data.profile)
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const calculateExperience = (gradYear: number) => {
+    return new Date().getFullYear() - gradYear
+  }
+
+  const calculateDaysRemaining = (expiryDate: string | null) => {
+    if (!expiryDate) return 0
+    const days = Math.ceil((new Date(expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    return days > 0 ? days : 0
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 font-medium">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const yearsOfExperience = profile ? calculateExperience(profile.grad_year) : 0
+  const daysRemaining = profile ? calculateDaysRemaining(profile.subscription_expiry) : 0
+  const sponsorshipsCount = profile?.sponsorships_count || 0
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -28,7 +86,7 @@ export default function TableauDeBordPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold">
-                <span className="gradient-text">Bienvenue</span>
+                <span className="gradient-text">Bienvenue{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}</span>
               </h1>
               <p className="text-slate-500">Votre espace personnel OMIGEC</p>
             </div>
@@ -80,7 +138,7 @@ export default function TableauDeBordPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-500 font-medium">Années d'expérience</p>
-                  <p className="text-4xl font-bold text-slate-900">5</p>
+                  <p className="text-4xl font-bold text-slate-900">{yearsOfExperience}</p>
                 </div>
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                   <Award className="w-7 h-7 text-white" />
@@ -95,7 +153,7 @@ export default function TableauDeBordPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-500 font-medium">Parrainages effectués</p>
-                  <p className="text-4xl font-bold text-slate-900">0</p>
+                  <p className="text-4xl font-bold text-slate-900">{sponsorshipsCount}</p>
                 </div>
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/30">
                   <User className="w-7 h-7 text-white" />
@@ -110,7 +168,7 @@ export default function TableauDeBordPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-500 font-medium">Jours restants</p>
-                  <p className="text-4xl font-bold text-slate-900">365</p>
+                  <p className="text-4xl font-bold text-slate-900">{daysRemaining}</p>
                 </div>
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
                   <Calendar className="w-7 h-7 text-white" />
