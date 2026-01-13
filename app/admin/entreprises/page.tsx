@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Entreprise, EntrepriseStatus } from '@/lib/types/database'
 import { 
   Building2, CheckCircle, XCircle, Clock, 
-  Filter, Mail, Phone, AlertCircle
+  Filter, Mail, Phone, AlertCircle, Key
 } from 'lucide-react'
 
 const STATUS_CONFIG: Record<EntrepriseStatus, { label: string; color: string; icon: any }> = {
@@ -22,6 +22,8 @@ export default function AdminEntreprisesPage() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<EntrepriseStatus | ''>('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [resetLoading, setResetLoading] = useState<string | null>(null)
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   useEffect(() => {
     fetchEntreprises()
@@ -80,6 +82,43 @@ export default function AdminEntreprisesPage() {
       setActionLoading(null)
     }
   }
+
+  const handleResetPassword = async (entrepriseId: string) => {
+    if (!confirm('Envoyer un email de réinitialisation de mot de passe à cette entreprise ?')) {
+      return
+    }
+
+    setResetLoading(entrepriseId)
+    setMessage(null)
+
+    try {
+      const res = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: entrepriseId, userType: 'entreprise' })
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: data.message })
+      } else {
+        setMessage({ type: 'error', text: data.error })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Erreur lors de l\'envoi de l\'email' })
+    } finally {
+      setResetLoading(null)
+    }
+  }
+
+  // Clear message after 5 seconds
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [message])
 
   if (isLoading) {
     return (
@@ -148,6 +187,36 @@ export default function AdminEntreprisesPage() {
         </div>
       )}
 
+      {/* Success/Error Message */}
+      {message && (
+        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${
+          message.type === 'success' 
+            ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200' 
+            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+        }`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+            message.type === 'success'
+              ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
+              : 'bg-gradient-to-br from-red-500 to-pink-500'
+          }`}>
+            {message.type === 'success' ? (
+              <CheckCircle className="w-5 h-5 text-white" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-white" />
+            )}
+          </div>
+          <p className={`${message.type === 'success' ? 'text-emerald-600' : 'text-red-600'} font-medium`}>
+            {message.text}
+          </p>
+          <button 
+            onClick={() => setMessage(null)}
+            className={`ml-auto ${message.type === 'success' ? 'text-emerald-400 hover:text-emerald-600' : 'text-red-400 hover:text-red-600'} text-xl`}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* List */}
       <div className="space-y-4">
         {entreprises.length === 0 ? (
@@ -196,6 +265,23 @@ export default function AdminEntreprisesPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
+                      {/* Reset Password Button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleResetPassword(entreprise.id)}
+                        disabled={resetLoading === entreprise.id}
+                        className="text-orange-600 hover:bg-orange-50 border-orange-200"
+                        title="Réinitialiser le mot de passe"
+                      >
+                        {resetLoading === entreprise.id ? (
+                          <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Key className="w-4 h-4" />
+                        )}
+                      </Button>
+
+                      {/* Status Action Buttons */}
                       {entreprise.status === 'en_attente' && (
                         <Button
                           size="sm"

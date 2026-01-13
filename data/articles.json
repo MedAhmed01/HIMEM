@@ -11,7 +11,7 @@
     "id": "2",
     "title": "Formation continue: Inscriptions ouvertes",
     "description": "Les inscriptions pour la session de formation continue du premier trimestre sont maintenant ouvertes. Places limitées.",
-    "image": "/articles/article2.jpg",
+    "image": "https://yhkuerjznwducxaaoilj.supabase.co/storage/v1/object/public/public-files/articles/1768342834358-82552441a258.jpg",
     "date": "2026-01-08",
     "published": true
   },
@@ -19,7 +19,7 @@
     "id": "3",
     "title": "Assemblée générale annuelle 2026",
     "description": "L'assemblée générale annuelle de l'OMIGEC se tiendra le 15 février 2026 à Nouakchott. Tous les membres sont conviés.",
-    "image": "/articles/article3.jpg",
+    "image": "https://yhkuerjznwducxaaoilj.supabase.co/storage/v1/object/public/public-files/articles/1768342898573-248095815286.jpg",
     "date": "2026-01-05",
     "published": true
   }

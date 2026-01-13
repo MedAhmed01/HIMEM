@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Users, Check, X, Search, Filter, Sparkles, Calendar, Mail, Phone } from 'lucide-react'
+import { Users, Check, X, Search, Filter, Sparkles, Calendar, Mail, Phone, Key, AlertCircle, CheckCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 interface Engineer {
@@ -23,6 +23,8 @@ export default function IngenieursPage() {
   const [engineers, setEngineers] = useState<Engineer[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [resetLoading, setResetLoading] = useState<string | null>(null)
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   const loadEngineers = async () => {
     const res = await fetch('/api/admin/engineers')
@@ -48,6 +50,43 @@ export default function IngenieursPage() {
       loadEngineers()
     }
   }
+
+  const handleResetPassword = async (engineerId: string) => {
+    if (!confirm('Envoyer un email de réinitialisation de mot de passe à cet ingénieur ?')) {
+      return
+    }
+
+    setResetLoading(engineerId)
+    setMessage(null)
+
+    try {
+      const res = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: engineerId, userType: 'ingenieur' })
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: data.message })
+      } else {
+        setMessage({ type: 'error', text: data.error })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Erreur lors de l\'envoi de l\'email' })
+    } finally {
+      setResetLoading(null)
+    }
+  }
+
+  // Clear message after 5 seconds
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [message])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -138,6 +177,36 @@ export default function IngenieursPage() {
         </div>
       </div>
 
+      {/* Success/Error Message */}
+      {message && (
+        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${
+          message.type === 'success' 
+            ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200' 
+            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+        }`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+            message.type === 'success'
+              ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
+              : 'bg-gradient-to-br from-red-500 to-pink-500'
+          }`}>
+            {message.type === 'success' ? (
+              <CheckCircle className="w-5 h-5 text-white" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-white" />
+            )}
+          </div>
+          <p className={`${message.type === 'success' ? 'text-emerald-600' : 'text-red-600'} font-medium`}>
+            {message.text}
+          </p>
+          <button 
+            onClick={() => setMessage(null)}
+            className={`ml-auto ${message.type === 'success' ? 'text-emerald-400 hover:text-emerald-600' : 'text-red-400 hover:text-red-600'} text-xl`}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Engineers List */}
       <Card className="glass border-0 shadow-xl overflow-hidden">
         <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
@@ -215,6 +284,22 @@ export default function IngenieursPage() {
                           Non payé
                         </Badge>
                       )}
+
+                      {/* Reset Password Button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl border-2 border-orange-200 text-orange-600 hover:bg-orange-50"
+                        onClick={() => handleResetPassword(engineer.id)}
+                        disabled={resetLoading === engineer.id}
+                        title="Réinitialiser le mot de passe"
+                      >
+                        {resetLoading === engineer.id ? (
+                          <div className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Key className="w-4 h-4" />
+                        )}
+                      </Button>
 
                       {/* Action Button */}
                       {!isSubscriptionActive(engineer.subscription_expiry) ? (
