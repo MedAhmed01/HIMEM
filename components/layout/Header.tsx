@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { SponsorCarousel } from './SponsorCarousel'
-import { Menu, X, User, LogIn } from 'lucide-react'
+import { Menu, X, User, LogIn, ChevronDown, Building2, UserCircle } from 'lucide-react'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isInscriptionOpen, setIsInscriptionOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
 
@@ -67,12 +68,49 @@ export function Header() {
                 Connexion
               </Button>
             </Link>
-            <Link href="/inscription">
-              <Button className="h-9 px-4 rounded-full text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200">
+            
+            {/* Dropdown Inscription */}
+            <div className="relative inscription-dropdown">
+              <Button 
+                onClick={() => setIsInscriptionOpen(!isInscriptionOpen)}
+                className="h-9 px-4 rounded-full text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
+              >
                 <User className="w-3.5 h-3.5 mr-1.5" />
                 Inscription
+                <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
               </Button>
-            </Link>
+              
+              {isInscriptionOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+                  <Link 
+                    href="/inscription"
+                    onClick={() => setIsInscriptionOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <UserCircle className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">Ingénieur</p>
+                      <p className="text-xs text-gray-500">Inscription individuelle</p>
+                    </div>
+                  </Link>
+                  <Link 
+                    href="/inscription-entreprise"
+                    onClick={() => setIsInscriptionOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">Entreprise</p>
+                      <p className="text-xs text-gray-500">Compte professionnel</p>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -130,12 +168,23 @@ export function Header() {
                     Connexion
                   </Button>
                 </Link>
-                <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full h-10 rounded-lg text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium shadow-md">
-                    <User className="w-4 h-4 mr-2" />
-                    Inscription
-                  </Button>
-                </Link>
+                
+                {/* Inscription Options */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 px-3">Inscription</p>
+                  <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start">
+                      <UserCircle className="w-4 h-4 mr-2 text-blue-600" />
+                      <span>Ingénieur</span>
+                    </Button>
+                  </Link>
+                  <Link href="/inscription-entreprise" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start">
+                      <Building2 className="w-4 h-4 mr-2 text-green-600" />
+                      <span>Entreprise</span>
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </nav>
           </div>
