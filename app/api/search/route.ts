@@ -22,11 +22,10 @@ export async function GET(request: NextRequest) {
     const searchTerm = query.trim()
     const supabase = createAdminClient()
 
-    // Search by NNI or name (case insensitive)
+    // Search by NNI or name (case insensitive) - inclut les admins qui sont aussi ingénieurs
     const { data: profiles, error } = await supabase
       .from('profiles')
       .select('nni, full_name, diploma, grad_year, university, country, domain, exercise_mode, status, subscription_expiry, profile_image_url')
-      .eq('is_admin', false)
       .or(`nni.eq.${searchTerm},full_name.ilike.%${searchTerm}%`)
 
     if (error) {

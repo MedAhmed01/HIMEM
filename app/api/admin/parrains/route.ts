@@ -40,12 +40,11 @@ export async function GET() {
       }
     }
 
-    // Get validated engineers
+    // Get validated engineers (inclut les admins qui sont aussi ingénieurs)
     const { data: validatedEngineers } = await adminClient
       .from('profiles')
       .select('id, full_name, nni, email, grad_year')
       .eq('status', 'validated')
-      .eq('is_admin', false)
       .order('full_name')
 
     // Filter out those already references

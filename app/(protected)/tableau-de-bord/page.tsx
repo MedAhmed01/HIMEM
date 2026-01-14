@@ -252,6 +252,19 @@ export default function TableauDeBordPage() {
                   <p className="text-sm text-slate-500 mt-1">Voir les opportunités</p>
                 </div>
               </Link>
+
+              <Link href="/mes-candidatures" className="group">
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
+                    Mes candidatures
+                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  </h3>
+                  <p className="text-sm text-slate-500 mt-1">Suivre mes postulations</p>
+                </div>
+              </Link>
             </div>
           </CardContent>
         </Card>

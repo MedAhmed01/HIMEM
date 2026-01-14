@@ -24,11 +24,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
-    // Fetch all engineers (excluding admin)
+    // Fetch all engineers (inclut les admins qui sont aussi ingénieurs)
     const { data: engineers, error } = await adminClient
       .from('profiles')
       .select('*')
-      .eq('is_admin', false)
       .order('created_at', { ascending: false })
 
     if (error) {

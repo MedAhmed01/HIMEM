@@ -59,6 +59,9 @@ export default function AbonnementPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubscribing, setIsSubscribing] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const [uploadingReceipt, setUploadingReceipt] = useState(false)
 
   useEffect(() => {
     fetchSubscriptionInfo()
@@ -86,29 +89,82 @@ export default function AbonnementPage() {
   }
 
   const handleSubscribe = async (plan: SubscriptionPlan) => {
-    setIsSubscribing(plan)
+    setSelectedPlan(plan)
+    setError(null)
+  }
+
+  const handleConfirmSubscription = async () => {
+    if (!selectedPlan) return
+
+    setIsSubscribing(selectedPlan)
     setError(null)
 
     try {
+      let receiptUrl = null
+
+      // Upload du reçu si fourni
+      if (receiptFile) {
+        setUploadingReceipt(true)
+        
+        console.log('Uploading receipt:', {
+          name: receiptFile.name,
+          size: receiptFile.size,
+          type: receiptFile.type
+        })
+        
+        const formData = new FormData()
+        formData.append('file', receiptFile)
+        formData.append('type', 'subscription_receipt')
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include' // Important pour passer les cookies de session
+        })
+
+        if (!uploadRes.ok) {
+          const errorData = await uploadRes.json()
+          console.error('Upload error:', errorData)
+          throw new Error(errorData.error || 'Erreur lors de l\'upload du reçu')
+        }
+
+        const uploadData = await uploadRes.json()
+        console.log('Upload success:', uploadData)
+        receiptUrl = uploadData.url
+        setUploadingReceipt(false)
+      }
+
+      // Créer l'abonnement
       const response = await fetch('/api/entreprises/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan })
+        body: JSON.stringify({ 
+          plan: selectedPlan,
+          receiptUrl 
+        })
       })
 
       const data = await response.json()
+
+      console.log('Subscription creation response:', data)
 
       if (!response.ok) {
         throw new Error(data.error)
       }
 
+      // Afficher un message de succès
+      alert(data.message || 'Demande d\'abonnement créée avec succès !')
+
       // Rafraîchir les infos
       await fetchSubscriptionInfo()
+      setSelectedPlan(null)
+      setReceiptFile(null)
       
     } catch (err: any) {
       setError(err.message)
     } finally {
       setIsSubscribing(null)
+      setUploadingReceipt(false)
     }
   }
 
@@ -255,16 +311,7 @@ export default function AbonnementPage() {
                         : 'bg-blue-600 hover:bg-blue-700'
                     }`}
                   >
-                    {isSubscribing === key ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Traitement...
-                      </div>
-                    ) : isCurrentPlan ? (
-                      'Renouveler'
-                    ) : (
-                      'Souscrire'
-                    )}
+                    {isCurrentPlan ? 'Renouveler' : 'Souscrire'}
                   </Button>
                 </CardContent>
               </Card>
@@ -282,14 +329,99 @@ export default function AbonnementPage() {
               <h3 className="font-semibold text-blue-900 mb-2">Comment ça marche ?</h3>
               <ul className="text-blue-700 space-y-1 text-sm">
                 <li>• Choisissez le forfait adapté à vos besoins</li>
-                <li>• Publiez vos offres d'emploi immédiatement</li>
-                <li>• Les ingénieurs inscrits peuvent consulter vos offres</li>
-                <li>• Suivez les statistiques de vos annonces</li>
+                <li>• Effectuez le paiement et joignez le reçu</li>
+                <li>• Notre équipe vérifie votre paiement</li>
+                <li>• Une fois validé, publiez vos offres d'emploi immédiatement</li>
               </ul>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modal de paiement */}
+      {selectedPlan && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Finaliser l'abonnement {SUBSCRIPTION_PLANS[selectedPlan as SubscriptionPlan].name}
+            </h3>
+            
+            <div className="space-y-4">
+              {/* Montant */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-sm text-blue-700 mb-1">Montant à payer</p>
+                <p className="text-2xl font-bold text-blue-900">
+                  {formatPrice(SUBSCRIPTION_PLANS[selectedPlan as SubscriptionPlan].price)}
+                </p>
+              </div>
+
+              {/* Instructions de paiement */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="font-medium text-gray-900 mb-2">Instructions de paiement :</p>
+                <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                  <li>Effectuez le virement bancaire</li>
+                  <li>Conservez le reçu de paiement</li>
+                  <li>Joignez le reçu ci-dessous (optionnel)</li>
+                  <li>Notre équipe validera votre abonnement</li>
+                </ol>
+              </div>
+
+              {/* Upload du reçu */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reçu de paiement (optionnel)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                  className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {receiptFile && (
+                  <p className="text-sm text-green-600 mt-2">
+                    ✓ {receiptFile.name}
+                  </p>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  onClick={() => {
+                    setSelectedPlan(null)
+                    setReceiptFile(null)
+                    setError(null)
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isSubscribing !== null || uploadingReceipt}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleConfirmSubscription}
+                  disabled={isSubscribing !== null || uploadingReceipt}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  {uploadingReceipt ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Upload...
+                    </div>
+                  ) : isSubscribing ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Traitement...
+                    </div>
+                  ) : (
+                    'Confirmer'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

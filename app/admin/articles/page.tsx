@@ -118,48 +118,46 @@ export default function AdminArticlesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-            <Newspaper className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestion des Articles</h1>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Articles</h1>
+          <p className="text-gray-500 text-sm mt-1">Gérer les articles et actualités</p>
         </div>
-        <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700 rounded-lg">
           <Plus className="w-4 h-4 mr-2" /> Nouvel Article
         </Button>
       </div>
 
       {showForm && (
-        <Card className="bg-white">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-gray-900">{editingArticle ? 'Modifier l\'article' : 'Nouvel article'}</CardTitle>
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">{editingArticle ? 'Modifier l\'article' : 'Nouvel article'}</h2>
             <Button variant="ghost" size="icon" onClick={resetForm}><X className="w-4 h-4" /></Button>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="p-5">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="title" className="text-gray-700">Titre</Label>
+                <Label htmlFor="title" className="text-sm font-medium text-gray-700">Titre</Label>
                 <Input 
                   id="title" 
                   value={formData.title} 
                   onChange={e => setFormData({...formData, title: e.target.value})} 
                   required 
-                  className="bg-white text-gray-900"
+                  className="mt-1 h-10 rounded-lg border-gray-300"
                 />
               </div>
               <div>
-                <Label htmlFor="description" className="text-gray-700">Description</Label>
+                <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
                 <textarea
                   id="description"
-                  className="w-full min-h-[100px] px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                  className="mt-1 w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
                   required
                 />
               </div>
               <div>
-                <Label className="text-gray-700">Image</Label>
-                <div className="flex gap-3 mt-2">
+                <Label className="text-sm font-medium text-gray-700">Image</Label>
+                <div className="flex gap-3 mt-1">
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -172,7 +170,7 @@ export default function AdminArticlesPage() {
                     variant="outline"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="flex-shrink-0"
+                    className="h-10 px-4 rounded-lg border-gray-300 flex-shrink-0"
                   >
                     {uploading ? (
                       <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2" />
@@ -185,7 +183,7 @@ export default function AdminArticlesPage() {
                     value={formData.image} 
                     onChange={e => setFormData({...formData, image: e.target.value})} 
                     placeholder="/articles/image.jpg"
-                    className="bg-white text-gray-900"
+                    className="h-10 rounded-lg border-gray-300"
                   />
                 </div>
                 {formData.image && (
@@ -200,58 +198,78 @@ export default function AdminArticlesPage() {
                   id="published"
                   checked={formData.published}
                   onChange={e => setFormData({...formData, published: e.target.checked})}
-                  className="w-4 h-4"
+                  className="w-4 h-4 rounded border-gray-300"
                 />
-                <Label htmlFor="published" className="text-gray-700">Publié</Label>
+                <Label htmlFor="published" className="text-sm text-gray-700">Publié</Label>
               </div>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              <Button type="submit" className="h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700">
                 {editingArticle ? 'Mettre à jour' : 'Créer'}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="flex justify-center py-12">
+          <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="grid gap-4">
-          {articles.map(article => (
-            <Card key={article.id} className={`bg-white ${!article.published ? 'opacity-60' : ''}`}>
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    {article.image ? (
-                      <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <ImageIcon className="w-8 h-8 text-gray-400" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">{article.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mt-1">{article.description}</p>
-                    <p className="text-xs text-gray-400 mt-2">{new Date(article.date).toLocaleDateString('fr-FR')}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => togglePublished(article)}>
-                      {article.published ? <Eye className="w-4 h-4 text-green-600" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(article)}>
-                      <Pencil className="w-4 h-4 text-blue-600" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(article.id)}>
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </Button>
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="divide-y divide-gray-100">
+            {articles.length === 0 ? (
+              <div className="text-center py-12">
+                <Newspaper className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 font-medium">Aucun article</p>
+                <p className="text-gray-500 text-sm mt-1">Créez votre premier article</p>
+              </div>
+            ) : (
+              articles.map(article => (
+                <div key={article.id} className={`p-4 hover:bg-gray-50 transition-colors ${!article.published ? 'opacity-60' : ''}`}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      {article.image ? (
+                        <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <ImageIcon className="w-8 h-8 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate">{article.title}</h3>
+                      <p className="text-sm text-gray-600 line-clamp-2 mt-1">{article.description}</p>
+                      <p className="text-xs text-gray-400 mt-2">{new Date(article.date).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => togglePublished(article)}
+                        className="h-9 w-9 rounded-lg"
+                      >
+                        {article.published ? <Eye className="w-4 h-4 text-green-600" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleEdit(article)}
+                        className="h-9 w-9 rounded-lg"
+                      >
+                        <Pencil className="w-4 h-4 text-blue-600" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDelete(article.id)}
+                        className="h-9 w-9 rounded-lg"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-          {articles.length === 0 && (
-            <p className="text-center text-gray-500 py-8">Aucun article</p>
-          )}
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { plan } = body as { plan: SubscriptionPlan }
+    const { plan, receiptUrl } = body as { plan: SubscriptionPlan; receiptUrl?: string }
 
     // Valider le plan
     if (!plan || !SUBSCRIPTION_PLANS[plan]) {
@@ -94,11 +94,11 @@ export async function POST(request: NextRequest) {
     }
 
     const subscriptionService = new SubscriptionService(supabaseAdmin)
-    const subscription = await subscriptionService.createSubscription(entreprise.id, plan)
+    const subscription = await subscriptionService.createSubscription(entreprise.id, plan, receiptUrl)
 
     return NextResponse.json({
       success: true,
-      message: 'Abonnement créé avec succès',
+      message: 'Demande d\'abonnement créée. En attente de validation après vérification du paiement.',
       subscription
     })
 

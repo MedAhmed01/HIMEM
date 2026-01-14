@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { JobOffer, ContractType } from '@/lib/types/database'
 import { 
   ArrowLeft, Plus, Briefcase, MapPin, Calendar, Eye, 
-  Edit, Trash2, AlertCircle, CheckCircle 
+  Edit, Trash2, AlertCircle, CheckCircle, Users 
 } from 'lucide-react'
 
 const CONTRACT_LABELS: Record<ContractType, string> = {
@@ -90,8 +90,8 @@ export default function EntrepriseOffresPage() {
   }
 
   const activeJobs = jobs.filter(j => j.is_active && !isExpired(j.deadline))
-  const remainingQuota = subscriptionInfo?.subscription?.remainingQuota || 0
-  const hasActiveSubscription = subscriptionInfo?.hasActiveSubscription
+  const remainingQuota = subscriptionInfo?.subscription?.remainingQuota ?? 0
+  const hasActiveSubscription = subscriptionInfo?.hasActiveSubscription ?? false
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,11 +102,18 @@ export default function EntrepriseOffresPage() {
             <ArrowLeft className="w-4 h-4" />
             Tableau de bord
           </Link>
-          {hasActiveSubscription && remainingQuota > 0 && (
+          {hasActiveSubscription && remainingQuota > 0 ? (
             <Link href="/entreprise/offres/nouvelle">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="w-4 h-4 mr-2" />
                 Nouvelle offre
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/entreprise/abonnement">
+              <Button className="bg-amber-600 hover:bg-amber-700">
+                <Plus className="w-4 h-4 mr-2" />
+                {hasActiveSubscription ? 'Augmenter mon quota' : 'Souscrire pour publier'}
               </Button>
             </Link>
           )}
@@ -197,12 +204,22 @@ export default function EntrepriseOffresPage() {
                           <Eye className="w-4 h-4" />
                           {job.views_count} vue{job.views_count > 1 ? 's' : ''}
                         </span>
+                        <span className="flex items-center gap-1 text-blue-600 font-medium">
+                          <Users className="w-4 h-4" />
+                          {job.applications_count || 0} candidature{(job.applications_count || 0) > 1 ? 's' : ''}
+                        </span>
                       </div>
 
                       <p className="text-gray-600 text-sm line-clamp-2">{job.description}</p>
                     </div>
 
                     <div className="flex items-center gap-2">
+                      <Link href={`/entreprise/offres/${job.id}/candidatures`}>
+                        <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                          <Users className="w-4 h-4 mr-1" />
+                          Candidatures
+                        </Button>
+                      </Link>
                       <Link href={`/entreprise/offres/${job.id}/modifier`}>
                         <Button variant="outline" size="sm">
                           <Edit className="w-4 h-4" />

@@ -5,9 +5,9 @@ export class SubscriptionService {
   constructor(private supabase: SupabaseClient) {}
 
   /**
-   * Créer un nouvel abonnement pour une entreprise
+   * Créer un nouvel abonnement pour une entreprise (en attente de paiement)
    */
-  async createSubscription(entrepriseId: string, plan: SubscriptionPlan): Promise<EntrepriseSubscription> {
+  async createSubscription(entrepriseId: string, plan: SubscriptionPlan, receiptUrl?: string): Promise<EntrepriseSubscription> {
     // Vérifier que l'entreprise est validée
     const { data: entreprise, error: entError } = await this.supabase
       .from('entreprises')
@@ -35,7 +35,7 @@ export class SubscriptionService {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + SUBSCRIPTION_PLANS[plan].duration)
 
-    // Créer le nouvel abonnement
+    // Créer le nouvel abonnement en attente
     const { data, error } = await this.supabase
       .from('entreprise_subscriptions')
       .insert({
@@ -43,7 +43,9 @@ export class SubscriptionService {
         plan,
         starts_at: startsAt.toISOString(),
         expires_at: expiresAt.toISOString(),
-        is_active: true
+        is_active: false, // Pas actif jusqu'à validation admin
+        payment_status: 'pending',
+        receipt_url: receiptUrl || null
       })
       .select()
       .single()
@@ -182,6 +184,97 @@ export class SubscriptionService {
       daysRemaining,
       usedQuota: planConfig.maxOffers === Infinity ? 0 : planConfig.maxOffers - remainingQuota
     }
+  }
+
+  /**
+   * Obtenir les abonnements en attente de validation
+   */
+  async getPendingSubscriptions() {
+    const { data, error } = await this.supabase
+      .from('entreprise_subscriptions')
+      .select(`
+        *,
+        entreprises (
+          id,
+          nom,
+          email,
+          telephone
+        )
+      `)
+      .eq('payment_status', 'pending')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      throw new Error('Erreur lors de la récupération des abonnements en attente')
+    }
+
+    return data || []
+  }
+
+  /**
+   * Valider un abonnement (admin)
+   */
+  async approveSubscription(subscriptionId: string, adminId: string, notes?: string) {
+    const { data, error } = await this.supabase
+      .from('entreprise_subscriptions')
+      .update({
+        is_active: true,
+        payment_status: 'verified',
+        verified_by: adminId,
+        verified_at: new Date().toISOString(),
+        admin_notes: notes || null
+      })
+      .eq('id', subscriptionId)
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error('Erreur lors de la validation de l\'abonnement: ' + error.message)
+    }
+
+    return data
+  }
+
+  /**
+   * Rejeter un abonnement (admin)
+   */
+  async rejectSubscription(subscriptionId: string, adminId: string, reason: string) {
+    const { data, error } = await this.supabase
+      .from('entreprise_subscriptions')
+      .update({
+        is_active: false,
+        payment_status: 'rejected',
+        verified_by: adminId,
+        verified_at: new Date().toISOString(),
+        admin_notes: reason
+      })
+      .eq('id', subscriptionId)
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error('Erreur lors du rejet de l\'abonnement: ' + error.message)
+    }
+
+    return data
+  }
+
+  /**
+   * Mettre à jour le reçu de paiement
+   */
+  async updateReceipt(subscriptionId: string, receiptUrl: string) {
+    const { data, error } = await this.supabase
+      .from('entreprise_subscriptions')
+      .update({ receipt_url: receiptUrl })
+      .eq('id', subscriptionId)
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error('Erreur lors de la mise à jour du reçu: ' + error.message)
+    }
+
+    return data
   }
 }
 

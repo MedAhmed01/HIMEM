@@ -120,6 +120,11 @@ export interface EntrepriseSubscription {
   starts_at: string
   expires_at: string
   is_active: boolean
+  payment_status: 'pending' | 'verified' | 'rejected'
+  receipt_url: string | null
+  admin_notes: string | null
+  verified_by: string | null
+  verified_at: string | null
   created_at: string
 }
 
@@ -135,6 +140,7 @@ export interface JobOffer {
   deadline: string
   is_active: boolean
   views_count: number
+  applications_count?: number
   created_at: string
   updated_at: string
 }
@@ -144,6 +150,18 @@ export interface JobView {
   job_id: string
   engineer_id: string
   viewed_at: string
+}
+
+export type ApplicationStatus = 'pending' | 'accepted' | 'rejected'
+
+export interface JobApplication {
+  id: string
+  job_id: string
+  engineer_id: string
+  status: ApplicationStatus
+  cover_letter: string | null
+  created_at: string
+  updated_at: string
 }
 
 // Database schema type

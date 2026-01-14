@@ -88,27 +88,27 @@ export default function IngenieursPage() {
     switch (status) {
       case 'validated':
         return (
-          <Badge className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 shadow-sm">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
             Validé
-          </Badge>
+          </span>
         )
       case 'pending_docs':
         return (
-          <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 shadow-sm">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
             Documents en attente
-          </Badge>
+          </span>
         )
       case 'pending_reference':
         return (
-          <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0 shadow-sm">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
             Parrainage en attente
-          </Badge>
+          </span>
         )
       case 'rejected':
         return (
-          <Badge className="bg-gradient-to-r from-red-500 to-rose-500 text-white border-0 shadow-sm">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
             Rejeté
-          </Badge>
+          </span>
         )
       default:
         return <Badge variant="outline">{status}</Badge>
@@ -139,188 +139,177 @@ export default function IngenieursPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-500 font-medium">Chargement...</p>
+          <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-gray-600 text-sm">Chargement...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-            <Users className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold gradient-text">Ingénieurs</h1>
-            <p className="text-slate-500">Liste de tous les ingénieurs inscrits</p>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Ingénieurs</h1>
+          <p className="text-gray-500 text-sm mt-1">Gérer tous les ingénieurs inscrits</p>
         </div>
         
         {/* Search */}
-        <div className="relative w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             type="text"
-            placeholder="Rechercher..."
+            placeholder="Rechercher par nom, NNI ou email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-xl border-2 border-slate-200 focus:border-indigo-400"
+            className="pl-10 h-10 text-sm rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
         </div>
       </div>
 
       {/* Success/Error Message */}
       {message && (
-        <div className={`flex items-center gap-3 p-4 rounded-2xl border ${
+        <div className={`flex items-center gap-3 p-4 rounded-lg border ${
           message.type === 'success' 
-            ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200' 
-            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+            ? 'bg-green-50 border-green-200' 
+            : 'bg-red-50 border-red-200'
         }`}>
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-            message.type === 'success'
-              ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
-              : 'bg-gradient-to-br from-red-500 to-pink-500'
-          }`}>
-            {message.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-white" />
-            ) : (
-              <AlertCircle className="w-5 h-5 text-white" />
-            )}
-          </div>
-          <p className={`${message.type === 'success' ? 'text-emerald-600' : 'text-red-600'} font-medium`}>
+          {message.type === 'success' ? (
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+          )}
+          <p className={`${message.type === 'success' ? 'text-green-800' : 'text-red-800'} text-sm flex-1`}>
             {message.text}
           </p>
           <button 
             onClick={() => setMessage(null)}
-            className={`ml-auto ${message.type === 'success' ? 'text-emerald-400 hover:text-emerald-600' : 'text-red-400 hover:text-red-600'} text-xl`}
+            className={`${message.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'}`}
           >
-            ×
+            <X className="w-5 h-5" />
           </button>
         </div>
       )}
 
       {/* Engineers List */}
-      <Card className="glass border-0 shadow-xl overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shadow-md">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              Tous les ingénieurs ({filteredEngineers.length})
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-gray-700">
+              {filteredEngineers.length} ingénieur{filteredEngineers.length !== 1 ? 's' : ''}
+            </h2>
+          </div>
+        </div>
+
+        <div className="divide-y divide-gray-100">
           {filteredEngineers.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center mx-auto mb-6">
-                <Users className="w-12 h-12 text-slate-300" />
-              </div>
-              <p className="text-slate-600 font-semibold text-lg">Aucun ingénieur trouvé</p>
-              <p className="text-slate-400 mt-2">
-                {searchQuery ? 'Essayez avec d\'autres termes de recherche' : 'Aucun ingénieur inscrit pour le moment'}
+            <div className="text-center py-12">
+              <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-600 font-medium">Aucun ingénieur trouvé</p>
+              <p className="text-gray-400 text-sm mt-1">
+                {searchQuery ? 'Essayez avec d\'autres termes de recherche' : 'Aucun ingénieur inscrit'}
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {filteredEngineers.map((engineer) => (
-                <div
-                  key={engineer.id}
-                  className="rounded-2xl border border-slate-100 bg-gradient-to-r from-white to-slate-50 p-5 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between gap-6">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md flex-shrink-0">
-                        <span className="text-white font-bold text-xl">{engineer.full_name.charAt(0)}</span>
-                      </div>
-                      
+            filteredEngineers.map((engineer) => (
+              <div
+                key={engineer.id}
+                className="p-4 hover:bg-gray-50 transition-colors"
+              >
+                {/* Mobile Layout */}
+                <div className="flex items-start gap-3">
+                  {/* Avatar */}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-semibold text-lg">
+                      {engineer.full_name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Name and Status */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-bold text-lg text-slate-900">{engineer.full_name}</h3>
-                          {getStatusBadge(engineer.status)}
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <span className="font-medium text-slate-700">NNI:</span>
-                            {engineer.nni}
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <Mail className="w-4 h-4" />
-                            <span className="truncate">{engineer.email}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <Phone className="w-4 h-4" />
-                            {engineer.phone}
-                          </div>
-                          <div className="flex items-center gap-2 text-slate-500">
-                            <Calendar className="w-4 h-4" />
-                            Exp: {formatDate(engineer.subscription_expiry)}
-                          </div>
-                        </div>
+                        <h3 className="font-semibold text-gray-900 text-base truncate">
+                          {engineer.full_name}
+                        </h3>
+                        <p className="text-sm text-gray-500">NNI: {engineer.nni}</p>
+                      </div>
+                      {getStatusBadge(engineer.status)}
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="space-y-1 mb-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="truncate">{engineer.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span>{engineer.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span>Exp: {formatDate(engineer.subscription_expiry)}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      {/* Subscription Status */}
+                    {/* Actions */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Subscription Status Badge */}
                       {isSubscriptionActive(engineer.subscription_expiry) ? (
-                        <Badge className="bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 border-0 px-3 py-1.5">
-                          <Check className="w-3.5 h-3.5 mr-1" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-green-100 text-green-700 text-xs font-medium">
+                          <Check className="w-3.5 h-3.5" />
                           À jour
-                        </Badge>
+                        </span>
                       ) : (
-                        <Badge className="bg-gradient-to-r from-red-100 to-rose-100 text-red-700 border-0 px-3 py-1.5">
-                          <X className="w-3.5 h-3.5 mr-1" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-red-100 text-red-700 text-xs font-medium">
+                          <X className="w-3.5 h-3.5" />
                           Non payé
-                        </Badge>
+                        </span>
                       )}
 
                       {/* Change Password Button */}
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                        className="h-8 px-3 text-xs rounded-md border-gray-300 hover:bg-gray-50"
                         onClick={() => handleChangePassword(engineer.id, engineer.full_name)}
-                        title="Modifier le mot de passe"
                       >
-                        <Key className="w-4 h-4" />
+                        <Key className="w-3.5 h-3.5 mr-1.5" />
+                        Mot de passe
                       </Button>
 
-                      {/* Action Button */}
+                      {/* Activate/Deactivate Button */}
                       {!isSubscriptionActive(engineer.subscription_expiry) ? (
                         <Button
                           size="sm"
-                          className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 shadow-md"
+                          className="h-8 px-3 text-xs rounded-md bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => handleSubscription(engineer.id, 'activate')}
                         >
-                          <Check className="w-4 h-4 mr-1" />
-                          Activer (1 an)
+                          <Check className="w-3.5 h-3.5 mr-1.5" />
+                          Activer
                         </Button>
                       ) : (
                         <Button
                           size="sm"
                           variant="outline"
-                          className="rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50"
+                          className="h-8 px-3 text-xs rounded-md border-red-300 text-red-600 hover:bg-red-50"
                           onClick={() => handleSubscription(engineer.id, 'deactivate')}
                         >
-                          <X className="w-4 h-4 mr-1" />
+                          <X className="w-3.5 h-3.5 mr-1.5" />
                           Désactiver
                         </Button>
                       )}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Change Password Modal */}
       <ChangePasswordModal

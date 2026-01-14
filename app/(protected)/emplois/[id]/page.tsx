@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { JobOfferWithEntreprise, Domain, ContractType } from '@/lib/types/database'
 import { 
   ArrowLeft, Building2, MapPin, Calendar, Mail, Phone,
-  Briefcase, Clock, DollarSign, AlertCircle, Lock
+  Briefcase, Clock, DollarSign, AlertCircle, Lock, Send, CheckCircle
 } from 'lucide-react'
 
 const DOMAINS: { value: Domain; label: string }[] = [
@@ -34,6 +34,11 @@ export default function JobDetailPage() {
   const [showContacts, setShowContacts] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showApplicationModal, setShowApplicationModal] = useState(false)
+  const [coverLetter, setCoverLetter] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [applicationStatus, setApplicationStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [hasApplied, setHasApplied] = useState(false)
 
   useEffect(() => {
     if (jobId) {
@@ -52,6 +57,7 @@ export default function JobDetailPage() {
       
       setJob(data.job)
       setShowContacts(data.showContacts)
+      setHasApplied(data.hasApplied || false)
 
       // Enregistrer la vue
       await fetch(`/api/jobs/${jobId}/view`, { method: 'POST' })
@@ -60,6 +66,37 @@ export default function JobDetailPage() {
       setError(err.message)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleApply = async () => {
+    setIsSubmitting(true)
+    setApplicationStatus('idle')
+    
+    try {
+      const response = await fetch(`/api/jobs/${jobId}/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coverLetter })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la candidature')
+      }
+
+      setApplicationStatus('success')
+      setHasApplied(true)
+      setTimeout(() => {
+        setShowApplicationModal(false)
+        setCoverLetter('')
+      }, 2000)
+    } catch (err: any) {
+      setApplicationStatus('error')
+      setError(err.message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -195,50 +232,64 @@ export default function JobDetailPage() {
             {/* Contact */}
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Contact</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">Postuler</h3>
                 
-                {showContacts ? (
-                  <div className="space-y-3">
-                    {job.entreprise?.email && (
-                      <a 
-                        href={`mailto:${job.entreprise.email}`}
-                        className="flex items-center gap-3 text-blue-600 hover:text-blue-700"
-                      >
-                        <Mail className="w-5 h-5" />
-                        <span>{job.entreprise.email}</span>
-                      </a>
-                    )}
-                    {job.entreprise?.phone && (
-                      <a 
-                        href={`tel:${job.entreprise.phone}`}
-                        className="flex items-center gap-3 text-blue-600 hover:text-blue-700"
-                      >
-                        <Phone className="w-5 h-5" />
-                        <span>{job.entreprise.phone}</span>
-                      </a>
-                    )}
-                    <p className="text-sm text-gray-500 mt-4">
-                      Envoyez votre CV directement à l'entreprise
-                    </p>
-                  </div>
-                ) : (
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                {hasApplied ? (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                      <Lock className="w-5 h-5 text-amber-600 mt-0.5" />
+                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                       <div>
-                        <p className="font-medium text-amber-900">Accès restreint</p>
-                        <p className="text-amber-700 text-sm mt-1">
-                          Les coordonnées de l'entreprise sont réservées aux membres à jour de cotisation.
+                        <p className="font-medium text-green-900">Candidature envoyée</p>
+                        <p className="text-green-700 text-sm mt-1">
+                          Vous avez déjà postulé à cette offre. L'entreprise examinera votre candidature.
                         </p>
-                        <Link href="/tableau-de-bord">
-                          <Button size="sm" className="mt-3 bg-amber-600 hover:bg-amber-700">
-                            Renouveler ma cotisation
-                          </Button>
-                        </Link>
                       </div>
                     </div>
                   </div>
+                ) : (
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setShowApplicationModal(true)}
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Postuler à cette offre
+                  </Button>
                 )}
+
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3">Contact direct</h4>
+                  {showContacts ? (
+                    <div className="space-y-3">
+                      {job.entreprise?.email && (
+                        <a 
+                          href={`mailto:${job.entreprise.email}`}
+                          className="flex items-center gap-3 text-blue-600 hover:text-blue-700"
+                        >
+                          <Mail className="w-5 h-5" />
+                          <span className="text-sm">{job.entreprise.email}</span>
+                        </a>
+                      )}
+                      {job.entreprise?.phone && (
+                        <a 
+                          href={`tel:${job.entreprise.phone}`}
+                          className="flex items-center gap-3 text-blue-600 hover:text-blue-700"
+                        >
+                          <Phone className="w-5 h-5" />
+                          <span className="text-sm">{job.entreprise.phone}</span>
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <Lock className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-amber-700 text-xs">
+                          Coordonnées réservées aux membres à jour de cotisation
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -270,6 +321,89 @@ export default function JobDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Application Modal */}
+      {showApplicationModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <CardContent className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Postuler à cette offre</h2>
+              
+              {applicationStatus === 'success' ? (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+                  <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-green-900 mb-2">Candidature envoyée !</h3>
+                  <p className="text-green-700">
+                    Votre candidature a été transmise à l'entreprise. Vous serez contacté si votre profil correspond.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-2">{job?.title}</h3>
+                    <p className="text-gray-600">{job?.entreprise?.name}</p>
+                  </div>
+
+                  {error && applicationStatus === 'error' && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 flex items-center gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                      <p className="text-red-700">{error}</p>
+                    </div>
+                  )}
+
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Lettre de motivation (optionnelle)
+                    </label>
+                    <textarea
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                      placeholder="Expliquez pourquoi vous êtes intéressé par ce poste..."
+                      className="w-full h-40 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      disabled={isSubmitting}
+                    />
+                    <p className="text-sm text-gray-500 mt-2">
+                      Votre profil complet (CV, expérience, spécialisation) sera automatiquement envoyé avec votre candidature.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowApplicationModal(false)
+                        setCoverLetter('')
+                        setApplicationStatus('idle')
+                      }}
+                      disabled={isSubmitting}
+                      className="flex-1"
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      onClick={handleApply}
+                      disabled={isSubmitting}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Envoi en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Envoyer ma candidature
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

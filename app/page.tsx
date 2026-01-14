@@ -13,20 +13,20 @@ export default function Home() {
       
       <main className="flex-1">
         {/* Search Section - Right after sponsors */}
-        <section className="py-8 bg-gray-50 border-b border-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 shadow-sm">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
+        <section className="py-3 sm:py-5 md:py-6 bg-gray-50 border-b border-gray-100">
+          <div className="container mx-auto">
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white rounded-lg md:rounded-xl border border-gray-200 p-3 sm:p-4 md:p-6 shadow-sm">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   </div>
-                  <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 truncate">
                       Vérifier un Ingénieur
                     </h2>
-                    <p className="text-gray-600 text-sm">
-                      Recherchez par NNI ou nom pour vérifier le statut d'agrément
+                    <p className="text-gray-600 text-xs mt-0.5">
+                      Recherchez par NNI ou nom
                     </p>
                   </div>
                 </div>
@@ -40,36 +40,36 @@ export default function Home() {
         <LatestArticles />
 
         {/* Hero Section */}
-        <section className="py-20 lg:py-28">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
+        <section className="py-10 sm:py-14 md:py-16 lg:py-20">
+          <div className="container mx-auto">
+            <div className="max-w-3xl mx-auto text-center px-2">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-8">
-                <Sparkles className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-semibold text-blue-700">Plateforme Officielle</span>
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-50 border border-blue-200 mb-5 sm:mb-6 md:mb-8">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+                <span className="text-xs sm:text-sm font-semibold text-blue-700">Plateforme Officielle</span>
+                <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500 fill-yellow-500" />
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-900">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-5 md:mb-6 leading-tight text-gray-900 px-2">
                 L'Ordre Mauritanien des{' '}
                 <span className="text-blue-600">Ingénieurs en Génie Civil</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed px-2">
                 La plateforme digitale officielle pour la gestion, la vérification et l'accompagnement des ingénieurs en génie civil en Mauritanie.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/inscription">
-                  <Button className="h-14 px-8 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-                    <Sparkles className="w-5 h-5 mr-2" />
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2">
+                <Link href="/inscription" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto h-11 sm:h-12 md:h-13 px-5 sm:px-6 md:px-8 text-sm sm:text-base rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                    <Sparkles className="w-4 h-4 sm:w-4.5 sm:h-4.5 mr-2" />
                     Rejoindre l'OMIGEC
                   </Button>
                 </Link>
-                <Link href="/connexion">
-                  <Button variant="outline" className="h-14 px-8 text-lg rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">
+                <Link href="/connexion" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-12 md:h-13 px-5 sm:px-6 md:px-8 text-sm sm:text-base rounded-lg sm:rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">
                     Se connecter
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 ml-2" />
                   </Button>
                 </Link>
               </div>
@@ -78,22 +78,22 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-4">
-                <Star className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">Nos Services</span>
+        <section className="py-10 sm:py-14 md:py-16 lg:py-20 bg-gray-50">
+          <div className="container mx-auto">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-50 border border-blue-200 mb-3 sm:mb-4">
+                <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+                <span className="text-xs sm:text-sm font-medium text-blue-700">Nos Services</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
                 Une plateforme complète
               </h2>
-              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto">
                 Tout ce dont vous avez besoin pour gérer votre carrière d'ingénieur
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-6xl mx-auto">
               {[
                 { icon: CheckCircle, title: 'Inscription', desc: 'Inscrivez-vous en ligne et soumettez vos documents facilement', color: 'bg-blue-600' },
                 { icon: Users, title: 'Validation', desc: 'Système de parrainage par des ingénieurs agréés', color: 'bg-purple-600' },
@@ -102,13 +102,13 @@ export default function Home() {
               ].map((item, index) => (
                 <div 
                   key={index}
-                  className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-lg transition-all hover:-translate-y-1"
                 >
-                  <div className={`w-14 h-14 rounded-xl ${item.color} flex items-center justify-center mb-5`}>
-                    <item.icon className="w-7 h-7 text-white" />
+                  <div className={`w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-lg sm:rounded-xl ${item.color} flex items-center justify-center mb-3 sm:mb-4`}>
+                    <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.desc}</p>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1.5 sm:mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -116,18 +116,18 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-blue-600">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+        <section className="py-10 sm:py-14 md:py-16 lg:py-20 bg-gradient-to-br from-blue-600 to-blue-700">
+          <div className="container mx-auto text-center px-2">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 md:mb-6 px-2">
               Prêt à rejoindre l'OMIGEC ?
             </h2>
-            <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-blue-100 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto px-2 leading-relaxed">
               Inscrivez-vous dès maintenant et faites partie de l'ordre professionnel des ingénieurs en génie civil
             </p>
             <Link href="/inscription">
-              <Button className="h-14 px-10 text-lg rounded-xl bg-white text-blue-600 hover:bg-blue-50 font-semibold">
+              <Button className="h-11 sm:h-12 md:h-13 px-6 sm:px-8 md:px-10 text-sm sm:text-base rounded-lg sm:rounded-xl bg-white text-blue-600 hover:bg-blue-50 font-semibold shadow-lg hover:shadow-xl transition-all">
                 Commencer l'inscription
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
             </Link>
           </div>

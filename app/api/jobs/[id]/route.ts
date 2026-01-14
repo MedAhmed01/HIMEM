@@ -29,6 +29,7 @@ export async function GET(
     // Vérifier si l'utilisateur est un ingénieur actif pour afficher les contacts
     const { data: { user } } = await supabase.auth.getUser()
     let showContacts = false
+    let hasApplied = false
 
     if (user) {
       const { data: profile } = await supabaseAdmin
@@ -43,6 +44,16 @@ export async function GET(
           new Date(profile.subscription_expiry) > new Date()
         showContacts = isActive
       }
+
+      // Vérifier si l'ingénieur a déjà postulé
+      const { data: application } = await supabaseAdmin
+        .from('job_applications')
+        .select('id')
+        .eq('job_id', id)
+        .eq('engineer_id', user.id)
+        .single()
+
+      hasApplied = !!application
 
       // Ou si c'est l'entreprise propriétaire
       const { data: entreprise } = await supabaseAdmin
@@ -65,7 +76,7 @@ export async function GET(
       } as any
     }
 
-    return NextResponse.json({ job, showContacts })
+    return NextResponse.json({ job, showContacts, hasApplied })
 
   } catch (error: any) {
     console.error('Get job error:', error)

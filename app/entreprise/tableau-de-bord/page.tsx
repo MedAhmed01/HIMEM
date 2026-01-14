@@ -83,9 +83,9 @@ export default function EntrepriseTableauDeBordPage() {
 
   const activeJobs = jobs.filter(j => j.is_active && new Date(j.deadline) > new Date())
   const totalViews = jobs.reduce((sum, j) => sum + j.views_count, 0)
-  const hasActiveSubscription = subscriptionInfo?.hasActiveSubscription
-  const daysRemaining = subscriptionInfo?.subscription?.daysRemaining || 0
-  const remainingQuota = subscriptionInfo?.subscription?.remainingQuota || 0
+  const hasActiveSubscription = subscriptionInfo?.hasActiveSubscription ?? false
+  const daysRemaining = subscriptionInfo?.subscription?.daysRemaining ?? 0
+  const remainingQuota = subscriptionInfo?.subscription?.remainingQuota ?? 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -236,9 +236,15 @@ export default function EntrepriseTableauDeBordPage() {
                   <Link href="/entreprise/offres" className="flex-1">
                     <Button variant="outline" className="w-full">Voir mes offres</Button>
                   </Link>
-                  {hasActiveSubscription && remainingQuota > 0 && (
+                  {hasActiveSubscription && remainingQuota > 0 ? (
                     <Link href="/entreprise/offres/nouvelle">
                       <Button className="bg-blue-600 hover:bg-blue-700">
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/entreprise/abonnement">
+                      <Button className="bg-amber-600 hover:bg-amber-700">
                         <Plus className="w-4 h-4" />
                       </Button>
                     </Link>

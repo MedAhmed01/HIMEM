@@ -74,113 +74,85 @@ const quickActions = [
 
 export default function AdminDashboardPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center shadow-primary">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold gradient-text">Tableau de bord</h1>
-              <p className="text-slate-500">Vue d'ensemble de la plateforme OMIGEC</p>
-            </div>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tableau de bord</h1>
+          <p className="text-gray-500 text-sm mt-1">Vue d'ensemble de la plateforme OMIGEC</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border border-blue-100">
-          <Clock className="w-4 h-4 text-blue-500" />
-          <span className="text-sm text-blue-600 font-medium">
-            {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
+          <Clock className="w-4 h-4 text-blue-600" />
+          <span className="text-xs text-blue-700 font-medium">
+            {new Date().toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}
           </span>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Card key={index} className="glass border-0 shadow-xl overflow-hidden card-hover">
-              <div className={`h-1.5 bg-gradient-to-r ${stat.color}`}></div>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">{stat.title}</p>
-                    <p className="text-4xl font-bold text-slate-900">{stat.value}</p>
-                    <p className="text-xs text-slate-400 mt-1">{stat.subtitle}</p>
-                  </div>
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg ${stat.shadowColor}`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
+            <div key={index} className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between mb-3">
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
+              <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
+            </div>
           )
         })}
       </div>
 
       {/* Quick Actions */}
-      <Card className="glass border-0 shadow-xl overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shadow-md">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            Actions rapides
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Actions rapides</h2>
+        </div>
+        <div className="p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {quickActions.map((action, index) => {
               const Icon = action.icon
               return (
                 <Link
                   key={index}
                   href={action.href}
-                  className="group p-5 rounded-2xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300"
+                  className="group flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
-                        {action.title}
-                        <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                      </h3>
-                      <p className="text-sm text-slate-500 mt-1">{action.description}</p>
-                    </div>
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center gap-2 text-sm">
+                      <span className="truncate">{action.title}</span>
+                      <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all flex-shrink-0" />
+                    </h3>
+                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">{action.description}</p>
                   </div>
                 </Link>
               )
             })}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Recent Activity Placeholder */}
-      <Card className="glass border-0 shadow-xl overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-cyan-500 to-blue-500"></div>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-md">
-              <Clock className="w-5 h-5 text-white" />
-            </div>
-            Activité récente
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      {/* Recent Activity */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Activité récente</h2>
+        </div>
+        <div className="p-5">
           <div className="text-center py-12">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-10 h-10 text-slate-300" />
-            </div>
-            <p className="text-slate-500 font-medium">Aucune activité récente</p>
-            <p className="text-sm text-slate-400 mt-1">Les dernières actions apparaîtront ici</p>
+            <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-600 font-medium">Aucune activité récente</p>
+            <p className="text-sm text-gray-500 mt-1">Les dernières actions apparaîtront ici</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
