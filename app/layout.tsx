@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 // Using system fonts as fallback until Aljazeera font files are added
 // To add Aljazeera font: Place font files in public/fonts/ directory
@@ -47,7 +48,9 @@ export default function RootLayout({
         className={`${geistMono.variable} antialiased font-sans`}
         style={{ fontFamily: 'Arial, sans-serif' }}
       >
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

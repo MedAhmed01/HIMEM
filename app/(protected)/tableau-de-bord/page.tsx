@@ -20,6 +20,8 @@ import {
   Calendar,
   Languages
 } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { LanguageToggle } from '@/components/LanguageToggle'
 
 interface ProfileData {
   full_name: string
@@ -31,67 +33,10 @@ interface ProfileData {
   profile_image_url?: string
 }
 
-const translations = {
-  fr: {
-    welcome: 'Bienvenue',
-    personalSpace: 'Votre espace personnel OMIGEC',
-    fullName: 'Nom complet',
-    gradYear: 'Année de diplôme',
-    experience: 'Expérience',
-    years: 'ans',
-    status: 'Statut',
-    active: 'Actif',
-    subscriptionValid: 'Cotisation valide jusqu\'au',
-    quickActions: 'Actions rapides',
-    myProfile: 'Mon Profil',
-    manageInfo: 'Gérer mes infos',
-    myDocuments: 'Mes Documents',
-    myFiles: 'Mes fichiers',
-    subscription: 'Cotisation',
-    pay: 'Payer',
-    jobOffers: 'Offres d\'emploi',
-    opportunities: 'Opportunités',
-    applications: 'Candidatures',
-    myApplications: 'Mes postulations',
-    adminPanel: 'Accéder au panneau admin',
-    loading: 'Chargement...'
-  },
-  ar: {
-    welcome: 'مرحبا',
-    personalSpace: 'مساحتك الشخصية OMIGEC',
-    fullName: 'الاسم الكامل',
-    gradYear: 'سنة التخرج',
-    experience: 'الخبرة',
-    years: 'سنوات',
-    status: 'الحالة',
-    active: 'نشط',
-    subscriptionValid: 'الاشتراك صالح حتى',
-    quickActions: 'إجراءات سريعة',
-    myProfile: 'ملفي الشخصي',
-    manageInfo: 'إدارة معلوماتي',
-    myDocuments: 'مستنداتي',
-    myFiles: 'ملفاتي',
-    subscription: 'الاشتراك',
-    pay: 'دفع',
-    jobOffers: 'عروض العمل',
-    opportunities: 'الفرص',
-    applications: 'الطلبات',
-    myApplications: 'طلباتي',
-    adminPanel: 'الوصول إلى لوحة الإدارة',
-    loading: 'جاري التحميل...'
-  }
-}
-
 export default function TableauDeBordPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [language, setLanguage] = useState<'fr' | 'ar'>('fr')
-
-  const t = translations[language]
-
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'fr' ? 'ar' : 'fr')
-  }
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     loadProfile()
@@ -127,7 +72,7 @@ export default function TableauDeBordPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">{t.loading}</p>
+          <p className="text-slate-600 font-medium">{t.dashboard.loading}</p>
         </div>
       </div>
     )
@@ -155,21 +100,13 @@ export default function TableauDeBordPage() {
             </Avatar>
             <div>
               <h1 className="text-xl sm:text-3xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                {t.welcome}{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}
+                {t.dashboard.welcome}{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}
               </h1>
-              <p className="text-sm sm:text-base text-slate-500 group-hover:text-slate-600 transition-colors">{t.personalSpace}</p>
+              <p className="text-sm sm:text-base text-slate-500 group-hover:text-slate-600 transition-colors">{t.dashboard.personalSpace}</p>
             </div>
           </Link>
           
-          <Button 
-            onClick={toggleLanguage}
-            variant="outline" 
-            size="sm"
-            className="rounded-xl border-2 gap-2"
-          >
-            <Languages className="w-4 h-4" />
-            {language === 'fr' ? 'العربية' : 'Français'}
-          </Button>
+          <LanguageToggle />
         </div>
 
         {/* Profile Info Card */}
@@ -178,28 +115,28 @@ export default function TableauDeBordPage() {
           <CardContent className="pt-6 pb-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">{t.fullName}</p>
+                <p className="text-xs text-slate-500 font-medium">{t.dashboard.fullName}</p>
                 <p className="text-sm sm:text-base font-semibold text-slate-900">{profile?.full_name || '-'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">{t.gradYear}</p>
+                <p className="text-xs text-slate-500 font-medium">{t.dashboard.gradYear}</p>
                 <p className="text-sm sm:text-base font-semibold text-slate-900">{profile?.grad_year || '-'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">{t.experience}</p>
-                <p className="text-sm sm:text-base font-semibold text-slate-900">{yearsOfExperience} {t.years}</p>
+                <p className="text-xs text-slate-500 font-medium">{t.dashboard.experience}</p>
+                <p className="text-sm sm:text-base font-semibold text-slate-900">{yearsOfExperience} {t.dashboard.years}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">{t.status}</p>
+                <p className="text-xs text-slate-500 font-medium">{t.dashboard.status}</p>
                 <span className="inline-flex px-2.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 text-xs font-medium">
-                  {profile?.status === 'valide' ? t.active : profile?.status || '-'}
+                  {profile?.status === 'valide' ? t.dashboard.active : profile?.status || '-'}
                 </span>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-500 font-medium">{t.subscriptionValid}</p>
+                  <p className="text-xs text-slate-500 font-medium">{t.dashboard.subscriptionValid}</p>
                   <p className="text-sm sm:text-base font-semibold text-slate-900">31 {language === 'ar' ? 'ديسمبر' : 'décembre'} 2026</p>
                 </div>
               </div>
@@ -215,7 +152,7 @@ export default function TableauDeBordPage() {
               <div className="w-8 h-8 rounded-xl gradient-bg flex items-center justify-center shadow-md">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              {t.quickActions}
+              {t.dashboard.quickActions}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -226,9 +163,9 @@ export default function TableauDeBordPage() {
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors">
-                    {t.myProfile}
+                    {t.dashboard.myProfile}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{t.manageInfo}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.manageInfo}</p>
                 </div>
               </Link>
 
@@ -238,9 +175,9 @@ export default function TableauDeBordPage() {
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-pink-600 transition-colors">
-                    {t.myDocuments}
+                    {t.dashboard.myDocuments}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{t.myFiles}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.myFiles}</p>
                 </div>
               </Link>
 
@@ -250,9 +187,9 @@ export default function TableauDeBordPage() {
                     <CreditCard className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-emerald-600 transition-colors">
-                    {t.subscription}
+                    {t.dashboard.subscription}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{t.pay}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.pay}</p>
                 </div>
               </Link>
 
@@ -262,9 +199,9 @@ export default function TableauDeBordPage() {
                     <Briefcase className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-cyan-600 transition-colors">
-                    {t.jobOffers}
+                    {t.dashboard.jobOffers}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{t.opportunities}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.opportunities}</p>
                 </div>
               </Link>
 
@@ -274,9 +211,9 @@ export default function TableauDeBordPage() {
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
-                    {t.applications}
+                    {t.dashboard.applications}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{t.myApplications}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.myApplications}</p>
                 </div>
               </Link>
             </div>
@@ -288,7 +225,7 @@ export default function TableauDeBordPage() {
           <div className="text-center">
             <Link href="/admin" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
               <Settings className="w-4 h-4" />
-              {t.adminPanel}
+              {t.dashboard.adminPanel}
             </Link>
           </div>
         )}

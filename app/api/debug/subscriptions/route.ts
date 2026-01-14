@@ -47,9 +47,16 @@ export async function GET() {
       .order('created_at', { ascending: false })
 
     // Vérifier la structure de la table
-    const { data: tableInfo, error: tableError } = await supabaseAdmin
-      .rpc('get_table_columns', { table_name: 'entreprise_subscriptions' })
-      .catch(() => ({ data: null, error: 'RPC not available' }))
+    let tableInfo = null
+    let tableError = null
+    try {
+      const result = await supabaseAdmin
+        .rpc('get_table_columns', { table_name: 'entreprise_subscriptions' })
+      tableInfo = result.data
+      tableError = result.error
+    } catch (e) {
+      tableError = 'RPC not available'
+    }
 
     return NextResponse.json({
       user: {
