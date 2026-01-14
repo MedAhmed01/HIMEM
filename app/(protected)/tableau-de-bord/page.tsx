@@ -17,7 +17,8 @@ import {
   ArrowRight,
   Sparkles,
   Award,
-  Calendar
+  Calendar,
+  Languages
 } from 'lucide-react'
 
 interface ProfileData {
@@ -30,9 +31,67 @@ interface ProfileData {
   profile_image_url?: string
 }
 
+const translations = {
+  fr: {
+    welcome: 'Bienvenue',
+    personalSpace: 'Votre espace personnel OMIGEC',
+    fullName: 'Nom complet',
+    gradYear: 'Année de diplôme',
+    experience: 'Expérience',
+    years: 'ans',
+    status: 'Statut',
+    active: 'Actif',
+    subscriptionValid: 'Cotisation valide jusqu\'au',
+    quickActions: 'Actions rapides',
+    myProfile: 'Mon Profil',
+    manageInfo: 'Gérer mes infos',
+    myDocuments: 'Mes Documents',
+    myFiles: 'Mes fichiers',
+    subscription: 'Cotisation',
+    pay: 'Payer',
+    jobOffers: 'Offres d\'emploi',
+    opportunities: 'Opportunités',
+    applications: 'Candidatures',
+    myApplications: 'Mes postulations',
+    adminPanel: 'Accéder au panneau admin',
+    loading: 'Chargement...'
+  },
+  ar: {
+    welcome: 'مرحبا',
+    personalSpace: 'مساحتك الشخصية OMIGEC',
+    fullName: 'الاسم الكامل',
+    gradYear: 'سنة التخرج',
+    experience: 'الخبرة',
+    years: 'سنوات',
+    status: 'الحالة',
+    active: 'نشط',
+    subscriptionValid: 'الاشتراك صالح حتى',
+    quickActions: 'إجراءات سريعة',
+    myProfile: 'ملفي الشخصي',
+    manageInfo: 'إدارة معلوماتي',
+    myDocuments: 'مستنداتي',
+    myFiles: 'ملفاتي',
+    subscription: 'الاشتراك',
+    pay: 'دفع',
+    jobOffers: 'عروض العمل',
+    opportunities: 'الفرص',
+    applications: 'الطلبات',
+    myApplications: 'طلباتي',
+    adminPanel: 'الوصول إلى لوحة الإدارة',
+    loading: 'جاري التحميل...'
+  }
+}
+
 export default function TableauDeBordPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [language, setLanguage] = useState<'fr' | 'ar'>('fr')
+
+  const t = translations[language]
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'fr' ? 'ar' : 'fr')
+  }
 
   useEffect(() => {
     loadProfile()
@@ -68,7 +127,7 @@ export default function TableauDeBordPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 font-medium">Chargement...</p>
+          <p className="text-slate-600 font-medium">{t.loading}</p>
         </div>
       </div>
     )
@@ -79,7 +138,7 @@ export default function TableauDeBordPage() {
   const sponsorshipsCount = profile?.sponsorships_count || 0
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className={`min-h-screen py-8 px-4 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -96,11 +155,21 @@ export default function TableauDeBordPage() {
             </Avatar>
             <div>
               <h1 className="text-xl sm:text-3xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                Bienvenue{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}
+                {t.welcome}{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}
               </h1>
-              <p className="text-sm sm:text-base text-slate-500 group-hover:text-slate-600 transition-colors">Votre espace personnel OMIGEC</p>
+              <p className="text-sm sm:text-base text-slate-500 group-hover:text-slate-600 transition-colors">{t.personalSpace}</p>
             </div>
           </Link>
+          
+          <Button 
+            onClick={toggleLanguage}
+            variant="outline" 
+            size="sm"
+            className="rounded-xl border-2 gap-2"
+          >
+            <Languages className="w-4 h-4" />
+            {language === 'fr' ? 'العربية' : 'Français'}
+          </Button>
         </div>
 
         {/* Profile Info Card */}
@@ -109,29 +178,29 @@ export default function TableauDeBordPage() {
           <CardContent className="pt-6 pb-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Nom complet</p>
+                <p className="text-xs text-slate-500 font-medium">{t.fullName}</p>
                 <p className="text-sm sm:text-base font-semibold text-slate-900">{profile?.full_name || '-'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Année de diplôme</p>
+                <p className="text-xs text-slate-500 font-medium">{t.gradYear}</p>
                 <p className="text-sm sm:text-base font-semibold text-slate-900">{profile?.grad_year || '-'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Expérience</p>
-                <p className="text-sm sm:text-base font-semibold text-slate-900">{yearsOfExperience} ans</p>
+                <p className="text-xs text-slate-500 font-medium">{t.experience}</p>
+                <p className="text-sm sm:text-base font-semibold text-slate-900">{yearsOfExperience} {t.years}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-medium">Statut</p>
+                <p className="text-xs text-slate-500 font-medium">{t.status}</p>
                 <span className="inline-flex px-2.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 text-xs font-medium">
-                  {profile?.status === 'valide' ? 'Actif' : profile?.status || '-'}
+                  {profile?.status === 'valide' ? t.active : profile?.status || '-'}
                 </span>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-slate-500 font-medium">Cotisation valide jusqu'au</p>
-                  <p className="text-sm sm:text-base font-semibold text-slate-900">31 décembre 2026</p>
+                  <p className="text-xs text-slate-500 font-medium">{t.subscriptionValid}</p>
+                  <p className="text-sm sm:text-base font-semibold text-slate-900">31 {language === 'ar' ? 'ديسمبر' : 'décembre'} 2026</p>
                 </div>
               </div>
             </div>
@@ -146,7 +215,7 @@ export default function TableauDeBordPage() {
               <div className="w-8 h-8 rounded-xl gradient-bg flex items-center justify-center shadow-md">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              Actions rapides
+              {t.quickActions}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -157,9 +226,9 @@ export default function TableauDeBordPage() {
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors">
-                    Mon Profil
+                    {t.myProfile}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Gérer mes infos</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.manageInfo}</p>
                 </div>
               </Link>
 
@@ -169,9 +238,9 @@ export default function TableauDeBordPage() {
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-pink-600 transition-colors">
-                    Mes Documents
+                    {t.myDocuments}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Mes fichiers</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.myFiles}</p>
                 </div>
               </Link>
 
@@ -181,9 +250,9 @@ export default function TableauDeBordPage() {
                     <CreditCard className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-emerald-600 transition-colors">
-                    Cotisation
+                    {t.subscription}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Payer</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.pay}</p>
                 </div>
               </Link>
 
@@ -193,9 +262,9 @@ export default function TableauDeBordPage() {
                     <Briefcase className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-cyan-600 transition-colors">
-                    Offres d'emploi
+                    {t.jobOffers}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Opportunités</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.opportunities}</p>
                 </div>
               </Link>
 
@@ -205,9 +274,9 @@ export default function TableauDeBordPage() {
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
-                    Candidatures
+                    {t.applications}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Mes postulations</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t.myApplications}</p>
                 </div>
               </Link>
             </div>
@@ -219,7 +288,7 @@ export default function TableauDeBordPage() {
           <div className="text-center">
             <Link href="/admin" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
               <Settings className="w-4 h-4" />
-              Accéder au panneau admin
+              {t.adminPanel}
             </Link>
           </div>
         )}
