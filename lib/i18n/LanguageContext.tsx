@@ -13,32 +13,29 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('fr')
+  // Force French only - Arabic disabled for now
+  const [language] = useState<Language>('fr')
 
   useEffect(() => {
-    // Load language from localStorage
-    const savedLang = localStorage.getItem('language') as Language
-    if (savedLang && (savedLang === 'fr' || savedLang === 'ar')) {
-      setLanguageState(savedLang)
-    }
+    // Force French and LTR direction
+    document.documentElement.dir = 'ltr'
+    document.documentElement.lang = 'fr'
+    localStorage.setItem('language', 'fr')
   }, [])
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang)
-    localStorage.setItem('language', lang)
-    // Update document direction
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
-    document.documentElement.lang = lang
+  // Disabled - always use French
+  const setLanguage = () => {
+    // Do nothing - French only
   }
 
   const toggleLanguage = () => {
-    setLanguage(language === 'fr' ? 'ar' : 'fr')
+    // Do nothing - French only
   }
 
   const value = {
     language,
     setLanguage,
-    t: translations[language],
+    t: translations.fr,
     toggleLanguage
   }
 
