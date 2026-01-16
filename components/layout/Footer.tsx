@@ -16,9 +16,11 @@ export function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-2.5 mb-4 sm:mb-5 group">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl gradient-bg flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                <span className="text-white font-bold text-lg sm:text-xl">O</span>
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="OMIGEC Logo" 
+                className="w-10 h-10 sm:w-11 sm:h-11 object-contain group-hover:scale-105 transition-transform"
+              />
               <div className="text-xl sm:text-2xl font-bold text-white">OMIGEC</div>
             </Link>
             <p className="text-slate-400 text-xs sm:text-sm mb-4 sm:mb-5 leading-relaxed">

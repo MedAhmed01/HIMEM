@@ -18,10 +18,12 @@ import {
   Sparkles,
   Award,
   Calendar,
-  Languages
+  Languages,
+  LogOut
 } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { LanguageToggle } from '@/components/LanguageToggle'
+import { useRouter } from 'next/navigation'
 
 interface ProfileData {
   full_name: string
@@ -34,6 +36,7 @@ interface ProfileData {
 }
 
 export default function TableauDeBordPage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const { t, language } = useLanguage()
@@ -65,6 +68,15 @@ export default function TableauDeBordPage() {
     if (!expiryDate) return 0
     const days = Math.ceil((new Date(expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     return days > 0 ? days : 0
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/connexion')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   if (loading) {
@@ -106,7 +118,15 @@ export default function TableauDeBordPage() {
             </div>
           </Link>
           
-          <LanguageToggle />
+          {/* Logout Button */}
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="rounded-xl border-red-300 text-red-600 hover:bg-red-50"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Déconnexion
+          </Button>
         </div>
 
         {/* Profile Info Card */}

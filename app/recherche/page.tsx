@@ -119,7 +119,7 @@ export default function RecherchePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
-              { step: '1', title: 'Recherchez', desc: 'Utilisez le NNI ou le nom' },
+              { step: '1', title: 'Recherchez', desc: 'Utilisez le NNI, nom ou téléphone' },
               { step: '2', title: 'Consultez', desc: 'Voir les profils publics' },
               { step: '3', title: 'Vérifiez', desc: 'Diplômes certifiés OMIGEC' },
               { step: '4', title: 'Contactez', desc: 'Recrutez les meilleurs' }

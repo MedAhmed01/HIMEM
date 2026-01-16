@@ -1,45 +1,18 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Users, UserCheck, CheckCircle, ArrowRight, TrendingUp, Clock, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
-const stats = [
-  {
-    title: 'Documents en attente',
-    value: '0',
-    subtitle: 'À vérifier',
-    icon: FileText,
-    color: 'from-orange-500 to-amber-500',
-    shadowColor: 'shadow-orange-500/30',
-    bgColor: 'from-orange-50 to-amber-50'
-  },
-  {
-    title: 'Ingénieurs actifs',
-    value: '0',
-    subtitle: 'Validés et à jour',
-    icon: CheckCircle,
-    color: 'from-emerald-500 to-teal-500',
-    shadowColor: 'shadow-emerald-500/30',
-    bgColor: 'from-emerald-50 to-teal-50'
-  },
-  {
-    title: 'Parrains disponibles',
-    value: '0',
-    subtitle: 'Ingénieurs référents',
-    icon: UserCheck,
-    color: 'from-purple-500 to-pink-500',
-    shadowColor: 'shadow-purple-500/30',
-    bgColor: 'from-purple-50 to-pink-50'
-  },
-  {
-    title: 'Total ingénieurs',
-    value: '0',
-    subtitle: 'Tous statuts confondus',
-    icon: Users,
-    color: 'from-blue-500 to-cyan-500',
-    shadowColor: 'shadow-blue-500/30',
-    bgColor: 'from-blue-50 to-cyan-50'
-  }
-]
+interface Stats {
+  pendingDocs: number
+  pendingEngineers: number
+  pendingCompanies: number
+  activeEngineers: number
+  references: number
+  totalEngineers: number
+}
 
 const quickActions = [
   {
@@ -73,6 +46,72 @@ const quickActions = [
 ]
 
 export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<Stats>({
+    pendingDocs: 0,
+    pendingEngineers: 0,
+    pendingCompanies: 0,
+    activeEngineers: 0,
+    references: 0,
+    totalEngineers: 0
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadStats()
+  }, [])
+
+  const loadStats = async () => {
+    try {
+      const res = await fetch('/api/admin/stats')
+      const data = await res.json()
+      if (res.ok) {
+        setStats(data.stats)
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const statsCards = [
+    {
+      title: 'Documents en attente',
+      value: stats.pendingDocs.toString(),
+      subtitle: 'À vérifier',
+      icon: FileText,
+      color: 'from-orange-500 to-amber-500',
+      shadowColor: 'shadow-orange-500/30',
+      bgColor: 'from-orange-50 to-amber-50'
+    },
+    {
+      title: 'Ingénieurs actifs',
+      value: stats.activeEngineers.toString(),
+      subtitle: 'Validés et à jour',
+      icon: CheckCircle,
+      color: 'from-emerald-500 to-teal-500',
+      shadowColor: 'shadow-emerald-500/30',
+      bgColor: 'from-emerald-50 to-teal-50'
+    },
+    {
+      title: 'Parrains disponibles',
+      value: stats.references.toString(),
+      subtitle: 'Ingénieurs référents',
+      icon: UserCheck,
+      color: 'from-purple-500 to-pink-500',
+      shadowColor: 'shadow-purple-500/30',
+      bgColor: 'from-purple-50 to-pink-50'
+    },
+    {
+      title: 'Total ingénieurs',
+      value: stats.totalEngineers.toString(),
+      subtitle: 'Tous statuts confondus',
+      icon: Users,
+      color: 'from-blue-500 to-cyan-500',
+      shadowColor: 'shadow-blue-500/30',
+      bgColor: 'from-blue-50 to-cyan-50'
+    }
+  ]
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -91,21 +130,46 @@ export default function AdminDashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon
-          return (
-            <div key={index} className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-              </div>
-              <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-              <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
+        {loading ? (
+          // Loading skeleton
+          Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="bg-white rounded-lg border border-gray-200 p-5 animate-pulse">
+              <div className="w-10 h-10 rounded-lg bg-gray-200 mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded w-1/2 mb-1"></div>
+              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
             </div>
-          )
-        })}
+          ))
+        ) : (
+          statsCards.map((stat, index) => {
+            const Icon = stat.icon
+            const isPendingDocs = index === 0 // First card is pending docs
+            
+            return (
+              <div key={index} className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
+                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                {isPendingDocs && stats.pendingDocs > 0 ? (
+                  <div className="flex gap-2 mt-2">
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                      {stats.pendingEngineers} ingénieur{stats.pendingEngineers !== 1 ? 's' : ''}
+                    </span>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      {stats.pendingCompanies} entreprise{stats.pendingCompanies !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
+                )}
+              </div>
+            )
+          })
+        )}
       </div>
 
       {/* Quick Actions */}

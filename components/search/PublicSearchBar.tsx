@@ -108,7 +108,7 @@ export function PublicSearchBar() {
           <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
           <Input
             type="text"
-            placeholder="Rechercher par NNI ou nom..."
+            placeholder="Rechercher par NNI, nom ou téléphone..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value)
@@ -198,7 +198,7 @@ export function PublicSearchBar() {
                 <Search className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
               </div>
               <p className="text-slate-600 font-medium text-xs sm:text-sm">Aucun ingénieur agréé trouvé</p>
-              <p className="text-xs text-slate-500 mt-1">Vérifiez le NNI ou le nom saisi</p>
+              <p className="text-xs text-slate-500 mt-1">Vérifiez le NNI, nom ou téléphone saisi</p>
             </div>
           </div>
         )}

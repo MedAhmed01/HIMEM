@@ -9,8 +9,13 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  DollarSign
+  DollarSign,
+  Upload,
+  FileText,
+  Eye
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 interface Payment {
   id: string
@@ -19,12 +24,15 @@ interface Payment {
   payment_method: string
   status: string
   reference: string
+  receipt_url?: string
 }
 
 export default function CotisationPage() {
   const [payments, setPayments] = useState<Payment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [uploadingReceipt, setUploadingReceipt] = useState<string | null>(null)
+  const [viewingReceipt, setViewingReceipt] = useState<string | null>(null)
 
   useEffect(() => {
     loadPayments()
@@ -87,6 +95,47 @@ export default function CotisationPage() {
         )
       default:
         return <Badge variant="secondary">{status}</Badge>
+    }
+  }
+
+  const handleReceiptUpload = async (paymentId: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Veuillez sélectionner une image valide')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('L\'image ne doit pas dépasser 5MB')
+      return
+    }
+
+    setUploadingReceipt(paymentId)
+    setError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('receipt', file)
+      formData.append('paymentId', paymentId)
+
+      const res = await fetch('/api/payments/receipt', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        // Update the payment in the list
+        setPayments(prev => prev.map(p => 
+          p.id === paymentId ? { ...p, receipt_url: data.receiptUrl } : p
+        ))
+      } else {
+        setError(data.error)
+      }
+    } catch (error) {
+      setError('Erreur lors du téléchargement du reçu')
+    } finally {
+      setUploadingReceipt(null)
     }
   }
 
@@ -165,6 +214,55 @@ export default function CotisationPage() {
                             </span>
                           </div>
                         </div>
+                        
+                        {/* Receipt Actions */}
+                        <div className="mt-4 flex gap-2">
+                          {payment.receipt_url ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setViewingReceipt(payment.receipt_url!)}
+                              className="rounded-lg"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              Voir le reçu
+                            </Button>
+                          ) : (
+                            <label className="cursor-pointer">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0]
+                                  if (file) handleReceiptUpload(payment.id, file)
+                                }}
+                                className="hidden"
+                                disabled={uploadingReceipt === payment.id}
+                              />
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={uploadingReceipt === payment.id}
+                                className="rounded-lg pointer-events-none"
+                                asChild
+                              >
+                                <span>
+                                  {uploadingReceipt === payment.id ? (
+                                    <>
+                                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2" />
+                                      Téléchargement...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      Ajouter un reçu
+                                    </>
+                                  )}
+                                </span>
+                              </Button>
+                            </label>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
@@ -176,6 +274,31 @@ export default function CotisationPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Receipt Viewer Modal */}
+        {viewingReceipt && (
+          <div 
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setViewingReceipt(null)}
+          >
+            <div className="relative max-w-4xl w-full bg-white rounded-2xl p-4" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setViewingReceipt(null)}
+                className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors z-10"
+              >
+                <span className="text-2xl text-gray-600">×</span>
+              </button>
+              <div className="relative w-full h-[80vh]">
+                <Image
+                  src={viewingReceipt}
+                  alt="Reçu de paiement"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
           </div>
         )}
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { FileText, Download, CheckCircle, XCircle, UserCheck, Receipt, Mail, Phone, Trash2, AlertCircle, X } from 'lucide-react'
+import { FileText, Download, CheckCircle, XCircle, UserCheck, Receipt, Mail, Phone, Trash2, AlertCircle, X, User } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -243,8 +243,14 @@ export default function VerificationsPage() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-lg truncate">{engineer.full_name || 'Utilisateur'}</h3>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 mt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-gray-900 text-lg truncate">{engineer.full_name || 'Utilisateur'}</h3>
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-300 flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        Ingénieur
+                      </Badge>
+                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                       En attente
                     </span>
                   </div>

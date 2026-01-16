@@ -33,32 +33,33 @@ export function Header() {
   }, [lastScrollY])
 
   return (
-    <header className={`sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm transition-transform duration-300 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
+    <header className={`sticky top-0 z-50 bg-[#139a9d] border-b border-[#0f7a7d] shadow-sm transition-transform duration-300 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
       <div className="container mx-auto">
         <div className="grid grid-cols-3 items-center h-14 sm:h-16 md:h-18">
           {/* Logo - Left */}
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 justify-self-start">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-base sm:text-lg md:text-xl">O</span>
-            </div>
-            <span className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">OMIGEC</span>
+            <img 
+              src="/logo.png" 
+              alt="OMIGEC Logo" 
+              className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain"
+            />
           </Link>
           
           {/* Desktop Navigation - Center */}
           <nav className="hidden md:flex items-center justify-center gap-0.5">
-            <Link href="/" className="px-3 py-1.5 rounded-full text-sm text-gray-900 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+            <Link href="/" className="px-3 py-1.5 rounded-full text-sm text-white font-medium hover:bg-white/10 transition-all duration-200">
               {t.nav.home}
             </Link>
-            <Link href="/services" className="px-3 py-1.5 rounded-full text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+            <Link href="/services" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
               {t.nav.services}
             </Link>
-            <Link href="/emplois" className="px-3 py-1.5 rounded-full text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+            <Link href="/emplois" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
               {t.nav.jobs}
             </Link>
-            <Link href="/recherche" className="px-3 py-1.5 rounded-full text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+            <Link href="/recherche" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
               {t.common.search}
             </Link>
-            <Link href="/contact" className="px-3 py-1.5 rounded-full text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+            <Link href="/contact" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
               {t.nav.contact}
             </Link>
           </nav>
@@ -67,7 +68,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-2 justify-self-end">
             <LanguageToggle />
             <Link href="/connexion">
-              <Button variant="ghost" className="h-9 px-4 rounded-full text-sm text-gray-700 hover:bg-gray-100 font-medium">
+              <Button variant="ghost" className="h-9 px-4 rounded-full text-sm text-white hover:bg-white/10 font-medium">
                 <LogIn className="w-3.5 h-3.5 mr-1.5" />
                 {t.nav.login}
               </Button>
@@ -77,7 +78,7 @@ export function Header() {
             <div className="relative inscription-dropdown">
               <Button 
                 onClick={() => setIsInscriptionOpen(!isInscriptionOpen)}
-                className="h-9 px-4 rounded-full text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                className="h-9 px-4 rounded-full text-sm bg-white text-[#139a9d] hover:bg-white/90 font-medium shadow-md hover:shadow-lg transition-all duration-200"
               >
                 <User className="w-3.5 h-3.5 mr-1.5" />
                 {t.nav.register}
@@ -119,7 +120,7 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors justify-self-end col-start-3"
+            className="md:hidden p-2 rounded-full text-white hover:bg-white/10 transition-colors justify-self-end col-start-3"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -128,49 +129,49 @@ export function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-3 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
+          <div className="md:hidden py-3 border-t border-white/10 animate-in slide-in-from-top-2 duration-200">
             <nav className="flex flex-col gap-0.5">
               <Link 
                 href="/" 
-                className="px-3 py-2.5 rounded-lg text-sm text-gray-900 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all text-center"
+                className="px-3 py-2.5 rounded-lg text-sm text-white font-medium hover:bg-white/10 transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.home}
               </Link>
               <Link 
                 href="/services" 
-                className="px-3 py-2.5 rounded-lg text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all text-center"
+                className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.services}
               </Link>
               <Link 
                 href="/emplois" 
-                className="px-3 py-2.5 rounded-lg text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all text-center"
+                className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.jobs}
               </Link>
               <Link 
                 href="/recherche" 
-                className="px-3 py-2.5 rounded-lg text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all text-center"
+                className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.common.search}
               </Link>
               <Link 
                 href="/contact" 
-                className="px-3 py-2.5 rounded-lg text-sm text-gray-600 font-medium hover:bg-blue-50 hover:text-blue-600 transition-all text-center"
+                className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.contact}
               </Link>
-              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-white/10">
                 <div className="px-3 mb-2">
                   <LanguageToggle />
                 </div>
                 <Link href="/connexion" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full h-10 rounded-lg text-sm text-gray-700 hover:bg-gray-100 font-medium">
+                  <Button variant="ghost" className="w-full h-10 rounded-lg text-sm text-white hover:bg-white/10 font-medium">
                     <LogIn className="w-4 h-4 mr-2" />
                     {t.nav.login}
                   </Button>
@@ -178,16 +179,16 @@ export function Header() {
                 
                 {/* Inscription Options */}
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold text-gray-500 px-3">{t.nav.register}</p>
+                  <p className="text-xs font-semibold text-white/70 px-3">{t.nav.register}</p>
                   <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start">
-                      <UserCircle className="w-4 h-4 mr-2 text-blue-600" />
+                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
+                      <UserCircle className="w-4 h-4 mr-2" />
                       <span>{language === 'ar' ? 'مهندس' : 'Ingénieur'}</span>
                     </Button>
                   </Link>
                   <Link href="/inscription-entreprise" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start">
-                      <Building2 className="w-4 h-4 mr-2 text-green-600" />
+                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
+                      <Building2 className="w-4 h-4 mr-2" />
                       <span>{language === 'ar' ? 'شركة' : 'Entreprise'}</span>
                     </Button>
                   </Link>

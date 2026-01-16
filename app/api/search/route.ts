@@ -22,11 +22,11 @@ export async function GET(request: NextRequest) {
     const searchTerm = query.trim()
     const supabase = createAdminClient()
 
-    // Search by NNI or name (case insensitive) - inclut les admins qui sont aussi ingénieurs
+    // Search by NNI, name, or phone (case insensitive)
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('nni, full_name, diploma, grad_year, university, country, domain, exercise_mode, status, subscription_expiry, profile_image_url')
-      .or(`nni.eq.${searchTerm},full_name.ilike.%${searchTerm}%`)
+      .select('nni, full_name, diploma, grad_year, university, country, domain, exercise_mode, status, subscription_expiry, profile_image_url, phone')
+      .or(`nni.eq.${searchTerm},full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`)
 
     if (error) {
       console.error('Search error:', error)

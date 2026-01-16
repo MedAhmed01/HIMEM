@@ -26,9 +26,20 @@ import {
   Upload,
   Edit3,
   Globe,
-  School
+  School,
+  LogOut,
+  Key
 } from 'lucide-react'
 import type { Domain, ExerciseMode } from '@/lib/types/database'
+import { useRouter } from 'next/navigation'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface ProfileData {
   id: string
@@ -103,12 +114,22 @@ const COUNTRIES = [
 ]
 
 export default function ProfilPage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  
+  // Password change dialog
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  const [changingPassword, setChangingPassword] = useState(false)
 
   useEffect(() => {
     loadProfile()
@@ -224,6 +245,55 @@ export default function ProfilPage() {
       : profile.domain.filter(d => d !== domain)
     
     setProfile({ ...profile, domain: newDomains })
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/connexion')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
+  const handlePasswordChange = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setMessage({ type: 'error', text: 'Les mots de passe ne correspondent pas' })
+      return
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setMessage({ type: 'error', text: 'Le mot de passe doit contenir au moins 6 caractères' })
+      return
+    }
+
+    setChangingPassword(true)
+    setMessage(null)
+
+    try {
+      const res = await fetch('/api/profile/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setMessage({ type: 'success', text: 'Mot de passe modifié avec succès' })
+        setShowPasswordDialog(false)
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Erreur lors du changement de mot de passe' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Erreur lors du changement de mot de passe' })
+    } finally {
+      setChangingPassword(false)
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -431,14 +501,32 @@ export default function ProfilPage() {
         {/* Edit Toggle */}
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold text-slate-900">Informations du Profil</h2>
-          <Button
-            onClick={() => setIsEditing(!isEditing)}
-            variant={isEditing ? "outline" : "default"}
-            className="rounded-xl"
-          >
-            <Edit3 className="w-4 h-4 mr-2" />
-            {isEditing ? 'Annuler' : 'Modifier'}
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setShowPasswordDialog(true)}
+              variant="outline"
+              className="rounded-xl"
+            >
+              <Key className="w-4 h-4 mr-2" />
+              Changer le mot de passe
+            </Button>
+            <Button
+              onClick={() => setIsEditing(!isEditing)}
+              variant={isEditing ? "outline" : "default"}
+              className="rounded-xl"
+            >
+              <Edit3 className="w-4 h-4 mr-2" />
+              {isEditing ? 'Annuler' : 'Modifier'}
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="rounded-xl border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Déconnexion
+            </Button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -686,6 +774,77 @@ export default function ProfilPage() {
             </div>
           )}
         </form>
+
+        {/* Password Change Dialog */}
+        <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Changer le mot de passe</DialogTitle>
+              <DialogDescription>
+                Entrez votre mot de passe actuel et choisissez un nouveau mot de passe.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                  className="h-12 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  className="h-12 rounded-xl"
+                  placeholder="Au moins 6 caractères"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  className="h-12 rounded-xl"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPasswordDialog(false)
+                  setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+                }}
+                disabled={changingPassword}
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={handlePasswordChange}
+                disabled={changingPassword || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600"
+              >
+                {changingPassword ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Changement...
+                  </div>
+                ) : (
+                  'Changer le mot de passe'
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )
