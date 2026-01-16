@@ -9,10 +9,24 @@ import { notifyDocumentVerification } from '@/lib/utils/notifications'
  */
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const engineerId = formData.get('engineerId') as string
-    const action = formData.get('action') as string
-    const rejectionReason = formData.get('rejectionReason') as string | null
+    // Support both JSON and FormData
+    let engineerId: string
+    let action: string
+    let rejectionReason: string | null = null
+
+    const contentType = request.headers.get('content-type') || ''
+    
+    if (contentType.includes('application/json')) {
+      const json = await request.json()
+      engineerId = json.engineerId
+      action = json.action
+      rejectionReason = json.rejectionReason || null
+    } else {
+      const formData = await request.formData()
+      engineerId = formData.get('engineerId') as string
+      action = formData.get('action') as string
+      rejectionReason = formData.get('rejectionReason') as string | null
+    }
 
     if (!engineerId || !action) {
       return NextResponse.json(
@@ -96,8 +110,29 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      return NextResponse.json({
+        success: true,
+        message: 'Ingénieur approuvé avec succès.'
+      })
+
     } else if (action === 'reject') {
-      // Reject documents - keep status as pending_docs
+      // Reject documents - change status to rejected
+      const { error: updateError } = await adminClient
+        .from('profiles')
+        .update({ 
+          status: 'rejected',
+          rejection_reason: rejectionReason
+        })
+        .eq('id', engineerId)
+
+      if (updateError) {
+        console.error('Update error:', updateError)
+        return NextResponse.json(
+          { error: 'Erreur lors du rejet' },
+          { status: 500 }
+        )
+      }
+
       // Send email notification with rejection reason
       if (engineer.email) {
         await notifyDocumentVerification(
@@ -110,7 +145,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Documents rejetés. L\'ingénieur a été notifié.'
+        message: 'Ingénieur rejeté. L\'ingénieur a été notifié.'
       })
     } else {
       return NextResponse.json(
@@ -118,9 +153,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    // Return success and redirect
-    return NextResponse.redirect(new URL('/admin/verifications', request.url))
 
   } catch (error) {
     console.error('Verification error:', error)

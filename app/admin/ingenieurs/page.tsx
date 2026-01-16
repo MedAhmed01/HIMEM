@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Users, Check, X, Search, Filter, Sparkles, Calendar, Mail, Phone, Key, AlertCircle, CheckCircle } from 'lucide-react'
+import { Users, Check, X, Search, Filter, Sparkles, Calendar, Mail, Phone, Key, AlertCircle, CheckCircle, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
 
@@ -33,6 +33,16 @@ export default function IngenieursPage() {
     isOpen: false,
     userId: '',
     userName: ''
+  })
+
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean
+    engineerId: string
+    engineerName: string
+  }>({
+    isOpen: false,
+    engineerId: '',
+    engineerName: ''
   })
 
   const loadEngineers = async () => {
@@ -74,6 +84,27 @@ export default function IngenieursPage() {
 
   const handlePasswordChangeError = (error: string) => {
     setMessage({ type: 'error', text: error })
+  }
+
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(`/api/admin/engineers/${deleteDialog.engineerId}`, {
+        method: 'DELETE'
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok) {
+        setMessage({ type: 'success', text: data.message || 'Ingénieur supprimé avec succès' })
+        setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })
+        loadEngineers()
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Erreur lors de la suppression' })
+      }
+    } catch (error) {
+      console.error('Delete error:', error)
+      setMessage({ type: 'error', text: 'Erreur lors de la suppression' })
+    }
   }
 
   // Clear message after 5 seconds
@@ -302,6 +333,16 @@ export default function IngenieursPage() {
                           Désactiver
                         </Button>
                       )}
+
+                      {/* Delete Button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-3 text-xs rounded-md border-gray-300 text-gray-600 hover:bg-gray-50"
+                        onClick={() => setDeleteDialog({ isOpen: true, engineerId: engineer.id, engineerName: engineer.full_name })}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -321,6 +362,35 @@ export default function IngenieursPage() {
         onSuccess={handlePasswordChangeSuccess}
         onError={handlePasswordChangeError}
       />
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.isOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Supprimer l'ingénieur</h3>
+            <p className="text-gray-600 mb-6">
+              Êtes-vous sûr de vouloir supprimer définitivement <span className="font-semibold">{deleteDialog.engineerName}</span> ? 
+              Cette action est irréversible et supprimera toutes les données associées.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer définitivement
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
