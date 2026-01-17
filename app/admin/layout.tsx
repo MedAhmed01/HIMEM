@@ -43,7 +43,7 @@ export default function AdminLayout({
             <div className="flex items-center gap-2 sm:gap-3">
               <Link href="/admin" className="flex items-center gap-2 sm:gap-2.5 group">
                 <img 
-                  src="/logo.png" 
+                  src="/Logo.png" 
                   alt="OMIGEC Logo" 
                   className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain"
                 />
