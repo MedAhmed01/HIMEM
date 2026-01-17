@@ -9,7 +9,7 @@ import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '@/lib/types/database'
 import { formatPrice } from '@/lib/services/subscription.service'
 import { 
   ArrowLeft, Check, Crown, Briefcase, Rocket, 
-  Calendar, FileText, Zap, AlertCircle 
+  Calendar, FileText, Zap, AlertCircle, Building2, Clock
 } from 'lucide-react'
 
 interface SubscriptionInfo {
@@ -59,13 +59,36 @@ export default function AbonnementPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubscribing, setIsSubscribing] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const [receiptFile, setReceiptFile] = useState<File | null>(null)
-  const [uploadingReceipt, setUploadingReceipt] = useState(false)
+  const [entrepriseProfile, setEntrepriseProfile] = useState<any>(null)
 
   useEffect(() => {
-    fetchSubscriptionInfo()
+    fetchEntrepriseProfile()
   }, [])
+
+  const fetchEntrepriseProfile = async () => {
+    try {
+      const response = await fetch('/api/entreprises/profile')
+      const data = await response.json()
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/connexion?type=entreprise')
+          return
+        }
+        throw new Error(data.error)
+      }
+      
+      setEntrepriseProfile(data)
+      
+      if (data.hasEntreprise) {
+        await fetchSubscriptionInfo()
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const fetchSubscriptionInfo = async () => {
     try {
@@ -88,83 +111,36 @@ export default function AbonnementPage() {
     }
   }
 
-  const handleSubscribe = async (plan: SubscriptionPlan) => {
-    setSelectedPlan(plan)
-    setError(null)
-  }
-
-  const handleConfirmSubscription = async () => {
-    if (!selectedPlan) return
-
-    setIsSubscribing(selectedPlan)
+  const handleRequestSubscription = async (plan: SubscriptionPlan) => {
+    setIsSubscribing(plan)
     setError(null)
 
     try {
-      let receiptUrl = null
-
-      // Upload du reçu si fourni
-      if (receiptFile) {
-        setUploadingReceipt(true)
-        
-        console.log('Uploading receipt:', {
-          name: receiptFile.name,
-          size: receiptFile.size,
-          type: receiptFile.type
-        })
-        
-        const formData = new FormData()
-        formData.append('file', receiptFile)
-        formData.append('type', 'subscription_receipt')
-
-        const uploadRes = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include' // Important pour passer les cookies de session
-        })
-
-        if (!uploadRes.ok) {
-          const errorData = await uploadRes.json()
-          console.error('Upload error:', errorData)
-          throw new Error(errorData.error || 'Erreur lors de l\'upload du reçu')
-        }
-
-        const uploadData = await uploadRes.json()
-        console.log('Upload success:', uploadData)
-        receiptUrl = uploadData.url
-        setUploadingReceipt(false)
-      }
-
-      // Créer l'abonnement
-      const response = await fetch('/api/entreprises/subscriptions', {
+      const response = await fetch('/api/entreprises/subscriptions/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          plan: selectedPlan,
-          receiptUrl 
-        })
+        body: JSON.stringify({ plan })
       })
 
       const data = await response.json()
 
-      console.log('Subscription creation response:', data)
-
       if (!response.ok) {
+        if (data.action === 'register') {
+          // User needs to register as enterprise first
+          if (confirm('Vous devez d\'abord vous inscrire en tant qu\'entreprise. Voulez-vous être redirigé vers la page d\'inscription ?')) {
+            window.location.href = '/inscription-entreprise'
+            return
+          }
+        }
         throw new Error(data.error)
       }
 
-      // Afficher un message de succès
-      alert(data.message || 'Demande d\'abonnement créée avec succès !')
-
-      // Rafraîchir les infos
+      alert('Demande d\'abonnement envoyée avec succès. L\'administrateur activera votre abonnement sous peu.')
       await fetchSubscriptionInfo()
-      setSelectedPlan(null)
-      setReceiptFile(null)
-      
     } catch (err: any) {
       setError(err.message)
     } finally {
       setIsSubscribing(null)
-      setUploadingReceipt(false)
     }
   }
 
@@ -172,6 +148,78 @@ export default function AbonnementPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // If user doesn't have an enterprise account
+  if (!entrepriseProfile?.hasEntreprise) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600">
+              <ArrowLeft className="w-4 h-4" />
+              Retour à l'accueil
+            </Link>
+          </div>
+        </div>
+        
+        <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Building2 className="w-10 h-10 text-amber-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Compte Entreprise Requis</h1>
+          <p className="text-gray-600 text-lg mb-8">
+            Pour accéder aux abonnements, vous devez d'abord créer un compte entreprise.
+          </p>
+          <div className="space-y-4">
+            <Link 
+              href="/inscription-entreprise"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium"
+            >
+              <Building2 className="w-5 h-5" />
+              Créer un compte entreprise
+            </Link>
+            <p className="text-gray-500 text-sm">
+              Déjà inscrit ? <Link href="/connexion?type=entreprise" className="text-blue-600 hover:text-blue-700">Connectez-vous</Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // If enterprise account is not validated
+  if (entrepriseProfile.entreprise?.status !== 'valide') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600">
+              <ArrowLeft className="w-4 h-4" />
+              Retour à l'accueil
+            </Link>
+          </div>
+        </div>
+        
+        <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Clock className="w-10 h-10 text-amber-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Compte en Attente de Validation</h1>
+          <p className="text-gray-600 text-lg mb-4">
+            Votre compte entreprise <strong>{entrepriseProfile.entreprise?.name}</strong> est en cours de validation.
+          </p>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
+            <p className="text-amber-800">
+              Notre équipe examine votre demande. Vous pourrez accéder aux abonnements une fois votre compte validé.
+            </p>
+          </div>
+          <p className="text-gray-500">
+            Statut actuel: <span className="font-medium text-amber-600">{entrepriseProfile.entreprise?.status}</span>
+          </p>
+        </div>
       </div>
     )
   }
@@ -301,7 +349,7 @@ export default function AbonnementPage() {
                   </ul>
 
                   <Button
-                    onClick={() => handleSubscribe(key as SubscriptionPlan)}
+                    onClick={() => handleRequestSubscription(key as SubscriptionPlan)}
                     disabled={isSubscribing !== null}
                     className={`w-full h-12 rounded-xl text-white ${
                       isBusiness 
@@ -311,7 +359,7 @@ export default function AbonnementPage() {
                         : 'bg-blue-600 hover:bg-blue-700'
                     }`}
                   >
-                    {isCurrentPlan ? 'Renouveler' : 'Souscrire'}
+                    {isSubscribing === key ? 'Demande en cours...' : isCurrentPlan ? 'Renouveler' : 'Demander l\'activation'}
                   </Button>
                 </CardContent>
               </Card>
@@ -329,99 +377,14 @@ export default function AbonnementPage() {
               <h3 className="font-semibold text-[#139a9d] mb-2">Comment ça marche ?</h3>
               <ul className="text-[#139a9d]/80 space-y-1 text-sm">
                 <li>• Choisissez le forfait adapté à vos besoins</li>
-                <li>• Effectuez le paiement et joignez le reçu</li>
-                <li>• Notre équipe vérifie votre paiement</li>
-                <li>• Une fois validé, publiez vos offres d'emploi immédiatement</li>
+                <li>• Envoyez une demande d'activation à l'administrateur</li>
+                <li>• L'administrateur activera manuellement votre abonnement</li>
+                <li>• Une fois activé, publiez vos offres d'emploi immédiatement</li>
               </ul>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Modal de paiement */}
-      {selectedPlan && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Finaliser l'abonnement {SUBSCRIPTION_PLANS[selectedPlan as SubscriptionPlan].name}
-            </h3>
-            
-            <div className="space-y-4">
-              {/* Montant */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <p className="text-sm text-blue-700 mb-1">Montant à payer</p>
-                <p className="text-2xl font-bold text-blue-900">
-                  {formatPrice(SUBSCRIPTION_PLANS[selectedPlan as SubscriptionPlan].price)}
-                </p>
-              </div>
-
-              {/* Instructions de paiement */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="font-medium text-gray-900 mb-2">Instructions de paiement :</p>
-                <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-                  <li>Effectuez le virement bancaire</li>
-                  <li>Conservez le reçu de paiement</li>
-                  <li>Joignez le reçu ci-dessous (optionnel)</li>
-                  <li>Notre équipe validera votre abonnement</li>
-                </ol>
-              </div>
-
-              {/* Upload du reçu */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reçu de paiement (optionnel)
-                </label>
-                <input
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
-                  className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-                {receiptFile && (
-                  <p className="text-sm text-green-600 mt-2">
-                    ✓ {receiptFile.name}
-                  </p>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <Button
-                  onClick={() => {
-                    setSelectedPlan(null)
-                    setReceiptFile(null)
-                    setError(null)
-                  }}
-                  variant="outline"
-                  className="flex-1"
-                  disabled={isSubscribing !== null || uploadingReceipt}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={handleConfirmSubscription}
-                  disabled={isSubscribing !== null || uploadingReceipt}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
-                  {uploadingReceipt ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Upload...
-                    </div>
-                  ) : isSubscribing ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Traitement...
-                    </div>
-                  ) : (
-                    'Confirmer'
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

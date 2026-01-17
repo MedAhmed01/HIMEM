@@ -36,42 +36,40 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Vérifier que l'abonnement existe et est en attente
+    // Vérifier que l'abonnement existe et est actif
     const { data: subscription, error: subError } = await supabaseAdmin
       .from('entreprise_subscriptions')
       .select('*, entreprises(id, nom)')
       .eq('id', subscriptionId)
-      .eq('payment_status', 'pending')
-      .eq('is_active', false)
+      .eq('is_active', true)
       .single()
 
     if (subError || !subscription) {
-      return NextResponse.json({ error: 'Abonnement non trouvé ou déjà traité' }, { status: 404 })
+      return NextResponse.json({ error: 'Abonnement non trouvé ou déjà inactif' }, { status: 404 })
     }
 
-    // Rejeter l'abonnement
+    // Désactiver l'abonnement
     const { error: updateError } = await supabaseAdmin
       .from('entreprise_subscriptions')
       .update({
-        payment_status: 'rejected',
-        admin_notes: `Rejeté par admin: ${reason}`,
-        verified_by: user.id,
-        verified_at: new Date().toISOString()
+        is_active: false,
+        admin_notes: `Désactivé par admin: ${reason}`,
+        expires_at: new Date().toISOString() // Expire immédiatement
       })
       .eq('id', subscriptionId)
 
     if (updateError) {
-      console.error('Rejection error:', updateError)
-      return NextResponse.json({ error: 'Erreur lors du rejet' }, { status: 500 })
+      console.error('Deactivation error:', updateError)
+      return NextResponse.json({ error: 'Erreur lors de la désactivation' }, { status: 500 })
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Demande d\'abonnement rejetée avec succès'
+      message: 'Abonnement désactivé avec succès'
     })
 
   } catch (error) {
-    console.error('Reject subscription error:', error)
+    console.error('Deactivate subscription error:', error)
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 })
   }
 }

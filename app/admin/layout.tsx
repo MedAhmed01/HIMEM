@@ -11,7 +11,7 @@ const navigation = [
   { name: 'Parrains', href: '/admin/parrains', icon: UserCheck, color: 'from-[#139a9d] to-[#0f7a7d]' },
   { name: 'Ingénieurs', href: '/admin/ingenieurs', icon: Users, color: 'from-[#139a9d]/80 to-[#0f7a7d]/80' },
   { name: 'Entreprises', href: '/admin/entreprises', icon: Building2, color: 'from-[#139a9d] to-[#0f7a7d]' },
-  { name: 'Abonnements', href: '/admin/abonnements', icon: CreditCard, color: 'from-amber-500 to-amber-600' },
+  { name: 'Abonnements Entreprises', href: '/admin/abonnements-entreprises', icon: CreditCard, color: 'from-amber-500 to-amber-600' },
   { name: 'Messages', href: '/admin/messages', icon: Mail, color: 'from-green-500 to-green-600' },
   { name: 'Articles', href: '/admin/articles', icon: Newspaper, color: 'from-[#139a9d]/80 to-[#0f7a7d]/80' },
   { name: 'Sponsors', href: '/admin/sponsors', icon: Image, color: 'from-[#139a9d] to-[#0f7a7d]' },

@@ -24,10 +24,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { subscriptionId, reason } = body
+    const { subscriptionId, startDate, endDate, notes } = body
 
-    if (!subscriptionId || !reason) {
+    if (!subscriptionId || !startDate || !endDate) {
       return NextResponse.json({ error: 'Données manquantes' }, { status: 400 })
+    }
+
+    // Valider les dates
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    
+    if (start >= end) {
+      return NextResponse.json({ error: 'La date de fin doit être après la date de début' }, { status: 400 })
     }
 
     // Utiliser le client admin
@@ -39,7 +47,7 @@ export async function POST(request: NextRequest) {
     // Vérifier que l'abonnement existe et est en attente
     const { data: subscription, error: subError } = await supabaseAdmin
       .from('entreprise_subscriptions')
-      .select('*, entreprises(id, nom)')
+      .select('*, entreprises(id, nom, status)')
       .eq('id', subscriptionId)
       .eq('payment_status', 'pending')
       .eq('is_active', false)
@@ -49,29 +57,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Abonnement non trouvé ou déjà traité' }, { status: 404 })
     }
 
-    // Rejeter l'abonnement
+    // Vérifier que l'entreprise est validée
+    if (subscription.entreprises.status !== 'valide') {
+      return NextResponse.json({ 
+        error: 'L\'entreprise doit être validée avant d\'activer l\'abonnement' 
+      }, { status: 400 })
+    }
+
+    // Désactiver tous les autres abonnements de cette entreprise
+    await supabaseAdmin
+      .from('entreprise_subscriptions')
+      .update({ is_active: false })
+      .eq('entreprise_id', subscription.entreprise_id)
+      .eq('is_active', true)
+
+    // Activer l'abonnement avec les nouvelles dates
     const { error: updateError } = await supabaseAdmin
       .from('entreprise_subscriptions')
       .update({
-        payment_status: 'rejected',
-        admin_notes: `Rejeté par admin: ${reason}`,
+        is_active: true,
+        payment_status: 'verified',
+        starts_at: start.toISOString(),
+        expires_at: end.toISOString(),
         verified_by: user.id,
-        verified_at: new Date().toISOString()
+        verified_at: new Date().toISOString(),
+        admin_notes: notes || null
       })
       .eq('id', subscriptionId)
 
     if (updateError) {
-      console.error('Rejection error:', updateError)
-      return NextResponse.json({ error: 'Erreur lors du rejet' }, { status: 500 })
+      console.error('Activation error:', updateError)
+      return NextResponse.json({ error: 'Erreur lors de l\'activation' }, { status: 500 })
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Demande d\'abonnement rejetée avec succès'
+      message: 'Abonnement activé avec succès'
     })
 
   } catch (error) {
-    console.error('Reject subscription error:', error)
+    console.error('Activate subscription error:', error)
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 })
   }
 }

@@ -5,9 +5,9 @@ export class SubscriptionService {
   constructor(private supabase: SupabaseClient) {}
 
   /**
-   * Créer un nouvel abonnement pour une entreprise (en attente de paiement)
+   * Créer une demande d'abonnement (sans paiement automatique)
    */
-  async createSubscription(entrepriseId: string, plan: SubscriptionPlan, receiptUrl?: string): Promise<EntrepriseSubscription> {
+  async createSubscriptionRequest(entrepriseId: string, plan: SubscriptionPlan): Promise<EntrepriseSubscription> {
     // Vérifier que l'entreprise est validée
     const { data: entreprise, error: entError } = await this.supabase
       .from('entreprises')
@@ -20,7 +20,20 @@ export class SubscriptionService {
     }
 
     if (entreprise.status !== 'valide') {
-      throw new Error('L\'entreprise doit être validée pour souscrire à un abonnement')
+      throw new Error('L\'entreprise doit être validée pour demander un abonnement')
+    }
+
+    // Vérifier s'il y a déjà une demande en attente
+    const { data: existingRequest } = await this.supabase
+      .from('entreprise_subscriptions')
+      .select('id')
+      .eq('entreprise_id', entrepriseId)
+      .eq('payment_status', 'pending')
+      .eq('is_active', false)
+      .single()
+
+    if (existingRequest) {
+      throw new Error('Une demande d\'abonnement est déjà en attente de validation')
     }
 
     // Désactiver les anciens abonnements actifs
@@ -30,12 +43,12 @@ export class SubscriptionService {
       .eq('entreprise_id', entrepriseId)
       .eq('is_active', true)
 
-    // Calculer la date d'expiration (30 jours)
+    // Calculer la date d'expiration par défaut (l'admin pourra la modifier)
     const startsAt = new Date()
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + SUBSCRIPTION_PLANS[plan].duration)
 
-    // Créer le nouvel abonnement en attente
+    // Créer la demande d'abonnement
     const { data, error } = await this.supabase
       .from('entreprise_subscriptions')
       .insert({
@@ -44,14 +57,13 @@ export class SubscriptionService {
         starts_at: startsAt.toISOString(),
         expires_at: expiresAt.toISOString(),
         is_active: false, // Pas actif jusqu'à validation admin
-        payment_status: 'pending',
-        receipt_url: receiptUrl || null
+        payment_status: 'pending'
       })
       .select()
       .single()
 
     if (error) {
-      throw new Error('Erreur lors de la création de l\'abonnement: ' + error.message)
+      throw new Error('Erreur lors de la création de la demande: ' + error.message)
     }
 
     return data
@@ -66,6 +78,7 @@ export class SubscriptionService {
       .select('*')
       .eq('entreprise_id', entrepriseId)
       .eq('is_active', true)
+      .eq('payment_status', 'verified')
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(1)
@@ -187,32 +200,135 @@ export class SubscriptionService {
   }
 
   /**
-   * Obtenir les abonnements en attente de validation
+   * Obtenir les demandes d'abonnement en attente (admin)
    */
-  async getPendingSubscriptions() {
+  async getPendingSubscriptions(): Promise<any[]> {
     const { data, error } = await this.supabase
       .from('entreprise_subscriptions')
       .select(`
-        *,
+        id,
+        plan,
+        created_at,
+        starts_at,
+        expires_at,
+        payment_status,
         entreprises (
           id,
           nom,
           email,
-          telephone
+          telephone,
+          status
         )
       `)
       .eq('payment_status', 'pending')
+      .eq('is_active', false)
       .order('created_at', { ascending: false })
 
     if (error) {
-      throw new Error('Erreur lors de la récupération des abonnements en attente')
+      throw new Error('Erreur lors de la récupération des demandes: ' + error.message)
     }
 
     return data || []
   }
 
   /**
-   * Valider un abonnement (admin)
+   * Activer manuellement un abonnement (admin)
+   */
+  async activateSubscription(
+    subscriptionId: string, 
+    adminId: string, 
+    startDate: string, 
+    endDate: string, 
+    notes?: string
+  ): Promise<void> {
+    // Valider les dates
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    
+    if (start >= end) {
+      throw new Error('La date de fin doit être après la date de début')
+    }
+
+    // Obtenir l'abonnement
+    const { data: subscription, error: subError } = await this.supabase
+      .from('entreprise_subscriptions')
+      .select('entreprise_id')
+      .eq('id', subscriptionId)
+      .eq('payment_status', 'pending')
+      .eq('is_active', false)
+      .single()
+
+    if (subError || !subscription) {
+      throw new Error('Abonnement non trouvé ou déjà traité')
+    }
+
+    // Désactiver tous les autres abonnements de cette entreprise
+    await this.supabase
+      .from('entreprise_subscriptions')
+      .update({ is_active: false })
+      .eq('entreprise_id', subscription.entreprise_id)
+      .eq('is_active', true)
+
+    // Activer l'abonnement
+    const { error: updateError } = await this.supabase
+      .from('entreprise_subscriptions')
+      .update({
+        is_active: true,
+        payment_status: 'verified',
+        starts_at: start.toISOString(),
+        expires_at: end.toISOString(),
+        verified_by: adminId,
+        verified_at: new Date().toISOString(),
+        admin_notes: notes || null
+      })
+      .eq('id', subscriptionId)
+
+    if (updateError) {
+      throw new Error('Erreur lors de l\'activation: ' + updateError.message)
+    }
+  }
+
+  /**
+   * Rejeter une demande d'abonnement (admin)
+   */
+  async rejectSubscription(subscriptionId: string, adminId: string, reason: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('entreprise_subscriptions')
+      .update({
+        payment_status: 'rejected',
+        admin_notes: `Rejeté: ${reason}`,
+        verified_by: adminId,
+        verified_at: new Date().toISOString()
+      })
+      .eq('id', subscriptionId)
+      .eq('payment_status', 'pending')
+
+    if (error) {
+      throw new Error('Erreur lors du rejet: ' + error.message)
+    }
+  }
+
+  /**
+   * Désactiver un abonnement actif (admin)
+   */
+  async deactivateSubscription(subscriptionId: string, reason: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('entreprise_subscriptions')
+      .update({
+        is_active: false,
+        admin_notes: `Désactivé: ${reason}`,
+        expires_at: new Date().toISOString() // Expire immédiatement
+      })
+      .eq('id', subscriptionId)
+      .eq('is_active', true)
+
+    if (error) {
+      throw new Error('Erreur lors de la désactivation: ' + error.message)
+    }
+  }
+
+  /**
+   * Valider un abonnement (admin) - Legacy method for compatibility
    */
   async approveSubscription(subscriptionId: string, adminId: string, notes?: string) {
     const { data, error } = await this.supabase
@@ -230,30 +346,6 @@ export class SubscriptionService {
 
     if (error) {
       throw new Error('Erreur lors de la validation de l\'abonnement: ' + error.message)
-    }
-
-    return data
-  }
-
-  /**
-   * Rejeter un abonnement (admin)
-   */
-  async rejectSubscription(subscriptionId: string, adminId: string, reason: string) {
-    const { data, error } = await this.supabase
-      .from('entreprise_subscriptions')
-      .update({
-        is_active: false,
-        payment_status: 'rejected',
-        verified_by: adminId,
-        verified_at: new Date().toISOString(),
-        admin_notes: reason
-      })
-      .eq('id', subscriptionId)
-      .select()
-      .single()
-
-    if (error) {
-      throw new Error('Erreur lors du rejet de l\'abonnement: ' + error.message)
     }
 
     return data

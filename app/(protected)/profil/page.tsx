@@ -400,9 +400,9 @@ export default function ProfilPage() {
 
         {/* Profile Header */}
         <Card className="glass border-0 shadow-2xl overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d] relative">
+          <div className="h-24 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d] relative">
             <div className="absolute inset-0 bg-black/20"></div>
-            <div className="absolute -bottom-16 left-8 flex items-end gap-6">
+            <div className="absolute -bottom-16 left-8">
               {/* Profile Image */}
               <div className="relative">
                 <Avatar className="w-32 h-32 border-4 border-white shadow-2xl">
@@ -432,21 +432,6 @@ export default function ProfilPage() {
                   )}
                 </label>
               </div>
-              
-              {/* Profile Info */}
-              <div className="pb-4">
-                <h1 className="text-3xl font-bold mb-2 text-slate-900">{profile.full_name}</h1>
-                <div className="flex items-center gap-4 text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <Mail className="w-4 h-4" />
-                    {profile.email}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Phone className="w-4 h-4" />
-                    {profile.phone}
-                  </span>
-                </div>
-              </div>
             </div>
             
             {/* Status Badge */}
@@ -455,8 +440,25 @@ export default function ProfilPage() {
             </div>
           </div>
           
+          {/* Profile Info - Now on white background */}
+          <div className="pt-8 px-8 pb-4">
+            <div className="ml-40"> {/* Offset to align with profile image */}
+              <h1 className="text-3xl font-bold mb-2 text-slate-900">{profile.full_name}</h1>
+              <div className="flex items-center gap-4 text-slate-600">
+                <span className="flex items-center gap-1">
+                  <Mail className="w-4 h-4" />
+                  {profile.email}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Phone className="w-4 h-4" />
+                  {profile.phone}
+                </span>
+              </div>
+            </div>
+          </div>
+          
           {/* Profile Stats */}
-          <CardContent className="pt-20 pb-8">
+          <CardContent className="pt-4 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-[#139a9d]/10 to-[#0f7a7d]/10 border border-[#139a9d]/30">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] rounded-xl flex items-center justify-center mx-auto mb-3">
@@ -676,29 +678,36 @@ export default function ProfilPage() {
               <div className="space-y-4">
                 <Label className="text-sm font-semibold text-slate-700">Domaines d'Expertise</Label>
                 <div className="grid grid-cols-1 gap-4">
-                  {DOMAINS.map((domain) => (
+                  {DOMAINS.map((domain) => {
+                    const isSelected = profile.domain.includes(domain.value)
+                    return (
                     <div key={domain.value} className={`p-4 rounded-2xl border-2 transition-all ${
-                      profile.domain.includes(domain.value) 
-                        ? `bg-gradient-to-r ${domain.color} bg-opacity-10 border-current` 
+                      isSelected 
+                        ? `bg-gradient-to-r ${domain.color} border-current` 
                         : 'border-slate-200 hover:border-slate-300'
                     }`}>
                       <div className="flex items-start space-x-3">
                         <Checkbox
                           id={domain.value}
-                          checked={profile.domain.includes(domain.value)}
+                          checked={isSelected}
                           onCheckedChange={(checked) => handleDomainToggle(domain.value, checked as boolean)}
                           disabled={!isEditing}
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <Label htmlFor={domain.value} className="font-semibold cursor-pointer text-slate-900">
+                          <Label htmlFor={domain.value} className={`font-semibold cursor-pointer ${
+                            isSelected ? 'text-white' : 'text-slate-900'
+                          }`}>
                             {domain.label}
                           </Label>
-                          <p className="text-sm text-slate-600 mt-1">{domain.description}</p>
+                          <p className={`text-sm mt-1 ${
+                            isSelected ? 'text-white/90' : 'text-slate-600'
+                          }`}>{domain.description}</p>
                         </div>
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
 
