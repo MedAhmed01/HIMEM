@@ -70,7 +70,7 @@ const DOMAINS = [
     value: 'batiment_constructions' as Domain,
     label: 'Bâtiment et constructions diverses',
     description: 'Bâtiments résidentiels, commerciaux, industriels',
-    color: 'from-orange-500 to-amber-500'
+    color: 'from-[#139a9d] to-[#0f7a7d]'
   },
   {
     value: 'hydraulique_environnement' as Domain,
@@ -307,14 +307,14 @@ export default function ProfilPage() {
         )
       case 'pending_docs':
         return (
-          <Badge className="bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 px-4 py-2">
+          <Badge className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] text-white border-0 px-4 py-2">
             <FileText className="w-4 h-4 mr-2" />
             Documents en attente
           </Badge>
         )
       case 'pending_reference':
         return (
-          <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0 px-4 py-2">
+          <Badge className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] text-white border-0 px-4 py-2">
             <User className="w-4 h-4 mr-2" />
             Parrainage en attente
           </Badge>
@@ -342,9 +342,9 @@ export default function ProfilPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-[#139a9d]/10">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600 font-medium">Chargement du profil...</p>
         </div>
       </div>
@@ -353,7 +353,7 @@ export default function ProfilPage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-[#139a9d]/10">
         <Card className="max-w-md shadow-2xl">
           <CardContent className="pt-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -366,7 +366,7 @@ export default function ProfilPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#139a9d]/5 to-[#0f7a7d]/5 py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Success/Error Message */}
         {message && (
@@ -400,7 +400,7 @@ export default function ProfilPage() {
 
         {/* Profile Header */}
         <Card className="glass border-0 shadow-2xl overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
+          <div className="h-32 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d] relative">
             <div className="absolute inset-0 bg-black/20"></div>
             <div className="absolute -bottom-16 left-8 flex items-end gap-6">
               {/* Profile Image */}
@@ -411,7 +411,7 @@ export default function ProfilPage() {
                     alt={profile.full_name}
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-3xl font-bold">
+                  <AvatarFallback className="bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] text-white text-3xl font-bold">
                     {profile.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
@@ -458,8 +458,8 @@ export default function ProfilPage() {
           {/* Profile Stats */}
           <CardContent className="pt-20 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-[#139a9d]/10 to-[#0f7a7d]/10 border border-[#139a9d]/30">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] rounded-xl flex items-center justify-center mx-auto mb-3">
                   <GraduationCap className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-2xl font-bold text-slate-900">{calculateExperience(profile.grad_year)}</p>
@@ -474,16 +474,16 @@ export default function ProfilPage() {
                 <p className="text-sm text-slate-600">Parrainages effectués</p>
               </div>
               
-              <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-[#139a9d]/10 to-[#0f7a7d]/10 border border-[#139a9d]/30">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Calendar className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-2xl font-bold text-slate-900">{profile.grad_year}</p>
                 <p className="text-sm text-slate-600">Année de sortie</p>
               </div>
               
-              <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-[#139a9d]/10 to-[#0f7a7d]/10 border border-[#139a9d]/30">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-2xl font-bold text-slate-900">
@@ -532,10 +532,10 @@ export default function ProfilPage() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Informations Personnelles */}
           <Card className="glass border-0 shadow-xl overflow-hidden">
-            <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+            <div className="h-1.5 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d]"></div>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md">
                   <User className="w-5 h-5 text-white" />
                 </div>
                 Informations Personnelles
@@ -662,10 +662,10 @@ export default function ProfilPage() {
 
           {/* Domaines et Mode d'Exercice */}
           <Card className="glass border-0 shadow-xl overflow-hidden">
-            <div className="h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500"></div>
+            <div className="h-1.5 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d]"></div>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md">
                   <Building className="w-5 h-5 text-white" />
                 </div>
                 Domaines et Mode d'Exercice
@@ -714,7 +714,7 @@ export default function ProfilPage() {
                         key={mode.value}
                         className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                           isSelected 
-                            ? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-300' 
+                            ? 'bg-gradient-to-r from-[#139a9d]/10 to-[#0f7a7d]/10 border-[#139a9d]/50' 
                             : 'border-slate-200 hover:border-slate-300'
                         } ${!isEditing ? 'cursor-not-allowed opacity-60' : ''}`}
                         onClick={() => isEditing && setProfile({ ...profile, exercise_mode: mode.value })}
@@ -722,7 +722,7 @@ export default function ProfilPage() {
                         <div className="flex items-start space-x-3">
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                             isSelected 
-                              ? 'bg-gradient-to-br from-indigo-500 to-purple-600' 
+                              ? 'bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]' 
                               : 'bg-slate-100'
                           }`}>
                             <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-slate-600'}`} />
@@ -757,7 +757,7 @@ export default function ProfilPage() {
               <Button
                 type="submit"
                 disabled={saving}
-                className="h-12 px-8 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
+                className="h-12 px-8 rounded-xl bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] hover:from-[#0f7a7d] hover:to-[#139a9d] shadow-lg shadow-[#139a9d]/30"
               >
                 {saving ? (
                   <div className="flex items-center gap-2">
@@ -831,7 +831,7 @@ export default function ProfilPage() {
               <Button
                 onClick={handlePasswordChange}
                 disabled={changingPassword || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600"
+                className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d]"
               >
                 {changingPassword ? (
                   <div className="flex items-center gap-2">
