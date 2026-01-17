@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { 
   Mail, Phone, MapPin, Clock, 
   Send, Facebook, Linkedin, Twitter, CheckCircle, AlertCircle 
@@ -289,8 +288,6 @@ export default function ContactPage() {
         </div>
       </div>
       </main>
-      
-      <Footer />
     </div>
   )
 }

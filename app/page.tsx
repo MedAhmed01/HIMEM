@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { PublicSearchBar } from '@/components/search/PublicSearchBar'
 import { LatestArticles } from '@/components/layout/LatestArticles'
 import { CheckCircle, Users, FileText, Briefcase, ArrowRight, Shield, Sparkles, Star } from 'lucide-react'
@@ -133,8 +132,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   )
 }

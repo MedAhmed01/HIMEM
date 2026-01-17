@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { 
   Users, Building2, FileText, Search, 
   CheckCircle, ArrowRight, Briefcase 
@@ -128,8 +127,6 @@ export default function ServicesPage() {
         </div>
       </div>
       </main>
-      
-      <Footer />
     </div>
   )
 }

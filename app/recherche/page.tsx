@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { PublicSearchBar } from '@/components/search/PublicSearchBar'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { Search, Users, CheckCircle, Shield } from 'lucide-react'
 
 export default function RecherchePage() {
@@ -136,8 +135,6 @@ export default function RecherchePage() {
         </div>
       </div>
       </main>
-      
-      <Footer />
     </div>
   )
 }

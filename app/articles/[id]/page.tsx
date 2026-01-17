@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Calendar, Share2, Facebook, Twitter, Linkedin, Link as LinkIcon, Check } from 'lucide-react'
 
@@ -61,9 +60,8 @@ export default function ArticlePage() {
       <div className="flex flex-col min-h-screen bg-white">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#139a9d] border-t-transparent rounded-full animate-spin" />
         </main>
-        <Footer />
       </div>
     )
   }
@@ -75,13 +73,12 @@ export default function ArticlePage() {
         <main className="flex-1 flex flex-col items-center justify-center py-20">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Article non trouvé</h1>
           <Link href="/">
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-[#139a9d] hover:bg-[#0f7a7d]">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour à l'accueil
             </Button>
           </Link>
         </main>
-        <Footer />
       </div>
     )
   }
@@ -186,8 +183,6 @@ export default function ArticlePage() {
           </div>
         </article>
       </main>
-
-      <Footer />
     </div>
   )
 }
