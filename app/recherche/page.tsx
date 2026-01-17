@@ -13,7 +13,7 @@ export default function RecherchePage() {
       
       <main className="flex-1 bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-20">
+      <div className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/30 border border-blue-400/30 mb-6">
@@ -86,7 +86,7 @@ export default function RecherchePage() {
         </div>
 
         {/* CTA for Companies */}
-        <Card className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <Card className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] text-white">
           <CardContent className="p-8 md:p-12 text-center">
             <h2 className="text-3xl font-bold mb-4">
               Vous êtes une entreprise ?

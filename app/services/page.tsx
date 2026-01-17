@@ -15,7 +15,7 @@ export default function ServicesPage() {
       title: 'Recherche d\'Ingénieurs',
       description: 'Accédez à notre base de données d\'ingénieurs qualifiés et vérifiés.',
       link: '/recherche',
-      color: 'from-blue-500 to-blue-600'
+      color: 'from-[#139a9d] to-[#0f7a7d]'
     },
     {
       icon: Briefcase,
@@ -60,7 +60,7 @@ export default function ServicesPage() {
       
       <main className="flex-1 bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-20">
+      <div className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">

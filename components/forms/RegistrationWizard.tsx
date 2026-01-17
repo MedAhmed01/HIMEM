@@ -148,18 +148,18 @@ export function RegistrationWizard({ onComplete }: RegistrationWizardProps) {
                 <div className="flex flex-col items-center flex-1">
                   <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center mb-2 ${
                     isCompleted ? 'bg-green-500 text-white' :
-                    isCurrent ? 'bg-blue-600 text-white' :
+                    isCurrent ? 'bg-[#139a9d] text-white' :
                     'bg-gray-200 text-gray-500'
                   }`}>
                     {isCompleted ? <Check className="w-5 h-5 md:w-6 md:h-6" /> : <Icon className="w-5 h-5 md:w-6 md:h-6" />}
                   </div>
                   <span className={`text-xs md:text-sm font-medium text-center hidden md:block ${
-                    isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                    isCurrent ? 'text-[#139a9d]' : isCompleted ? 'text-green-600' : 'text-gray-500'
                   }`}>
                     {step.title}
                   </span>
                   <span className={`text-xs font-medium text-center md:hidden ${
-                    isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                    isCurrent ? 'text-[#139a9d]' : isCompleted ? 'text-green-600' : 'text-gray-500'
                   }`}>
                     {step.id}
                   </span>
@@ -179,7 +179,7 @@ export function RegistrationWizard({ onComplete }: RegistrationWizardProps) {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         {/* Step Header */}
         <div className="flex items-center gap-4 mb-6 pb-4 border-b border-gray-200">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-[#139a9d] rounded-xl flex items-center justify-center">
             <StepIcon className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -211,7 +211,7 @@ export function RegistrationWizard({ onComplete }: RegistrationWizardProps) {
               type="button"
               onClick={handleNext}
               disabled={!validateStep(currentStep)}
-              className="h-12 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50 disabled:bg-gray-300"
+              className="h-12 px-8 rounded-xl bg-[#139a9d] hover:bg-[#0f7a7d] text-white font-medium disabled:opacity-50 disabled:bg-gray-300"
             >
               Suivant
               <ChevronRight className="w-5 h-5 ml-2" />

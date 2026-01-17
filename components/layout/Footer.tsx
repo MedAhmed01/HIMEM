@@ -27,16 +27,16 @@ export function Footer() {
               Ordre Mauritanien des Ingénieurs en Génie Civil - La plateforme digitale pour la gestion des ingénieurs.
             </p>
             <div className="flex space-x-2 sm:space-x-2.5">
-              <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-blue-500 hover:to-blue-600 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
+              <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-[#139a9d] hover:to-[#0f7a7d] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
                 <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-500 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
                 <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
-              <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:to-blue-500 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
+              <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:to-[#139a9d] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
                 <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
-              <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-blue-600 hover:to-blue-700 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
+              <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-[#139a9d] hover:to-[#0f7a7d] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">
                 <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
             </div>
@@ -45,7 +45,7 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h3 className="text-white text-base sm:text-lg font-semibold mb-4 sm:mb-5 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gradient-to-r from-[#139a9d] to-cyan-500"></div>
               Liens Rapides
             </h3>
             <ul className="space-y-2.5 sm:space-y-3">
@@ -118,7 +118,7 @@ export function Footer() {
             </h3>
             <ul className="space-y-3 sm:space-y-3.5">
               <li className="flex items-start gap-2.5 text-slate-400">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#139a9d]/20 to-cyan-500/20 flex items-center justify-center flex-shrink-0">
                   <Mail className="w-4 h-4 text-cyan-400" />
                 </div>
                 <div>

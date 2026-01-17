@@ -236,9 +236,9 @@ export function PublicSearchBar() {
 
                   {/* Compact Stats */}
                   <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
-                    <div className="bg-blue-50 rounded-md sm:rounded-lg p-1.5 sm:p-2 border border-blue-100">
+                    <div className="bg-[#139a9d]/10 rounded-md sm:rounded-lg p-1.5 sm:p-2 border border-[#139a9d]/20">
                       <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5">
-                        <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-600" />
+                        <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#139a9d]" />
                         <span className="text-xs text-slate-600">Expérience</span>
                       </div>
                       <p className="text-xs sm:text-sm font-bold text-slate-900">{calculateExperience(selectedEngineer.grad_year)} ans</p>

@@ -90,10 +90,10 @@ export function Header() {
                   <Link 
                     href="/inscription"
                     onClick={() => setIsInscriptionOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#139a9d]/10 transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <UserCircle className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 rounded-lg bg-[#139a9d]/20 flex items-center justify-center">
+                      <UserCircle className="w-5 h-5 text-[#139a9d]" />
                     </div>
                     <div>
                       <p className="font-medium text-gray-900 text-sm">{language === 'ar' ? 'مهندس' : 'Ingénieur'}</p>

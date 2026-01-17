@@ -116,7 +116,7 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-10 sm:py-14 md:py-16 lg:py-20 bg-gradient-to-br from-blue-600 to-blue-700">
+        <section className="py-10 sm:py-14 md:py-16 lg:py-20 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]">
           <div className="container mx-auto text-center px-2">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 md:mb-6 px-2">
               Prêt à rejoindre l'OMIGEC ?

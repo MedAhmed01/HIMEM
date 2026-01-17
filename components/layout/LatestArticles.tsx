@@ -33,7 +33,7 @@ export function LatestArticles() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center py-8">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-[#139a9d] border-t-transparent rounded-full animate-spin" />
           </div>
         </div>
       </section>
@@ -47,7 +47,7 @@ export function LatestArticles() {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-[#139a9d] flex items-center justify-center">
               <Newspaper className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Dernières Actualités</h2>
@@ -82,13 +82,13 @@ export function LatestArticles() {
                         year: 'numeric' 
                       })}</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#139a9d] transition-colors">
                       {article.title}
                     </h3>
                     <p className="text-gray-600 text-sm line-clamp-3 mb-4">
                       {article.description}
                     </p>
-                    <div className="flex items-center text-blue-600 text-sm font-medium">
+                    <div className="flex items-center text-[#139a9d] text-sm font-medium">
                       <span>Lire la suite</span>
                       <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     </div>

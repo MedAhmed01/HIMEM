@@ -41,11 +41,11 @@ export function SponsorCarousel() {
     : sponsors
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-t border-blue-100/50 py-3 overflow-hidden">
+    <div className="bg-gradient-to-r from-[#139a9d]/10 via-purple-50 to-pink-50 border-t border-[#139a9d]/20 py-3 overflow-hidden">
       <div className="relative">
         {shouldAnimate && (
           <>
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-blue-50 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#139a9d]/10 to-transparent z-10 pointer-events-none"></div>
             <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-pink-50 to-transparent z-10 pointer-events-none"></div>
           </>
         )}
@@ -60,7 +60,7 @@ export function SponsorCarousel() {
               className="flex-shrink-0 mx-6 group"
               onClick={(e) => !sponsor.website_url && e.preventDefault()}
             >
-              <div className="h-14 w-36 rounded-xl bg-white/80 backdrop-blur-sm border border-blue-100 flex items-center justify-center px-4 transition-all duration-300 group-hover:shadow-lg group-hover:border-blue-300 group-hover:scale-105">
+              <div className="h-14 w-36 rounded-xl bg-white/80 backdrop-blur-sm border border-[#139a9d]/20 flex items-center justify-center px-4 transition-all duration-300 group-hover:shadow-lg group-hover:border-[#139a9d]/50 group-hover:scale-105">
                 {sponsor.logo_url ? (
                   <img
                     src={sponsor.logo_url}
@@ -68,7 +68,7 @@ export function SponsorCarousel() {
                     className="max-h-10 max-w-full object-contain"
                   />
                 ) : (
-                  <span className="text-blue-500 text-sm font-medium">{sponsor.name}</span>
+                  <span className="text-[#139a9d] text-sm font-medium">{sponsor.name}</span>
                 )}
               </div>
             </a>

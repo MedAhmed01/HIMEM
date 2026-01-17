@@ -56,11 +56,11 @@ export function ReferenceSelector({ references, onSelect }: ReferenceSelectorPro
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">
+          <div className="bg-[#139a9d]/10 border border-[#139a9d]/30 rounded-lg p-4">
+            <h4 className="font-semibold text-[#139a9d] mb-2">
               Qu'est-ce qu'un parrain ?
             </h4>
-            <p className="text-sm text-blue-800">
+            <p className="text-sm text-[#139a9d]/80">
               Un parrain est un ingénieur agréé qui confirme votre identité et vos qualifications.
               Une fois que votre parrain aura validé votre demande, votre inscription sera finalisée.
             </p>

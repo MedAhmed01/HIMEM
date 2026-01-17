@@ -6,15 +6,15 @@ import { useRouter } from 'next/navigation'
 import { FileText, Users, Briefcase, UserCheck, LayoutDashboard, Home, LogOut, Sparkles, Image, Newspaper, Building2, Menu, X, CreditCard, Mail } from 'lucide-react'
 
 const navigation = [
-  { name: 'Tableau de bord', href: '/admin', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
-  { name: 'Vérifications', href: '/admin/verifications', icon: FileText, color: 'from-blue-400 to-blue-500' },
-  { name: 'Parrains', href: '/admin/parrains', icon: UserCheck, color: 'from-blue-500 to-blue-600' },
-  { name: 'Ingénieurs', href: '/admin/ingenieurs', icon: Users, color: 'from-blue-400 to-blue-500' },
-  { name: 'Entreprises', href: '/admin/entreprises', icon: Building2, color: 'from-blue-500 to-blue-600' },
+  { name: 'Tableau de bord', href: '/admin', icon: LayoutDashboard, color: 'from-[#139a9d] to-[#0f7a7d]' },
+  { name: 'Vérifications', href: '/admin/verifications', icon: FileText, color: 'from-[#139a9d]/80 to-[#0f7a7d]/80' },
+  { name: 'Parrains', href: '/admin/parrains', icon: UserCheck, color: 'from-[#139a9d] to-[#0f7a7d]' },
+  { name: 'Ingénieurs', href: '/admin/ingenieurs', icon: Users, color: 'from-[#139a9d]/80 to-[#0f7a7d]/80' },
+  { name: 'Entreprises', href: '/admin/entreprises', icon: Building2, color: 'from-[#139a9d] to-[#0f7a7d]' },
   { name: 'Abonnements', href: '/admin/abonnements', icon: CreditCard, color: 'from-amber-500 to-amber-600' },
   { name: 'Messages', href: '/admin/messages', icon: Mail, color: 'from-green-500 to-green-600' },
-  { name: 'Articles', href: '/admin/articles', icon: Newspaper, color: 'from-blue-400 to-blue-500' },
-  { name: 'Sponsors', href: '/admin/sponsors', icon: Image, color: 'from-blue-500 to-blue-600' },
+  { name: 'Articles', href: '/admin/articles', icon: Newspaper, color: 'from-[#139a9d]/80 to-[#0f7a7d]/80' },
+  { name: 'Sponsors', href: '/admin/sponsors', icon: Image, color: 'from-[#139a9d] to-[#0f7a7d]' },
 ]
 
 export default function AdminLayout({
