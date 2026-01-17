@@ -118,14 +118,26 @@ export default function JobDetailPage() {
       })
 
       const data = await response.json()
-      console.log('Application response:', { status: response.status, data })
+      console.log('Application response:', { 
+        status: response.status, 
+        statusText: response.statusText,
+        data 
+      })
 
       if (!response.ok) {
         // Show debug info in development
-        if (process.env.NODE_ENV === 'development' && data.debug) {
-          console.error('Application error debug:', data.debug)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Application error debug:', data.debug || 'No debug info')
+          console.error('Full error response:', data)
         }
-        throw new Error(data.error || 'Erreur lors de la candidature')
+        
+        // Create a more detailed error message
+        let errorMessage = data.error || 'Erreur lors de la candidature'
+        if (data.debug && Object.keys(data.debug).length > 0) {
+          errorMessage += ` (Debug: ${JSON.stringify(data.debug)})`
+        }
+        
+        throw new Error(errorMessage)
       }
 
       setApplicationStatus('success')
@@ -139,6 +151,11 @@ export default function JobDetailPage() {
       console.error('Application error:', err)
       setApplicationStatus('error')
       setError(err.message)
+      
+      // Also show an alert in development for immediate feedback
+      if (process.env.NODE_ENV === 'development') {
+        alert(`Application failed: ${err.message}`)
+      }
     } finally {
       setIsSubmitting(false)
     }
