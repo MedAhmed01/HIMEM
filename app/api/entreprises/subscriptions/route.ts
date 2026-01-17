@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     const subscriptionService = new SubscriptionService(supabaseAdmin)
-    const subscription = await subscriptionService.createSubscription(entreprise.id, plan, receiptUrl)
+    const subscription = await subscriptionService.createSubscriptionRequest(entreprise.id, plan)
 
     return NextResponse.json({
       success: true,

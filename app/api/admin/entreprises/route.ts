@@ -71,12 +71,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Process subscription data to get the most relevant subscription for each entreprise
-    const processedEntreprises = entreprises.map(entreprise => {
+    const processedEntreprises = entreprises.map((entreprise: any) => {
       const subscriptions = entreprise.entreprise_subscriptions || []
       
       // Find active subscription first, then most recent
-      const activeSubscription = subscriptions.find(sub => sub.is_active && sub.payment_status === 'verified')
-      const mostRecentSubscription = subscriptions.sort((a, b) => 
+      const activeSubscription = subscriptions.find((sub: any) => sub.is_active && sub.payment_status === 'verified')
+      const mostRecentSubscription = subscriptions.sort((a: any, b: any) => 
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )[0]
       

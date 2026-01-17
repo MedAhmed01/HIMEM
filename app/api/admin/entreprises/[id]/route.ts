@@ -3,8 +3,8 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -13,6 +13,14 @@ export async function DELETE(
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+    }
+
+    // Await params in Next.js 15
+    const resolvedParams = await params
+    const entrepriseId = resolvedParams.id
+
+    if (!entrepriseId) {
+      return NextResponse.json({ error: 'ID entreprise manquant' }, { status: 400 })
     }
 
     // Vérifier que l'utilisateur est admin
@@ -26,12 +34,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
     }
 
-    const entrepriseId = params.id
-
-    if (!entrepriseId) {
-      return NextResponse.json({ error: 'ID entreprise manquant' }, { status: 400 })
-    }
-
     // Utiliser le client admin
     const supabaseAdmin = createAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,7 +43,7 @@ export async function DELETE(
     // Vérifier que l'entreprise existe
     const { data: entreprise, error: entError } = await supabaseAdmin
       .from('entreprises')
-      .select('id, nom, user_id')
+      .select('id, name, user_id')
       .eq('id', entrepriseId)
       .single()
 
@@ -51,41 +53,43 @@ export async function DELETE(
 
     // Supprimer dans l'ordre pour respecter les contraintes de clés étrangères
     
-    // 1. Supprimer les candidatures aux offres d'emploi
-    await supabaseAdmin
-      .from('job_applications')
-      .delete()
-      .in('job_id', 
-        supabaseAdmin
-          .from('job_offers')
-          .select('id')
-          .eq('entreprise_id', entrepriseId)
-      )
+    // 1. Get job offer IDs first
+    const { data: jobOffers } = await supabaseAdmin
+      .from('job_offers')
+      .select('id')
+      .eq('entreprise_id', entrepriseId)
 
-    // 2. Supprimer les vues des offres d'emploi
-    await supabaseAdmin
-      .from('job_views')
-      .delete()
-      .in('job_id', 
-        supabaseAdmin
-          .from('job_offers')
-          .select('id')
-          .eq('entreprise_id', entrepriseId)
-      )
+    const jobOfferIds = jobOffers?.map(job => job.id) || []
 
-    // 3. Supprimer les offres d'emploi
+    // 2. Supprimer les candidatures aux offres d'emploi
+    if (jobOfferIds.length > 0) {
+      await supabaseAdmin
+        .from('job_applications')
+        .delete()
+        .in('job_id', jobOfferIds)
+    }
+
+    // 3. Supprimer les vues des offres d'emploi
+    if (jobOfferIds.length > 0) {
+      await supabaseAdmin
+        .from('job_views')
+        .delete()
+        .in('job_id', jobOfferIds)
+    }
+
+    // 4. Supprimer les offres d'emploi
     await supabaseAdmin
       .from('job_offers')
       .delete()
       .eq('entreprise_id', entrepriseId)
 
-    // 4. Supprimer les abonnements
+    // 5. Supprimer les abonnements
     await supabaseAdmin
       .from('entreprise_subscriptions')
       .delete()
       .eq('entreprise_id', entrepriseId)
 
-    // 5. Supprimer l'entreprise
+    // 6. Supprimer l'entreprise
     const { error: deleteError } = await supabaseAdmin
       .from('entreprises')
       .delete()
@@ -96,7 +100,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Erreur lors de la suppression' }, { status: 500 })
     }
 
-    // 6. Supprimer le profil utilisateur associé si nécessaire
+    // 7. Supprimer le profil utilisateur associé si nécessaire
     if (entreprise.user_id) {
       await supabaseAdmin
         .from('profiles')
@@ -109,7 +113,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: `Entreprise ${entreprise.nom} supprimée avec succès`
+      message: `Entreprise ${entreprise.name} supprimée avec succès`
     })
 
   } catch (error) {
