@@ -3,7 +3,7 @@ import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, Heart, Spa
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-purple-950">
+    <footer className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-purple-950">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#139a9d]/20 rounded-full blur-3xl"></div>

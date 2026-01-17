@@ -66,7 +66,7 @@ export default function ServicesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Nos Services
             </h1>
-            <p className="text-xl text-blue-100">
+            <p className="text-xl text-white/80">
               L'OMIGEC offre une gamme complète de services pour les ingénieurs 
               et les entreprises en Mauritanie
             </p>
@@ -105,7 +105,7 @@ export default function ServicesPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-blue-50 py-16">
+      <div className="bg-[#139a9d]/10 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Prêt à commencer ?
@@ -115,7 +115,7 @@ export default function ServicesPage() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/inscription">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Button size="lg" className="bg-[#139a9d] hover:bg-[#0f7a7d]">
                 S'inscrire
               </Button>
             </Link>

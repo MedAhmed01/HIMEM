@@ -99,7 +99,7 @@ export function JobOfferForm({
           type="text"
           value={data.title}
           onChange={(e) => handleChange('title', e.target.value)}
-          className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.title ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+          className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.title ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d]`}
           placeholder="Ex: Ingénieur Génie Civil Senior"
         />
         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
@@ -115,7 +115,7 @@ export function JobOfferForm({
           value={data.description}
           onChange={(e) => handleChange('description', e.target.value)}
           rows={6}
-          className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.description ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+          className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.description ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d]`}
           placeholder="Décrivez les responsabilités, les qualifications requises, etc."
         />
         {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
@@ -155,7 +155,7 @@ export function JobOfferForm({
           <select
             value={data.contract_type}
             onChange={(e) => handleChange('contract_type', e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.contract_type ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.contract_type ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d]`}
           >
             {CONTRACT_TYPES.map(type => (
               <option key={type.value} value={type.value}>{type.label}</option>
@@ -173,7 +173,7 @@ export function JobOfferForm({
             type="text"
             value={data.location}
             onChange={(e) => handleChange('location', e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.location ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.location ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d]`}
             placeholder="Ex: Nouakchott, Mauritanie"
           />
           {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
@@ -191,7 +191,7 @@ export function JobOfferForm({
             type="text"
             value={data.salary_range}
             onChange={(e) => handleChange('salary_range', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#139a9d]"
             placeholder="Ex: 300 000 - 500 000 MRU"
           />
         </div>
@@ -206,7 +206,7 @@ export function JobOfferForm({
             value={data.deadline}
             onChange={(e) => handleChange('deadline', e.target.value)}
             min={new Date().toISOString().split('T')[0]}
-            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.deadline ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.deadline ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d]`}
           />
           {errors.deadline && <p className="text-red-500 text-sm mt-1">{errors.deadline}</p>}
         </div>

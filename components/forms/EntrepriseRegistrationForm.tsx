@@ -104,7 +104,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
               type="text"
               value={data.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.name ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
               placeholder="Ex: SOGEA Mauritanie"
             />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
@@ -118,7 +118,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
               type="text"
               value={data.nif}
               onChange={(e) => handleChange('nif', e.target.value)}
-              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.nif ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.nif ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
               placeholder="Ex: 123456789"
             />
             {errors.nif && <p className="text-red-500 text-sm mt-1">{errors.nif}</p>}
@@ -132,7 +132,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
           <select
             value={data.sector}
             onChange={(e) => handleChange('sector', e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.sector ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.sector ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
           >
             <option value="">Sélectionnez un secteur</option>
             {SECTORS.map(sector => (
@@ -150,7 +150,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
             value={data.description}
             onChange={(e) => handleChange('description', e.target.value)}
             rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#139a9d] focus:border-transparent"
             placeholder="Décrivez brièvement votre entreprise..."
           />
         </div>
@@ -173,7 +173,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
               type="email"
               value={data.email}
               onChange={(e) => handleChange('email', e.target.value)}
-              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
               placeholder="contact@entreprise.mr"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -187,7 +187,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
               type="tel"
               value={data.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
-              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              className={`w-full px-4 py-3 rounded-xl border bg-white text-gray-900 ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
               placeholder="+222 XX XX XX XX"
             />
             {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
@@ -212,7 +212,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
                 type={showPassword ? 'text' : 'password'}
                 value={data.password}
                 onChange={(e) => handleChange('password', e.target.value)}
-                className={`w-full px-4 py-3 pr-12 rounded-xl border bg-white text-gray-900 ${errors.password ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                className={`w-full px-4 py-3 pr-12 rounded-xl border bg-white text-gray-900 ${errors.password ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
                 placeholder="Minimum 8 caractères"
               />
               <button
@@ -235,7 +235,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={data.confirmPassword}
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                className={`w-full px-4 py-3 pr-12 rounded-xl border bg-white text-gray-900 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                className={`w-full px-4 py-3 pr-12 rounded-xl border bg-white text-gray-900 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-[#139a9d] focus:border-transparent`}
                 placeholder="Confirmez votre mot de passe"
               />
               <button
