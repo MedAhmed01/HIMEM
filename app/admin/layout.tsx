@@ -39,13 +39,13 @@ export default function AdminLayout({
       {/* Admin Header */}
       <header className="sticky top-0 z-50 bg-[#139a9d] border-b border-[#0f7a7d] shadow-sm">
         <div className="container mx-auto">
-          <div className="flex items-center justify-between py-2 sm:py-3 md:py-4">
+          <div className="flex items-center justify-between h-14 sm:h-16 md:h-18">
             <div className="flex items-center gap-2 sm:gap-3">
               <Link href="/admin" className="flex items-center gap-2 sm:gap-2.5 group">
                 <img 
                   src="/logo.png" 
                   alt="OMIGEC Logo" 
-                  className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-contain"
+                  className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain"
                 />
               </Link>
               <span className="hidden sm:flex px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white/10 border border-white/20 text-white text-xs sm:text-sm font-medium items-center gap-1 sm:gap-1.5">
@@ -75,7 +75,7 @@ export default function AdminLayout({
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
-          <nav className="absolute top-[180px] sm:top-[200px] md:top-[220px] left-0 right-0 bg-white border-b border-gray-200 shadow-xl max-h-[calc(100vh-180px)] sm:max-h-[calc(100vh-200px)] md:max-h-[calc(100vh-220px)] overflow-y-auto">
+          <nav className="absolute top-[160px] sm:top-[192px] md:top-[224px] left-0 right-0 bg-white border-b border-gray-200 shadow-xl max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-192px)] md:max-h-[calc(100vh-224px)] overflow-y-auto">
             <div className="p-3 sm:p-4 space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon
