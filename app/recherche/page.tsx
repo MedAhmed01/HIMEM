@@ -124,7 +124,7 @@ export default function RecherchePage() {
               { step: '4', title: 'Contactez', desc: 'Recrutez les meilleurs' }
             ].map((item, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-blue-600 text-white text-2xl font-bold flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-[#139a9d] text-white text-2xl font-bold flex items-center justify-center mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>

@@ -322,12 +322,12 @@ export default function AbonnementPage() {
         {/* Info */}
         <div className="mt-12 bg-blue-50 border border-blue-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <FileText className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-[#139a9d]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText className="w-6 h-6 text-[#139a9d]" />
             </div>
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">Comment ça marche ?</h3>
-              <ul className="text-blue-700 space-y-1 text-sm">
+              <h3 className="font-semibold text-[#139a9d] mb-2">Comment ça marche ?</h3>
+              <ul className="text-[#139a9d]/80 space-y-1 text-sm">
                 <li>• Choisissez le forfait adapté à vos besoins</li>
                 <li>• Effectuez le paiement et joignez le reçu</li>
                 <li>• Notre équipe vérifie votre paiement</li>
