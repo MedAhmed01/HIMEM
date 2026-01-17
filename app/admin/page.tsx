@@ -120,9 +120,9 @@ export default function AdminDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tableau de bord</h1>
           <p className="text-gray-500 text-sm mt-1">Vue d'ensemble de la plateforme OMIGEC</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200">
-          <Clock className="w-4 h-4 text-blue-600" />
-          <span className="text-xs text-blue-700 font-medium">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#139a9d]/10 border border-[#139a9d]/30">
+          <Clock className="w-4 h-4 text-[#139a9d]" />
+          <span className="text-xs text-[#139a9d] font-medium">
             {new Date().toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}
           </span>
         </div>
@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
                 <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
                 {isPendingDocs && stats.pendingDocs > 0 ? (
                   <div className="flex gap-2 mt-2">
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                    <span className="text-xs bg-[#139a9d]/20 text-[#139a9d] px-2 py-1 rounded-full font-medium">
                       {stats.pendingEngineers} ingénieur{stats.pendingEngineers !== 1 ? 's' : ''}
                     </span>
                     <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
@@ -185,13 +185,13 @@ export default function AdminDashboardPage() {
                 <Link
                   key={index}
                   href={action.href}
-                  className="group flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
+                  className="group flex items-start gap-4 p-4 rounded-lg border border-gray-200 hover:border-[#139a9d]/50 hover:bg-[#139a9d]/5 transition-all"
                 >
                   <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center gap-2 text-sm">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-[#139a9d] transition-colors flex items-center gap-2 text-sm">
                       <span className="truncate">{action.title}</span>
                       <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all flex-shrink-0" />
                     </h3>

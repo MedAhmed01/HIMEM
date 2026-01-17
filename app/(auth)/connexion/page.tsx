@@ -126,24 +126,24 @@ function ConnexionForm() {
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="w-full max-w-md">
         {/* Back Link */}
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-blue-600 mb-8 transition-colors group">
+        <Link href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-[#139a9d] mb-8 transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Retour à l'accueil
         </Link>
 
         <Card className="border-0 shadow-2xl overflow-hidden">
-          {/* Blue Top Bar */}
-          <div className="h-2 bg-blue-600"></div>
+          {/* Turquoise Top Bar */}
+          <div className="h-2 bg-[#139a9d]"></div>
           
           <CardHeader className="space-y-4 text-center pt-8">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-[#139a9d] flex items-center justify-center shadow-lg">
               {userType === 'entreprise' ? (
                 <Building2 className="w-8 h-8 text-white" />
               ) : (
                 <LogIn className="w-8 h-8 text-white" />
               )}
             </div>
-            <CardTitle className="text-3xl font-bold text-blue-600">
+            <CardTitle className="text-3xl font-bold text-[#139a9d]">
               Connexion
             </CardTitle>
             <CardDescription className="text-base">
@@ -160,7 +160,7 @@ function ConnexionForm() {
                 onClick={() => setUserType('ingenieur')}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                   userType === 'ingenieur'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-[#139a9d] shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -172,7 +172,7 @@ function ConnexionForm() {
                 onClick={() => setUserType('entreprise')}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                   userType === 'entreprise'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-[#139a9d] shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -198,7 +198,7 @@ function ConnexionForm() {
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="pl-12 h-12 rounded-xl border-2 border-slate-200 focus:border-blue-500 transition-colors"
+                    className="pl-12 h-12 rounded-xl border-2 border-slate-200 focus:border-[#139a9d] transition-colors"
                   />
                 </div>
               </div>
@@ -215,7 +215,7 @@ function ConnexionForm() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="pl-12 pr-12 h-12 rounded-xl border-2 border-slate-200 focus:border-blue-500 transition-colors"
+                    className="pl-12 pr-12 h-12 rounded-xl border-2 border-slate-200 focus:border-[#139a9d] transition-colors"
                   />
                   <button
                     type="button"
@@ -238,7 +238,7 @@ function ConnexionForm() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-base font-medium shadow-lg"
+                className="w-full h-12 bg-[#139a9d] hover:bg-[#0f7a7d] text-white rounded-xl text-base font-medium shadow-lg"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -259,12 +259,12 @@ function ConnexionForm() {
               <p className="text-center text-slate-600">
                 Pas encore de compte ?{' '}
                 {userType === 'entreprise' ? (
-                  <Link href="/inscription-entreprise" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1">
+                  <Link href="/inscription-entreprise" className="font-semibold text-[#139a9d] hover:text-[#0f7a7d] transition-colors inline-flex items-center gap-1">
                     <Building2 className="w-4 h-4" />
                     Inscrivez votre entreprise
                   </Link>
                 ) : (
-                  <Link href="/inscription" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1">
+                  <Link href="/inscription" className="font-semibold text-[#139a9d] hover:text-[#0f7a7d] transition-colors inline-flex items-center gap-1">
                     <Sparkles className="w-4 h-4" />
                     Inscrivez-vous
                   </Link>
@@ -284,9 +284,9 @@ export default function ConnexionPage() {
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="w-full max-w-md">
           <Card className="border-0 shadow-2xl overflow-hidden">
-            <div className="h-2 bg-blue-600"></div>
+            <div className="h-2 bg-[#139a9d]"></div>
             <CardContent className="py-16 text-center">
-              <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-8 h-8 border-2 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="mt-4 text-slate-600">Chargement...</p>
             </CardContent>
           </Card>

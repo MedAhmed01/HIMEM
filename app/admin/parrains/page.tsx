@@ -54,7 +54,7 @@ export default function ParrainsPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="w-12 h-12 border-3 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-gray-600 text-sm">Chargement...</p>
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function ParrainsPage() {
                   </div>
                   <Button
                     size="sm"
-                    className="h-9 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0"
+                    className="h-9 px-3 rounded-lg bg-[#139a9d] hover:bg-[#0f7a7d] text-white flex-shrink-0"
                     onClick={() => handleAction('add', engineer.id)}
                   >
                     <UserPlus className="w-4 h-4 mr-2" />

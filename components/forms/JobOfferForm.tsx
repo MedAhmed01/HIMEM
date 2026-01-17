@@ -135,7 +135,7 @@ export function JobOfferForm({
               onClick={() => toggleDomain(domain.value)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 data.domains.includes(domain.value)
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#139a9d] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -216,7 +216,7 @@ export function JobOfferForm({
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium"
+        className="w-full h-12 rounded-xl bg-[#139a9d] hover:bg-[#0f7a7d] text-white font-medium"
       >
         {isLoading ? (
           <>

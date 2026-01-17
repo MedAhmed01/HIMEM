@@ -83,7 +83,7 @@ export default function InscriptionPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
+          <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-[#139a9d] font-medium">
             <ArrowLeft className="w-4 h-4" />
             Retour à l'accueil
           </Link>
@@ -91,14 +91,14 @@ export default function InscriptionPage() {
       </div>
 
       {/* Title Section */}
-      <div className="bg-blue-600 text-white py-8">
+      <div className="bg-[#139a9d] text-white py-8">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <Sparkles className="w-6 h-6" />
-            <span className="text-blue-200 font-medium">Rejoignez l'OMIGEC</span>
+            <span className="text-[#139a9d]/70 font-medium">Rejoignez l'OMIGEC</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Inscription</h1>
-          <p className="text-blue-100 text-lg">
+          <p className="text-white/80 text-lg">
             Créez votre compte en quelques étapes simples
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function InscriptionPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-gray-600">
             Déjà inscrit ?{' '}
-            <Link href="/connexion" className="text-blue-600 hover:text-blue-700 font-bold">
+            <Link href="/connexion" className="text-[#139a9d] hover:text-[#0f7a7d] font-bold">
               Connectez-vous
             </Link>
           </p>

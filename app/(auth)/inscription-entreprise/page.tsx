@@ -71,7 +71,7 @@ export default function InscriptionEntreprisePage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium">
+          <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-[#139a9d] font-medium">
             <ArrowLeft className="w-4 h-4" />
             Retour à l'accueil
           </Link>
@@ -79,14 +79,14 @@ export default function InscriptionEntreprisePage() {
       </div>
 
       {/* Title Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8">
+      <div className="bg-gradient-to-r from-[#139a9d] to-[#0f7a7d] text-white py-8">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
             <Building2 className="w-6 h-6" />
-            <span className="text-blue-200 font-medium">Espace Entreprise</span>
+            <span className="text-white/70 font-medium">Espace Entreprise</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Inscription Entreprise</h1>
-          <p className="text-blue-100 text-lg">
+          <p className="text-white/80 text-lg">
             Recrutez les meilleurs ingénieurs de Mauritanie
           </p>
         </div>
@@ -96,8 +96,8 @@ export default function InscriptionEntreprisePage() {
       <div className="max-w-4xl mx-auto px-4 -mt-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-[#139a9d]/20 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-[#139a9d]" />
             </div>
             <div>
               <p className="font-medium text-gray-900">+500 Ingénieurs</p>
@@ -152,13 +152,13 @@ export default function InscriptionEntreprisePage() {
         <div className="max-w-4xl mx-auto px-4 text-center space-y-2">
           <p className="text-gray-600">
             Déjà inscrit ?{' '}
-            <Link href="/connexion?type=entreprise" className="text-blue-600 hover:text-blue-700 font-bold">
+            <Link href="/connexion?type=entreprise" className="text-[#139a9d] hover:text-[#0f7a7d] font-bold">
               Connectez-vous
             </Link>
           </p>
           <p className="text-gray-500 text-sm">
             Vous êtes ingénieur ?{' '}
-            <Link href="/inscription" className="text-blue-600 hover:text-blue-700">
+            <Link href="/inscription" className="text-[#139a9d] hover:text-[#0f7a7d]">
               Inscrivez-vous ici
             </Link>
           </p>

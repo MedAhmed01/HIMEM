@@ -180,7 +180,7 @@ export default function SponsorsPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="w-12 h-12 border-3 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-gray-600 text-sm">Chargement...</p>
         </div>
       </div>
@@ -230,7 +230,7 @@ export default function SponsorsPage() {
                 <Label className="text-sm font-medium text-gray-700">Logo *</Label>
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-[#139a9d] hover:bg-[#139a9d]/5 transition-colors"
                 >
                   {previewUrl ? (
                     <div className="space-y-2">

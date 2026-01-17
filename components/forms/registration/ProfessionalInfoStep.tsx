@@ -89,11 +89,11 @@ export function ProfessionalInfoStep({ data, onChange }: ProfessionalInfoStepPro
       </div>
 
       {data.graduationYear && !isNaN(Number(data.graduationYear)) && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-900">
+        <div className="bg-[#139a9d]/10 border border-[#139a9d]/30 rounded-lg p-4">
+          <p className="text-sm text-[#139a9d]">
             <strong>Expérience:</strong> {currentYear - Number(data.graduationYear)} ans
           </p>
-          <p className="text-sm text-blue-900 mt-1">
+          <p className="text-sm text-[#139a9d] mt-1">
             <strong>Cotisation annuelle:</strong>{' '}
             {currentYear - Number(data.graduationYear) < 5
               ? '1 500 MRU'

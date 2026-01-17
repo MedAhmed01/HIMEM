@@ -84,12 +84,12 @@ export default function AdminLayout({
                     key={item.name}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-blue-50 transition-all group"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#139a9d]/10 transition-all group"
                   >
                     <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center shadow-md`}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-medium text-sm text-gray-700 group-hover:text-blue-600 transition-colors">{item.name}</span>
+                    <span className="font-medium text-sm text-gray-700 group-hover:text-[#139a9d] transition-colors">{item.name}</span>
                   </Link>
                 )
               })}
@@ -133,12 +133,12 @@ export default function AdminLayout({
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="flex items-center gap-2.5 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-lg lg:rounded-xl hover:bg-blue-50 transition-all group"
+                      className="flex items-center gap-2.5 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-lg lg:rounded-xl hover:bg-[#139a9d]/10 transition-all group"
                     >
                       <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-lg lg:rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-md group-hover:scale-105 transition-transform`}>
                         <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
                       </div>
-                      <span className="font-medium text-sm lg:text-base text-gray-700 group-hover:text-blue-600 transition-colors">{item.name}</span>
+                      <span className="font-medium text-sm lg:text-base text-gray-700 group-hover:text-[#139a9d] transition-colors">{item.name}</span>
                     </Link>
                   )
                 })}

@@ -180,7 +180,7 @@ export default function VerificationsPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <div className="w-12 h-12 border-3 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="text-gray-600 text-sm">Chargement...</p>
         </div>
       </div>
@@ -245,7 +245,7 @@ export default function VerificationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-gray-900 text-lg truncate">{engineer.full_name || 'Utilisateur'}</h3>
-                      <Badge className="bg-blue-100 text-blue-800 border-blue-300 flex items-center gap-1">
+                      <Badge className="bg-[#139a9d]/20 text-[#139a9d] border-[#139a9d]/30 flex items-center gap-1">
                         <User className="w-3 h-3" />
                         Ingénieur
                       </Badge>

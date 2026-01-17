@@ -91,7 +91,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
       {/* Informations de l'entreprise */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Building2 className="w-5 h-5 text-blue-600" />
+          <Building2 className="w-5 h-5 text-[#139a9d]" />
           Informations de l'entreprise
         </h3>
         
@@ -160,7 +160,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
       {/* Coordonnées */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Mail className="w-5 h-5 text-blue-600" />
+          <Mail className="w-5 h-5 text-[#139a9d]" />
           Coordonnées
         </h3>
         
@@ -198,7 +198,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
       {/* Sécurité */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Lock className="w-5 h-5 text-blue-600" />
+          <Lock className="w-5 h-5 text-[#139a9d]" />
           Sécurité
         </h3>
         
@@ -252,12 +252,12 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
       </div>
 
       {/* Info box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div className="bg-[#139a9d]/10 border border-[#139a9d]/30 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <FileText className="w-5 h-5 text-blue-600 mt-0.5" />
+          <FileText className="w-5 h-5 text-[#139a9d] mt-0.5" />
           <div>
-            <p className="font-medium text-blue-900">Processus d'inscription</p>
-            <p className="text-blue-700 text-sm mt-1">
+            <p className="font-medium text-[#139a9d]">Processus d'inscription</p>
+            <p className="text-[#139a9d]/80 text-sm mt-1">
               Après soumission, votre demande sera examinée par notre équipe. 
               Une fois validée, vous pourrez souscrire à un forfait et publier vos offres d'emploi.
             </p>
@@ -269,7 +269,7 @@ export function EntrepriseRegistrationForm({ onSubmit, isLoading = false }: Entr
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50"
+        className="w-full h-12 rounded-xl bg-[#139a9d] hover:bg-[#0f7a7d] text-white font-medium disabled:opacity-50"
       >
         {isLoading ? (
           <>
