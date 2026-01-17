@@ -11,21 +11,42 @@ export async function POST(
     const body = await request.json()
     const { coverLetter } = body
 
+    console.log('Job application request:', { jobId, userId: 'checking...' })
+
     // Verify authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
+      console.log('Authentication error:', authError)
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
-    // Get engineer profile
+    console.log('User authenticated:', { userId: user.id, email: user.email })
+
+    // Get engineer profile - check both profiles table and ensure it's an engineer
     const { data: engineer, error: engineerError } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, status, subscription_expiry, user_type')
       .eq('id', user.id)
       .single()
 
+    console.log('Profile lookup result:', { engineer, engineerError })
+
     if (engineerError || !engineer) {
-      return NextResponse.json({ error: 'Profil ingénieur non trouvé' }, { status: 404 })
+      console.log('Profile not found or error:', engineerError)
+      return NextResponse.json({ 
+        error: 'Profil ingénieur non trouvé',
+        debug: {
+          userId: user.id,
+          error: engineerError?.message
+        }
+      }, { status: 404 })
+    }
+
+    // Check if user is an engineer (not an enterprise)
+    if (engineer.user_type === 'entreprise') {
+      return NextResponse.json({ 
+        error: 'Seuls les ingénieurs peuvent postuler aux offres' 
+      }, { status: 403 })
     }
 
     // Verify job exists and is active
@@ -35,8 +56,17 @@ export async function POST(
       .eq('id', jobId)
       .single()
 
+    console.log('Job lookup result:', { job, jobError })
+
     if (jobError || !job) {
-      return NextResponse.json({ error: 'Offre non trouvée' }, { status: 404 })
+      console.log('Job not found or error:', jobError)
+      return NextResponse.json({ 
+        error: 'Offre non trouvée',
+        debug: {
+          jobId,
+          error: jobError?.message
+        }
+      }, { status: 404 })
     }
 
     if (!job.is_active) {
@@ -71,9 +101,13 @@ export async function POST(
 
     if (insertError) {
       console.error('Error creating application:', insertError)
-      return NextResponse.json({ error: 'Erreur lors de la création de la candidature' }, { status: 500 })
+      return NextResponse.json({ 
+        error: 'Erreur lors de la création de la candidature',
+        debug: insertError.message
+      }, { status: 500 })
     }
 
+    console.log('Application created successfully')
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error in POST /api/jobs/[id]/apply:', error)

@@ -43,8 +43,20 @@ export default function JobDetailPage() {
   useEffect(() => {
     if (jobId) {
       fetchJob()
+      // Debug: Check profile status
+      checkProfileStatus()
     }
   }, [jobId])
+
+  const checkProfileStatus = async () => {
+    try {
+      const response = await fetch('/api/debug/profile-status')
+      const data = await response.json()
+      console.log('Profile status:', data)
+    } catch (err) {
+      console.error('Error checking profile status:', err)
+    }
+  }
 
   const fetchJob = async () => {
     try {
@@ -72,8 +84,11 @@ export default function JobDetailPage() {
   const handleApply = async () => {
     setIsSubmitting(true)
     setApplicationStatus('idle')
+    setError(null) // Clear previous errors
     
     try {
+      console.log('Applying to job:', jobId)
+      
       const response = await fetch(`/api/jobs/${jobId}/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -81,8 +96,13 @@ export default function JobDetailPage() {
       })
 
       const data = await response.json()
+      console.log('Application response:', { status: response.status, data })
 
       if (!response.ok) {
+        // Show debug info in development
+        if (process.env.NODE_ENV === 'development' && data.debug) {
+          console.error('Application error debug:', data.debug)
+        }
         throw new Error(data.error || 'Erreur lors de la candidature')
       }
 
@@ -91,8 +111,10 @@ export default function JobDetailPage() {
       setTimeout(() => {
         setShowApplicationModal(false)
         setCoverLetter('')
+        setApplicationStatus('idle')
       }, 2000)
     } catch (err: any) {
+      console.error('Application error:', err)
       setApplicationStatus('error')
       setError(err.message)
     } finally {
