@@ -1,34 +1,33 @@
--- ============================================
--- Retirer les droits admin à abdelvetahamar@gmail.com
--- ============================================
+-- SQL Script to set abdelvetahamar@gmail.com as admin
+-- Run this script in your Supabase SQL editor or database console
 
--- Étape 1: Vérifier le profil actuel
-SELECT 
-    id,
-    email,
-    full_name,
-    is_admin,
-    created_at
-FROM profiles
-WHERE email = 'abdelvetahamar@gmail.com';
-
--- Étape 2: Retirer les droits admin
+-- Update the profiles table to set is_admin = true for the specified email
 UPDATE profiles 
-SET is_admin = false 
-WHERE email = 'abdelvetahamar@gmail.com';
+SET is_admin = true 
+WHERE id = (
+  SELECT id 
+  FROM auth.users 
+  WHERE email = 'abdelvetahamar@gmail.com'
+);
 
--- Étape 3: Vérifier que ça a fonctionné
+-- Verify the update was successful
 SELECT 
-    id,
-    email,
-    full_name,
-    is_admin
-FROM profiles
-WHERE email = 'abdelvetahamar@gmail.com';
+  u.email,
+  p.full_name,
+  p.is_admin,
+  p.status,
+  p.created_at
+FROM auth.users u
+JOIN profiles p ON u.id = p.id
+WHERE u.email = 'abdelvetahamar@gmail.com';
 
--- Résultat attendu: is_admin = true
-
--- Étape 4: Voir tous les admins
-SELECT email, full_name, is_admin 
-FROM profiles 
-WHERE is_admin = true;
+-- Show all current admins for verification
+SELECT 
+  u.email,
+  p.full_name,
+  p.is_admin,
+  p.status
+FROM auth.users u
+JOIN profiles p ON u.id = p.id
+WHERE p.is_admin = true
+ORDER BY p.created_at;

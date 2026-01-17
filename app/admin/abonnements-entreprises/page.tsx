@@ -22,6 +22,15 @@ import {
 import { formatPrice } from '@/lib/services/subscription.service'
 import { SUBSCRIPTION_PLANS } from '@/lib/types/database'
 
+// Helper function to format price if import fails
+const safeFormatPrice = (amount: number): string => {
+  try {
+    return formatPrice(amount)
+  } catch {
+    return `${amount.toLocaleString('fr-FR')} MRU`
+  }
+}
+
 interface PendingSubscription {
   id: string
   plan: string
@@ -91,12 +100,15 @@ export default function AdminAbonnementsEntreprisesPage() {
 
   const fetchSubscriptions = async () => {
     try {
+      setError(null)
+      
       // Fetch pending subscriptions
       const pendingResponse = await fetch('/api/admin/subscriptions/pending')
       const pendingData = await pendingResponse.json()
 
       if (!pendingResponse.ok) {
-        throw new Error(pendingData.error)
+        console.error('Pending subscriptions error:', pendingData)
+        throw new Error(pendingData.error || 'Erreur lors du chargement des demandes en attente')
       }
 
       // Fetch active subscriptions
@@ -104,12 +116,19 @@ export default function AdminAbonnementsEntreprisesPage() {
       const activeData = await activeResponse.json()
 
       if (!activeResponse.ok) {
-        throw new Error(activeData.error)
+        console.error('Active subscriptions error:', activeData)
+        throw new Error(activeData.error || 'Erreur lors du chargement des abonnements actifs')
       }
+
+      console.log('Subscriptions loaded:', {
+        pending: pendingData.subscriptions?.length || 0,
+        active: activeData.subscriptions?.length || 0
+      })
 
       setPendingSubscriptions(pendingData.subscriptions || [])
       setActiveSubscriptions(activeData.subscriptions || [])
     } catch (err: any) {
+      console.error('Fetch subscriptions error:', err)
       setError(err.message)
     } finally {
       setIsLoading(false)
@@ -120,11 +139,13 @@ export default function AdminAbonnementsEntreprisesPage() {
     if (!activationDialog.subscription) return
 
     if (!activationData.startDate || !activationData.endDate) {
-      alert('Veuillez remplir les dates de début et de fin')
+      setError('Veuillez remplir les dates de début et de fin')
       return
     }
 
     setProcessingId(activationDialog.subscription.id)
+    setError(null)
+    
     try {
       const response = await fetch('/api/admin/subscriptions/activate', {
         method: 'POST',
@@ -140,15 +161,24 @@ export default function AdminAbonnementsEntreprisesPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error)
+        throw new Error(data.error || 'Erreur lors de l\'activation')
       }
 
-      alert('Abonnement activé avec succès')
+      console.log('Subscription activated successfully')
       await fetchSubscriptions()
       setActivationDialog({ isOpen: false, subscription: null })
       setActivationData({ startDate: '', endDate: '', notes: '' })
+      
+      // Show success message
+      const successDiv = document.createElement('div')
+      successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      successDiv.textContent = 'Abonnement activé avec succès'
+      document.body.appendChild(successDiv)
+      setTimeout(() => document.body.removeChild(successDiv), 3000)
+      
     } catch (err: any) {
-      alert('Erreur: ' + err.message)
+      console.error('Activation error:', err)
+      setError('Erreur lors de l\'activation: ' + err.message)
     } finally {
       setProcessingId(null)
     }
@@ -158,11 +188,13 @@ export default function AdminAbonnementsEntreprisesPage() {
     if (!deactivationDialog.subscription) return
 
     if (!deactivationReason.trim()) {
-      alert('Veuillez indiquer la raison de la désactivation')
+      setError('Veuillez indiquer la raison de la désactivation')
       return
     }
 
     setProcessingId(deactivationDialog.subscription.id)
+    setError(null)
+    
     try {
       const response = await fetch('/api/admin/subscriptions/deactivate', {
         method: 'POST',
@@ -176,15 +208,24 @@ export default function AdminAbonnementsEntreprisesPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error)
+        throw new Error(data.error || 'Erreur lors de la désactivation')
       }
 
-      alert('Abonnement désactivé avec succès')
+      console.log('Subscription deactivated successfully')
       await fetchSubscriptions()
       setDeactivationDialog({ isOpen: false, subscription: null })
       setDeactivationReason('')
+      
+      // Show success message
+      const successDiv = document.createElement('div')
+      successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      successDiv.textContent = 'Abonnement désactivé avec succès'
+      document.body.appendChild(successDiv)
+      setTimeout(() => document.body.removeChild(successDiv), 3000)
+      
     } catch (err: any) {
-      alert('Erreur: ' + err.message)
+      console.error('Deactivation error:', err)
+      setError('Erreur lors de la désactivation: ' + err.message)
     } finally {
       setProcessingId(null)
     }
@@ -224,6 +265,8 @@ export default function AdminAbonnementsEntreprisesPage() {
     if (!reason) return
 
     setProcessingId(subscriptionId)
+    setError(null)
+    
     try {
       const response = await fetch('/api/admin/subscriptions/reject', {
         method: 'POST',
@@ -234,13 +277,22 @@ export default function AdminAbonnementsEntreprisesPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error)
+        throw new Error(data.error || 'Erreur lors du rejet')
       }
 
-      alert('Demande rejetée avec succès')
+      console.log('Subscription rejected successfully')
       await fetchSubscriptions()
+      
+      // Show success message
+      const successDiv = document.createElement('div')
+      successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      successDiv.textContent = 'Demande rejetée avec succès'
+      document.body.appendChild(successDiv)
+      setTimeout(() => document.body.removeChild(successDiv), 3000)
+      
     } catch (err: any) {
-      alert('Erreur: ' + err.message)
+      console.error('Rejection error:', err)
+      setError('Erreur lors du rejet: ' + err.message)
     } finally {
       setProcessingId(null)
     }
@@ -282,7 +334,28 @@ export default function AdminAbonnementsEntreprisesPage() {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-500" />
-          <p className="text-red-700">{error}</p>
+          <div className="flex-1">
+            <p className="text-red-700">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="text-red-600 hover:text-red-800 text-sm underline mt-1"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Debug info in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+          <h3 className="font-semibold text-blue-900 mb-2">Debug Info</h3>
+          <div className="text-sm text-blue-700 space-y-1">
+            <p>Pending subscriptions: {pendingSubscriptions.length}</p>
+            <p>Active subscriptions: {activeSubscriptions.length}</p>
+            <p>Loading: {isLoading ? 'Yes' : 'No'}</p>
+            <p>Processing ID: {processingId || 'None'}</p>
+          </div>
         </div>
       )}
 
@@ -358,7 +431,7 @@ export default function AdminAbonnementsEntreprisesPage() {
                           {SUBSCRIPTION_PLANS[subscription.plan as keyof typeof SUBSCRIPTION_PLANS]?.name || subscription.plan}
                         </span>
                         <span className="px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full">
-                          {formatPrice(SUBSCRIPTION_PLANS[subscription.plan as keyof typeof SUBSCRIPTION_PLANS]?.price || 0)}
+                          {safeFormatPrice(SUBSCRIPTION_PLANS[subscription.plan as keyof typeof SUBSCRIPTION_PLANS]?.price || 0)}
                         </span>
                       </div>
                       <div className="flex items-center gap-6 text-sm text-gray-600">

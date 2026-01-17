@@ -51,7 +51,18 @@ export async function DELETE(
 
     // Supprimer dans l'ordre pour respecter les contraintes de clés étrangères
     
-    // 1. Supprimer les vues d'offres d'emploi
+    // 1. Supprimer les candidatures aux offres d'emploi
+    await supabaseAdmin
+      .from('job_applications')
+      .delete()
+      .in('job_id', 
+        supabaseAdmin
+          .from('job_offers')
+          .select('id')
+          .eq('entreprise_id', entrepriseId)
+      )
+
+    // 2. Supprimer les vues des offres d'emploi
     await supabaseAdmin
       .from('job_views')
       .delete()
@@ -62,37 +73,38 @@ export async function DELETE(
           .eq('entreprise_id', entrepriseId)
       )
 
-    // 2. Supprimer les offres d'emploi
+    // 3. Supprimer les offres d'emploi
     await supabaseAdmin
       .from('job_offers')
       .delete()
       .eq('entreprise_id', entrepriseId)
 
-    // 3. Supprimer les abonnements
+    // 4. Supprimer les abonnements
     await supabaseAdmin
       .from('entreprise_subscriptions')
       .delete()
       .eq('entreprise_id', entrepriseId)
 
-    // 4. Supprimer l'entreprise
-    const { error: deleteEntError } = await supabaseAdmin
+    // 5. Supprimer l'entreprise
+    const { error: deleteError } = await supabaseAdmin
       .from('entreprises')
       .delete()
       .eq('id', entrepriseId)
 
-    if (deleteEntError) {
-      console.error('Delete entreprise error:', deleteEntError)
-      return NextResponse.json({ error: 'Erreur lors de la suppression de l\'entreprise' }, { status: 500 })
+    if (deleteError) {
+      console.error('Delete entreprise error:', deleteError)
+      return NextResponse.json({ error: 'Erreur lors de la suppression' }, { status: 500 })
     }
 
-    // 5. Supprimer l'utilisateur auth (optionnel - peut être conservé)
+    // 6. Supprimer le profil utilisateur associé si nécessaire
     if (entreprise.user_id) {
-      try {
-        await supabaseAdmin.auth.admin.deleteUser(entreprise.user_id)
-      } catch (authDeleteError) {
-        console.warn('Could not delete auth user:', authDeleteError)
-        // Ne pas faire échouer la suppression si l'utilisateur auth ne peut pas être supprimé
-      }
+      await supabaseAdmin
+        .from('profiles')
+        .delete()
+        .eq('id', entreprise.user_id)
+
+      // Supprimer l'utilisateur auth (optionnel, peut être fait manuellement)
+      // await supabaseAdmin.auth.admin.deleteUser(entreprise.user_id)
     }
 
     return NextResponse.json({

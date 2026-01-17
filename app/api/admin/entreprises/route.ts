@@ -35,7 +35,18 @@ export async function GET(request: NextRequest) {
 
     let query = supabaseAdmin
       .from('entreprises')
-      .select('*')
+      .select(`
+        *,
+        entreprise_subscriptions!inner (
+          id,
+          plan,
+          starts_at,
+          expires_at,
+          is_active,
+          payment_status,
+          created_at
+        )
+      `)
       .order('created_at', { ascending: false })
 
     if (status) {
@@ -45,10 +56,40 @@ export async function GET(request: NextRequest) {
     const { data: entreprises, error } = await query
 
     if (error) {
-      throw new Error('Erreur lors de la récupération des entreprises')
+      console.error('Query error:', error)
+      // Fallback to basic query without subscriptions
+      const { data: basicEntreprises, error: basicError } = await supabaseAdmin
+        .from('entreprises')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (basicError) {
+        throw new Error('Erreur lors de la récupération des entreprises')
+      }
+
+      return NextResponse.json({ entreprises: basicEntreprises })
     }
 
-    return NextResponse.json({ entreprises })
+    // Process subscription data to get the most relevant subscription for each entreprise
+    const processedEntreprises = entreprises.map(entreprise => {
+      const subscriptions = entreprise.entreprise_subscriptions || []
+      
+      // Find active subscription first, then most recent
+      const activeSubscription = subscriptions.find(sub => sub.is_active && sub.payment_status === 'verified')
+      const mostRecentSubscription = subscriptions.sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )[0]
+      
+      const currentSubscription = activeSubscription || mostRecentSubscription || null
+
+      return {
+        ...entreprise,
+        currentSubscription,
+        hasActiveSubscription: !!activeSubscription
+      }
+    })
+
+    return NextResponse.json({ entreprises: processedEntreprises })
 
   } catch (error: any) {
     console.error('Get entreprises error:', error)

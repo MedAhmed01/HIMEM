@@ -7,9 +7,33 @@ import { Badge } from '@/components/ui/badge'
 import { Entreprise, EntrepriseStatus } from '@/lib/types/database'
 import { 
   Building2, CheckCircle, XCircle, Clock, 
-  Filter, Mail, Phone, AlertCircle, Key
+  Filter, Mail, Phone, AlertCircle, Key,
+  CreditCard, Play, Pause, Calendar
 } from 'lucide-react'
 import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+interface EntrepriseWithSubscription extends Entreprise {
+  currentSubscription?: {
+    id: string
+    plan: string
+    starts_at: string
+    expires_at: string
+    is_active: boolean
+    payment_status: string
+  } | null
+  hasActiveSubscription: boolean
+}
 
 const STATUS_CONFIG: Record<EntrepriseStatus, { label: string; color: string; icon: any }> = {
   en_attente: { label: 'En attente', color: 'amber', icon: Clock },
@@ -18,7 +42,7 @@ const STATUS_CONFIG: Record<EntrepriseStatus, { label: string; color: string; ic
 }
 
 export default function AdminEntreprisesPage() {
-  const [entreprises, setEntreprises] = useState<Entreprise[]>([])
+  const [entreprises, setEntreprises] = useState<EntrepriseWithSubscription[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<EntrepriseStatus | ''>('')
@@ -32,6 +56,21 @@ export default function AdminEntreprisesPage() {
     isOpen: false,
     userId: '',
     userName: ''
+  })
+
+  // Subscription activation modal
+  const [activationModal, setActivationModal] = useState<{
+    isOpen: boolean
+    entrepriseId: string
+    entrepriseName: string
+  }>({
+    isOpen: false,
+    entrepriseId: '',
+    entrepriseName: ''
+  })
+  const [activationData, setActivationData] = useState({
+    plan: 'business',
+    duration: 30
   })
 
   useEffect(() => {
@@ -106,6 +145,64 @@ export default function AdminEntreprisesPage() {
 
   const handlePasswordChangeError = (error: string) => {
     setMessage({ type: 'error', text: error })
+  }
+
+  const handleActivateSubscription = async () => {
+    if (!activationModal.entrepriseId) return
+
+    setActionLoading(activationModal.entrepriseId)
+    try {
+      const response = await fetch(`/api/admin/entreprises/${activationModal.entrepriseId}/activate-subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activationData)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de l\'activation')
+      }
+
+      setMessage({ type: 'success', text: data.message })
+      await fetchEntreprises()
+      setActivationModal({ isOpen: false, entrepriseId: '', entrepriseName: '' })
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleDeactivateSubscription = async (entrepriseId: string, entrepriseName: string) => {
+    if (!confirm(`Désactiver l'abonnement de ${entrepriseName} ?`)) return
+
+    setActionLoading(entrepriseId)
+    try {
+      const response = await fetch(`/api/admin/entreprises/${entrepriseId}/deactivate-subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'Désactivé manuellement par admin' })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de la désactivation')
+      }
+
+      setMessage({ type: 'success', text: data.message })
+      await fetchEntreprises()
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const openActivationModal = (entrepriseId: string, entrepriseName: string) => {
+    setActivationModal({ isOpen: true, entrepriseId, entrepriseName })
+    setActivationData({ plan: 'business', duration: 30 })
   }
 
   // Clear message after 5 seconds
@@ -255,12 +352,60 @@ export default function AdminEntreprisesPage() {
                           {entreprise.phone}
                         </span>
                       </div>
+
+                      {/* Subscription Info */}
+                      {entreprise.currentSubscription && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <CreditCard className="w-3.5 h-3.5 text-blue-500" />
+                          <span className="text-xs text-gray-600">
+                            Abonnement {entreprise.currentSubscription.plan}
+                            {entreprise.hasActiveSubscription ? (
+                              <span className="text-green-600 ml-1">
+                                (actif jusqu'au {new Date(entreprise.currentSubscription.expires_at).toLocaleDateString('fr-FR')})
+                              </span>
+                            ) : (
+                              <span className="text-red-600 ml-1">(inactif)</span>
+                            )}
+                          </span>
+                        </div>
+                      )}
+
                       <p className="text-xs text-gray-400 mt-2">
                         NIF: {entreprise.nif} • Inscrit le {new Date(entreprise.created_at).toLocaleDateString('fr-FR')}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Subscription Controls */}
+                      {entreprise.status === 'valide' && (
+                        <>
+                          {entreprise.hasActiveSubscription ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeactivateSubscription(entreprise.id, entreprise.name)}
+                              disabled={actionLoading === entreprise.id}
+                              className="h-9 px-3 rounded-lg border-red-300 text-red-600 hover:bg-red-50"
+                              title="Désactiver l'abonnement"
+                            >
+                              <Pause className="w-4 h-4 mr-1" />
+                              {actionLoading === entreprise.id ? '...' : 'Désactiver'}
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => openActivationModal(entreprise.id, entreprise.name)}
+                              disabled={actionLoading === entreprise.id}
+                              className="h-9 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+                              title="Activer un abonnement"
+                            >
+                              <Play className="w-4 h-4 mr-1" />
+                              Activer
+                            </Button>
+                          )}
+                        </>
+                      )}
+
                       {/* Change Password Button */}
                       <Button
                         size="sm"
@@ -323,6 +468,73 @@ export default function AdminEntreprisesPage() {
         onSuccess={handlePasswordChangeSuccess}
         onError={handlePasswordChangeError}
       />
+
+      {/* Subscription Activation Modal */}
+      <Dialog open={activationModal.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          setActivationModal({ isOpen: false, entrepriseId: '', entrepriseName: '' })
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Activer un abonnement</DialogTitle>
+            <DialogDescription>
+              Activer un abonnement pour {activationModal.entrepriseName}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="plan">Plan d'abonnement</Label>
+              <Select value={activationData.plan} onValueChange={(value) => 
+                setActivationData(prev => ({ ...prev, plan: value }))
+              }>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="starter">Starter (3 offres, 5000 MRU)</SelectItem>
+                  <SelectItem value="business">Business (10 offres, 12000 MRU)</SelectItem>
+                  <SelectItem value="premium">Premium (illimité, 25000 MRU)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="duration">Durée (jours)</Label>
+              <Input
+                id="duration"
+                type="number"
+                min="1"
+                max="365"
+                value={activationData.duration}
+                onChange={(e) => setActivationData(prev => ({ 
+                  ...prev, 
+                  duration: parseInt(e.target.value) || 30 
+                }))}
+              />
+            </div>
+            <div className="text-sm text-gray-600">
+              <Calendar className="w-4 h-4 inline mr-1" />
+              L'abonnement sera actif du {new Date().toLocaleDateString('fr-FR')} au{' '}
+              {new Date(Date.now() + activationData.duration * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setActivationModal({ isOpen: false, entrepriseId: '', entrepriseName: '' })}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleActivateSubscription}
+              disabled={actionLoading !== null}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {actionLoading ? 'Activation...' : 'Activer'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
