@@ -24,14 +24,29 @@ export async function GET() {
       })
     }
 
-    // Test basic query
-    const { data: testQuery, error: testError } = await supabase
+    // Test basic query - check both profiles and entreprises tables
+    const { data: engineerProfile, error: engineerError } = await supabase
       .from('profiles')
-      .select('id, user_type, status')
+      .select('id, status, is_admin, full_name, subscription_expiry')
       .eq('id', user.id)
       .single()
 
-    console.log('Profile query result:', { testQuery, testError: testError?.message })
+    const { data: enterpriseProfile, error: enterpriseError } = await supabase
+      .from('entreprises')
+      .select('id, nom, status, email')
+      .eq('user_id', user.id)
+      .single()
+
+    console.log('Profile queries:', { 
+      engineerProfile, 
+      engineerError: engineerError?.message,
+      enterpriseProfile,
+      enterpriseError: enterpriseError?.message
+    })
+
+    let userType = 'unknown'
+    if (engineerProfile) userType = 'engineer'
+    else if (enterpriseProfile) userType = 'enterprise'
 
     // Test job_applications table access
     const { data: appTest, error: appError } = await supabase
@@ -43,17 +58,20 @@ export async function GET() {
     console.log('Job applications query result:', { 
       canAccessTable: !appError, 
       appError: appError?.message,
-      hasApplications: appTest?.length > 0
+      hasApplications: (appTest?.length || 0) > 0
     })
 
     return NextResponse.json({
       authenticated: true,
+      userType,
       user: {
         id: user.id,
         email: user.email
       },
-      profile: testQuery,
-      profileError: testError?.message,
+      engineerProfile: engineerProfile || null,
+      enterpriseProfile: enterpriseProfile || null,
+      engineerError: engineerError?.message,
+      enterpriseError: enterpriseError?.message,
       canAccessJobApplications: !appError,
       jobApplicationsError: appError?.message,
       timestamp: new Date().toISOString()

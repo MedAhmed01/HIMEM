@@ -74,7 +74,7 @@ export default function JobDetailPage() {
       } else {
         alert('Test passed! You should be able to apply.')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Test error:', err)
       alert('Test failed with error: ' + err.message)
     }

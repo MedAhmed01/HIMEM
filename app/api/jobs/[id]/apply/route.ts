@@ -27,34 +27,51 @@ export async function POST(
       }, { status: 401 })
     }
 
-    // Step 2: Check if user profile exists and is an engineer
+    // Step 2: Check if user is an engineer (has profile in profiles table)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, user_type, status, subscription_expiry')
+      .select('id, status, subscription_expiry, is_admin, full_name')
       .eq('id', user.id)
       .single()
 
     console.log('Step 2 - Profile:', { profile, profileError: profileError?.message })
 
     if (profileError || !profile) {
-      console.log('❌ Profile lookup failed')
+      // Check if user is an enterprise instead
+      const { data: enterprise, error: enterpriseError } = await supabase
+        .from('entreprises')
+        .select('id, nom')
+        .eq('user_id', user.id)
+        .single()
+
+      if (enterprise) {
+        console.log('❌ User is enterprise, not engineer')
+        return NextResponse.json({ 
+          error: 'Les entreprises ne peuvent pas postuler aux offres. Connectez-vous avec un compte ingénieur.',
+          step: 'user_type',
+          debug: { isEnterprise: true, enterpriseName: enterprise.nom }
+        }, { status: 403 })
+      }
+
+      console.log('❌ Profile lookup failed - user not found in profiles or entreprises')
       return NextResponse.json({ 
-        error: 'Profil ingénieur non trouvé',
+        error: 'Profil non trouvé. Veuillez vous inscrire en tant qu\'ingénieur.',
         step: 'profile',
         debug: { 
           profileError: profileError?.message,
+          enterpriseError: enterpriseError?.message,
           userId: user.id 
         }
       }, { status: 404 })
     }
 
-    // Step 3: Verify user is an engineer
-    if (profile.user_type === 'entreprise') {
-      console.log('❌ User is enterprise, not engineer')
+    // Step 3: Check if user is admin (admins shouldn't apply to jobs)
+    if (profile.is_admin) {
+      console.log('❌ User is admin, not regular engineer')
       return NextResponse.json({ 
-        error: 'Seuls les ingénieurs peuvent postuler aux offres',
-        step: 'user_type',
-        debug: { userType: profile.user_type }
+        error: 'Les administrateurs ne peuvent pas postuler aux offres',
+        step: 'admin_check',
+        debug: { isAdmin: profile.is_admin }
       }, { status: 403 })
     }
 
