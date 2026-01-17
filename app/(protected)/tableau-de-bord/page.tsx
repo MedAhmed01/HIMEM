@@ -83,7 +83,7 @@ export default function TableauDeBordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-600 font-medium">{t.dashboard.loading}</p>
         </div>
       </div>
@@ -100,18 +100,18 @@ export default function TableauDeBordPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Link href="/profil" className="flex items-center gap-3 sm:gap-4 group cursor-pointer">
-            <Avatar className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-white shadow-xl ring-2 ring-indigo-100 group-hover:ring-indigo-300 transition-all">
+            <Avatar className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-white shadow-xl ring-2 ring-[#139a9d]/20 group-hover:ring-[#139a9d]/40 transition-all">
               <AvatarImage 
                 src={profile?.profile_image_url} 
                 alt={profile?.full_name || 'User'}
                 className="object-cover"
               />
-              <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-lg sm:text-xl font-bold">
+              <AvatarFallback className="bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] text-white text-lg sm:text-xl font-bold">
                 {profile?.full_name.split(' ').map(n => n[0]).join('').slice(0, 2) || 'U'}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-xl sm:text-3xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+              <h1 className="text-xl sm:text-3xl font-bold text-slate-900 group-hover:text-[#139a9d] transition-colors">
                 {t.dashboard.welcome}{profile ? `, ${profile.full_name.split(' ')[0]}` : ''}
               </h1>
               <p className="text-sm sm:text-base text-slate-500 group-hover:text-slate-600 transition-colors">{t.dashboard.personalSpace}</p>
@@ -131,7 +131,7 @@ export default function TableauDeBordPage() {
 
         {/* Profile Info Card */}
         <Card className="glass border-0 shadow-xl overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+          <div className="h-2 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d]"></div>
           <CardContent className="pt-6 pb-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="space-y-1">
@@ -166,10 +166,10 @@ export default function TableauDeBordPage() {
 
         {/* Quick Actions */}
         <Card className="glass border-0 shadow-xl overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+          <div className="h-1.5 bg-gradient-to-r from-[#139a9d] via-[#0f7a7d] to-[#139a9d]"></div>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-3 text-lg">
-              <div className="w-8 h-8 rounded-xl gradient-bg flex items-center justify-center shadow-md">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               {t.dashboard.quickActions}
@@ -178,11 +178,11 @@ export default function TableauDeBordPage() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               <Link href="/profil" className="group">
-                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-[#139a9d]/30 hover:shadow-md transition-all duration-300">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
                     <User className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-[#139a9d] transition-colors">
                     {t.dashboard.myProfile}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.manageInfo}</p>
@@ -190,11 +190,11 @@ export default function TableauDeBordPage() {
               </Link>
 
               <Link href="/documents" className="group">
-                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-pink-200 hover:shadow-md transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-[#139a9d]/30 hover:shadow-md transition-all duration-300">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
                     <FileText className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-pink-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-[#139a9d] transition-colors">
                     {t.dashboard.myDocuments}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.myFiles}</p>
@@ -202,11 +202,11 @@ export default function TableauDeBordPage() {
               </Link>
 
               <Link href="/cotisation" className="group">
-                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-[#139a9d]/30 hover:shadow-md transition-all duration-300">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
                     <CreditCard className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-emerald-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-[#139a9d] transition-colors">
                     {t.dashboard.subscription}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.pay}</p>
@@ -214,11 +214,11 @@ export default function TableauDeBordPage() {
               </Link>
 
               <Link href="/emplois" className="group">
-                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-cyan-200 hover:shadow-md transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-[#139a9d]/30 hover:shadow-md transition-all duration-300">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
                     <Briefcase className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-cyan-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-[#139a9d] transition-colors">
                     {t.dashboard.jobOffers}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.opportunities}</p>
@@ -226,11 +226,11 @@ export default function TableauDeBordPage() {
               </Link>
 
               <Link href="/mes-candidatures" className="group">
-                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all duration-300">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
+                <div className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-white border border-slate-100 hover:border-[#139a9d]/30 hover:shadow-md transition-all duration-300">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] flex items-center justify-center shadow-md mb-3 group-hover:scale-110 transition-transform">
                     <FileText className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-semibold text-sm text-slate-900 group-hover:text-[#139a9d] transition-colors">
                     {t.dashboard.applications}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">{t.dashboard.myApplications}</p>
@@ -243,7 +243,7 @@ export default function TableauDeBordPage() {
         {/* Admin Link */}
         {profile?.is_admin && (
           <div className="text-center">
-            <Link href="/admin" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+            <Link href="/admin" className="inline-flex items-center gap-2 text-[#139a9d] hover:text-[#0f7a7d] font-medium transition-colors">
               <Settings className="w-4 h-4" />
               {t.dashboard.adminPanel}
             </Link>
