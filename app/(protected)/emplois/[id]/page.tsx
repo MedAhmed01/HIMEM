@@ -58,6 +58,28 @@ export default function JobDetailPage() {
     }
   }
 
+  const testJobApplication = async () => {
+    try {
+      console.log('Testing job application for job:', jobId)
+      const response = await fetch('/api/debug/test-job-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId })
+      })
+      const data = await response.json()
+      console.log('Job application test result:', data)
+      
+      if (!data.success) {
+        alert(`Test failed at step: ${data.step}\nError: ${data.error}`)
+      } else {
+        alert('Test passed! You should be able to apply.')
+      }
+    } catch (err) {
+      console.error('Test error:', err)
+      alert('Test failed with error: ' + err.message)
+    }
+  }
+
   const fetchJob = async () => {
     try {
       const response = await fetch(`/api/jobs/${jobId}`)
@@ -269,13 +291,26 @@ export default function JobDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    onClick={() => setShowApplicationModal(true)}
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    Postuler à cette offre
-                  </Button>
+                  <>
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      onClick={() => setShowApplicationModal(true)}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Postuler à cette offre
+                    </Button>
+                    
+                    {/* Debug button - only in development */}
+                    {process.env.NODE_ENV === 'development' && (
+                      <Button 
+                        variant="outline"
+                        className="w-full mt-2 text-xs"
+                        onClick={testJobApplication}
+                      >
+                        🔧 Test Application (Debug)
+                      </Button>
+                    )}
+                  </>
                 )}
 
                 <div className="mt-4 pt-4 border-t border-gray-200">

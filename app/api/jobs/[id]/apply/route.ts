@@ -82,19 +82,19 @@ export async function POST(
       .from('job_applications')
       .select('id')
       .eq('job_id', jobId)
-      .eq('engineer_id', engineer.id)
+      .eq('engineer_id', user.id) // Use user.id which matches auth.uid()
       .single()
 
     if (existingApplication) {
       return NextResponse.json({ error: 'Vous avez déjà postulé à cette offre' }, { status: 400 })
     }
 
-    // Create application
+    // Create application using auth.uid() directly to match RLS policy
     const { error: insertError } = await supabase
       .from('job_applications')
       .insert({
         job_id: jobId,
-        engineer_id: engineer.id,
+        engineer_id: user.id, // This should match auth.uid()
         cover_letter: coverLetter || null,
         status: 'pending'
       })
@@ -103,7 +103,11 @@ export async function POST(
       console.error('Error creating application:', insertError)
       return NextResponse.json({ 
         error: 'Erreur lors de la création de la candidature',
-        debug: insertError.message
+        debug: {
+          insertError: insertError.message,
+          userId: user.id,
+          jobId
+        }
       }, { status: 500 })
     }
 
