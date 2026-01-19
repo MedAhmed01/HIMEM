@@ -4,11 +4,10 @@ import { cookies } from 'next/headers'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; type: string } }
+  { params }: { params: Promise<{ id: string; type: string }> }
 ) {
   try {
-    const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = await createClient()
 
     // Check if user is admin
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -27,7 +26,7 @@ export async function GET(
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const { id, type } = params
+    const { id, type } = await params
 
     // Get engineer data
     const { data: engineer, error: engineerError } = await supabase
