@@ -1,27 +1,26 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Entreprise, EntrepriseStatus } from '@/lib/types/database'
 import { 
-  Building2, CheckCircle, XCircle, Clock, 
-  Filter, Mail, Phone, AlertCircle, Key,
-  CreditCard, Play, Pause, Calendar
+  Building2, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  Search,
+  Filter,
+  Mail, 
+  Phone, 
+  AlertCircle, 
+  Key,
+  CreditCard,
+  MoreVertical,
+  Ban,
+  Check,
+  X,
+  Plus
 } from 'lucide-react'
 import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface EntrepriseWithSubscription extends Entreprise {
   currentSubscription?: {
@@ -36,8 +35,8 @@ interface EntrepriseWithSubscription extends Entreprise {
 }
 
 const STATUS_CONFIG: Record<EntrepriseStatus, { label: string; color: string; icon: any }> = {
-  en_attente: { label: 'En attente', color: 'amber', icon: Clock },
-  valide: { label: 'Validé', color: 'green', icon: CheckCircle },
+  en_attente: { label: 'En attente', color: 'orange', icon: Clock },
+  valide: { label: 'Validé', color: 'emerald', icon: CheckCircle },
   suspendu: { label: 'Suspendu', color: 'red', icon: XCircle }
 }
 
@@ -45,7 +44,9 @@ export default function AdminEntreprisesPage() {
   const [entreprises, setEntreprises] = useState<EntrepriseWithSubscription[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<EntrepriseStatus | ''>('')
+  const [categoryFilter, setCategoryFilter] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [changePasswordModal, setChangePasswordModal] = useState<{
@@ -56,21 +57,6 @@ export default function AdminEntreprisesPage() {
     isOpen: false,
     userId: '',
     userName: ''
-  })
-
-  // Subscription activation modal
-  const [activationModal, setActivationModal] = useState<{
-    isOpen: boolean
-    entrepriseId: string
-    entrepriseName: string
-  }>({
-    isOpen: false,
-    entrepriseId: '',
-    entrepriseName: ''
-  })
-  const [activationData, setActivationData] = useState({
-    plan: 'business',
-    duration: 30
   })
 
   useEffect(() => {
@@ -85,12 +71,9 @@ export default function AdminEntreprisesPage() {
       const response = await fetch(`/api/admin/entreprises?${params}`)
       const data = await response.json()
       
-      console.log('Entreprises data:', data)
-      
       if (!response.ok) throw new Error(data.error)
       setEntreprises(data.entreprises || [])
     } catch (err: any) {
-      console.error('Fetch error:', err)
       setError(err.message)
     } finally {
       setIsLoading(false)
@@ -106,8 +89,9 @@ export default function AdminEntreprisesPage() {
         throw new Error(data.error)
       }
       await fetchEntreprises()
+      setMessage({ type: 'success', text: 'Entreprise validée avec succès' })
     } catch (err: any) {
-      setError(err.message)
+      setMessage({ type: 'error', text: err.message })
     } finally {
       setActionLoading(null)
     }
@@ -124,8 +108,28 @@ export default function AdminEntreprisesPage() {
         throw new Error(data.error)
       }
       await fetchEntreprises()
+      setMessage({ type: 'success', text: 'Entreprise suspendue avec succès' })
     } catch (err: any) {
-      setError(err.message)
+      setMessage({ type: 'error', text: err.message })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleReject = async (id: string) => {
+    if (!confirm('Rejeter cette entreprise ? Cette action est irréversible.')) return
+    
+    setActionLoading(id)
+    try {
+      const response = await fetch(`/api/admin/entreprises/${id}/reject`, { method: 'POST' })
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error)
+      }
+      await fetchEntreprises()
+      setMessage({ type: 'success', text: 'Entreprise rejetée avec succès' })
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message })
     } finally {
       setActionLoading(null)
     }
@@ -147,64 +151,6 @@ export default function AdminEntreprisesPage() {
     setMessage({ type: 'error', text: error })
   }
 
-  const handleActivateSubscription = async () => {
-    if (!activationModal.entrepriseId) return
-
-    setActionLoading(activationModal.entrepriseId)
-    try {
-      const response = await fetch(`/api/admin/entreprises/${activationModal.entrepriseId}/activate-subscription`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(activationData)
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de l\'activation')
-      }
-
-      setMessage({ type: 'success', text: data.message })
-      await fetchEntreprises()
-      setActivationModal({ isOpen: false, entrepriseId: '', entrepriseName: '' })
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message })
-    } finally {
-      setActionLoading(null)
-    }
-  }
-
-  const handleDeactivateSubscription = async (entrepriseId: string, entrepriseName: string) => {
-    if (!confirm(`Désactiver l'abonnement de ${entrepriseName} ?`)) return
-
-    setActionLoading(entrepriseId)
-    try {
-      const response = await fetch(`/api/admin/entreprises/${entrepriseId}/deactivate-subscription`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'Désactivé manuellement par admin' })
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de la désactivation')
-      }
-
-      setMessage({ type: 'success', text: data.message })
-      await fetchEntreprises()
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message })
-    } finally {
-      setActionLoading(null)
-    }
-  }
-
-  const openActivationModal = (entrepriseId: string, entrepriseName: string) => {
-    setActivationModal({ isOpen: true, entrepriseId, entrepriseName })
-    setActivationData({ plan: 'business', duration: 30 })
-  }
-
   // Clear message after 5 seconds
   useEffect(() => {
     if (message) {
@@ -213,13 +159,63 @@ export default function AdminEntreprisesPage() {
     }
   }, [message])
 
-  if (isLoading) {
+  const getStatusBadge = (status: EntrepriseStatus) => {
+    const config = STATUS_CONFIG[status]
+    const colorClasses = {
+      emerald: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+      orange: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+      red: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-400 border-red-200 dark:border-red-800'
+    }
+    
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colorClasses[config.color as keyof typeof colorClasses]}`}>
+        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+          config.color === 'emerald' ? 'bg-emerald-500' :
+          config.color === 'orange' ? 'bg-orange-500' : 'bg-red-500'
+        }`}></span>
+        {config.label}
+      </span>
     )
   }
+
+  const getPlanBadge = (plan: string | undefined) => {
+    if (!plan) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+          <Clock className="w-3 h-3" />
+          Standard
+        </span>
+      )
+    }
+
+    const planConfig = {
+      business: { label: 'Business', icon: CreditCard, color: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 border-blue-100 dark:border-blue-800' },
+      premium: { label: 'Premium', icon: CreditCard, color: 'bg-purple-50 text-purple-700 dark:bg-purple-900/20 dark:text-purple-300 border-purple-100 dark:border-purple-800' },
+      starter: { label: 'Starter', icon: CreditCard, color: 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 border-green-100 dark:border-green-800' }
+    }
+
+    const config = planConfig[plan as keyof typeof planConfig] || planConfig.business
+    const Icon = config.icon
+
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${config.color}`}>
+        <Icon className="w-3 h-3" />
+        {config.label}
+      </span>
+    )
+  }
+
+  const filteredEntreprises = entreprises.filter(entreprise => {
+    const matchesSearch = 
+      entreprise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entreprise.nif?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      entreprise.email.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    const matchesStatus = !statusFilter || entreprise.status === statusFilter
+    const matchesCategory = !categoryFilter || entreprise.sector?.toLowerCase().includes(categoryFilter.toLowerCase())
+    
+    return matchesSearch && matchesStatus && matchesCategory
+  })
 
   const counts = {
     total: entreprises.length,
@@ -228,395 +224,319 @@ export default function AdminEntreprisesPage() {
     suspendu: entreprises.filter(e => e.status === 'suspendu').length
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Modern Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent">
-                Entreprises
-              </h1>
-              <p className="text-gray-600 mt-1">Gérer les entreprises inscrites sur la plateforme</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                {counts.total} entreprises
-              </div>
-            </div>
-          </div>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Entreprises</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Gérer les entreprises inscrites sur la plateforme</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            {counts.total} entreprise{counts.total !== 1 ? 's' : ''}
+          </span>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Modern Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <button 
-            onClick={() => setStatusFilter('')}
-            className={`group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 hover:scale-105 hover:shadow-xl ${
-              statusFilter === '' 
-                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' 
-                : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-lg'
-            }`}
-          >
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-2">
-                <div className={`p-2 rounded-xl ${
-                  statusFilter === '' 
-                    ? 'bg-white/20' 
-                    : 'bg-blue-100'
-                }`}>
-                  <Building2 className={`w-5 h-5 ${
-                    statusFilter === '' ? 'text-white' : 'text-blue-600'
-                  }`} />
-                </div>
-                <div className={`text-2xl font-bold ${
-                  statusFilter === '' ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {counts.total}
-                </div>
-              </div>
-              <p className={`text-sm font-medium ${
-                statusFilter === '' ? 'text-blue-100' : 'text-gray-600'
-              }`}>
-                Total
-              </p>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Card */}
+        <div className="bg-blue-600 rounded-xl p-5 shadow-lg text-white relative overflow-hidden group">
+          <div className="absolute right-0 top-0 opacity-10 transform translate-x-2 -translate-y-2 group-hover:scale-110 transition-transform duration-300">
+            <Building2 className="w-24 h-24" />
+          </div>
+          <div className="flex flex-col justify-between h-full relative z-10">
+            <div className="bg-white/20 w-10 h-10 rounded-lg flex items-center justify-center mb-3 backdrop-blur-sm">
+              <Building2 className="w-5 h-5 text-white" />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-blue-600/5 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
-
-          <button 
-            onClick={() => setStatusFilter('en_attente')}
-            className={`group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 hover:scale-105 hover:shadow-xl ${
-              statusFilter === 'en_attente' 
-                ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25' 
-                : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-lg'
-            }`}
-          >
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-2">
-                <div className={`p-2 rounded-xl ${
-                  statusFilter === 'en_attente' 
-                    ? 'bg-white/20' 
-                    : 'bg-amber-100'
-                }`}>
-                  <Clock className={`w-5 h-5 ${
-                    statusFilter === 'en_attente' ? 'text-white' : 'text-amber-600'
-                  }`} />
-                </div>
-                <div className={`text-2xl font-bold ${
-                  statusFilter === 'en_attente' ? 'text-white' : 'text-amber-600'
-                }`}>
-                  {counts.en_attente}
-                </div>
-              </div>
-              <p className={`text-sm font-medium ${
-                statusFilter === 'en_attente' ? 'text-amber-100' : 'text-gray-600'
-              }`}>
-                En attente
-              </p>
+            <div>
+              <span className="text-4xl font-bold block mb-1">{counts.total}</span>
+              <span className="text-blue-100 font-medium text-sm">Total Entreprises</span>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-600/0 via-amber-600/5 to-amber-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
-
-          <button 
-            onClick={() => setStatusFilter('valide')}
-            className={`group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 hover:scale-105 hover:shadow-xl ${
-              statusFilter === 'valide' 
-                ? 'bg-gradient-to-br from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-500/25' 
-                : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-lg'
-            }`}
-          >
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-2">
-                <div className={`p-2 rounded-xl ${
-                  statusFilter === 'valide' 
-                    ? 'bg-white/20' 
-                    : 'bg-emerald-100'
-                }`}>
-                  <CheckCircle className={`w-5 h-5 ${
-                    statusFilter === 'valide' ? 'text-white' : 'text-emerald-600'
-                  }`} />
-                </div>
-                <div className={`text-2xl font-bold ${
-                  statusFilter === 'valide' ? 'text-white' : 'text-emerald-600'
-                }`}>
-                  {counts.valide}
-                </div>
-              </div>
-              <p className={`text-sm font-medium ${
-                statusFilter === 'valide' ? 'text-emerald-100' : 'text-gray-600'
-              }`}>
-                Validées
-              </p>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/0 via-emerald-600/5 to-emerald-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
-
-          <button 
-            onClick={() => setStatusFilter('suspendu')}
-            className={`group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 hover:scale-105 hover:shadow-xl ${
-              statusFilter === 'suspendu' 
-                ? 'bg-gradient-to-br from-red-500 to-rose-500 text-white shadow-lg shadow-red-500/25' 
-                : 'bg-white hover:bg-gray-50 text-gray-900 shadow-md hover:shadow-lg'
-            }`}
-          >
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-2">
-                <div className={`p-2 rounded-xl ${
-                  statusFilter === 'suspendu' 
-                    ? 'bg-white/20' 
-                    : 'bg-red-100'
-                }`}>
-                  <XCircle className={`w-5 h-5 ${
-                    statusFilter === 'suspendu' ? 'text-white' : 'text-red-600'
-                  }`} />
-                </div>
-                <div className={`text-2xl font-bold ${
-                  statusFilter === 'suspendu' ? 'text-white' : 'text-red-600'
-                }`}>
-                  {counts.suspendu}
-                </div>
-              </div>
-              <p className={`text-sm font-medium ${
-                statusFilter === 'suspendu' ? 'text-red-100' : 'text-gray-600'
-              }`}>
-                Suspendues
-              </p>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-red-600/0 via-red-600/5 to-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
+          </div>
         </div>
 
-        {/* Active Filter Indicator */}
-        {statusFilter && (
-          <div className="flex items-center gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200/50">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <span className="text-gray-700 font-medium">
-              Filtre actif: {STATUS_CONFIG[statusFilter].label}
-            </span>
-            <button 
-              onClick={() => setStatusFilter('')} 
-              className="ml-auto px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
-            >
-              Effacer
-            </button>
-          </div>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            <p className="text-red-700 text-sm">{error}</p>
-          </div>
-        )}
-
-        {/* Success/Error Message */}
-        {message && (
-          <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm ${
-            message.type === 'success' 
-              ? 'bg-emerald-50/80 border-emerald-200 text-emerald-800' 
-              : 'bg-red-50/80 border-red-200 text-red-800'
-          }`}>
-            {message.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-            )}
-            <p className="text-sm flex-1 font-medium">{message.text}</p>
-            <button 
-              onClick={() => setMessage(null)}
-              className={`p-1 rounded-lg transition-colors ${
-                message.type === 'success' 
-                  ? 'hover:bg-emerald-100 text-emerald-400 hover:text-emerald-600' 
-                  : 'hover:bg-red-100 text-red-400 hover:text-red-600'
-              }`}
-            >
-              <XCircle className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Modern Entreprises List */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/50 overflow-hidden shadow-xl">
-          {entreprises.length === 0 ? (
-            <div className="py-16 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                <Building2 className="w-10 h-10 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucune entreprise trouvée</h3>
-              <p className="text-gray-500">Les entreprises inscrites apparaîtront ici</p>
+        {/* En attente */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between hover:border-orange-500/50 transition-colors group">
+          <div className="flex justify-between items-start">
+            <div className="bg-orange-50 dark:bg-orange-900/20 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600">
+              <Clock className="w-5 h-5" />
             </div>
-          ) : (
-            <div className="divide-y divide-gray-100/50">
-              {entreprises.map((entreprise, index) => {
-                const statusConfig = STATUS_CONFIG[entreprise.status]
-                const StatusIcon = statusConfig.icon
-                
-                return (
-                  <div 
-                    key={entreprise.id} 
-                    className="group p-6 hover:bg-white/80 transition-all duration-300 hover:shadow-lg"
-                    style={{
-                      animationDelay: `${index * 100}ms`
-                    }}
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                      {/* Company Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                          {/* Logo/Icon */}
-                          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-                            <Building2 className="w-8 h-8 text-blue-600" />
-                          </div>
-                          
-                          {/* Details */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                              <h3 className="text-xl font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-300">
-                                {entreprise.name}
-                              </h3>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                                  entreprise.status === 'valide' 
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                                    : entreprise.status === 'en_attente'
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                                    : 'bg-red-100 text-red-800 border border-red-200'
-                                }`}>
-                                  <StatusIcon className="w-3 h-3 mr-1" />
-                                  {statusConfig.label}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <p className="text-gray-600 mb-3 font-medium">{entreprise.sector}</p>
-                            
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                                <Mail className="w-4 h-4" />
-                                <span className="truncate max-w-[200px]">{entreprise.email}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                <Phone className="w-4 h-4" />
-                                <span>{entreprise.phone}</span>
-                              </div>
-                            </div>
+            <span className="text-3xl font-bold text-slate-900 dark:text-white group-hover:text-orange-600 transition-colors">
+              {counts.en_attente}
+            </span>
+          </div>
+          <span className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-3">En attente</span>
+        </div>
 
-                            {/* Subscription Info */}
-                            {entreprise.currentSubscription && (
-                              <div className="flex items-center gap-2 mb-3">
-                                <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg border border-blue-200">
-                                  <CreditCard className="w-4 h-4 text-blue-600" />
-                                  <span className="text-sm font-medium text-blue-800">
-                                    {entreprise.currentSubscription.plan}
-                                  </span>
-                                  {entreprise.hasActiveSubscription ? (
-                                    <span className="text-xs text-emerald-600 font-medium">
-                                      (actif jusqu'au {new Date(entreprise.currentSubscription.expires_at).toLocaleDateString('fr-FR')})
-                                    </span>
-                                  ) : (
-                                    <span className="text-xs text-red-600 font-medium">(inactif)</span>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center gap-4 text-xs text-gray-400">
-                              <span>NIF: {entreprise.nif}</span>
-                              <span>•</span>
-                              <span>Inscrit le {new Date(entreprise.created_at).toLocaleDateString('fr-FR')}</span>
-                            </div>
+        {/* Validées */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between hover:border-emerald-500/50 transition-colors group">
+          <div className="flex justify-between items-start">
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 w-10 h-10 rounded-lg flex items-center justify-center text-emerald-600">
+              <CheckCircle className="w-5 h-5" />
+            </div>
+            <span className="text-3xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+              {counts.valide}
+            </span>
+          </div>
+          <span className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-3">Validées</span>
+        </div>
+
+        {/* Suspendues */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between hover:border-red-500/50 transition-colors group">
+          <div className="flex justify-between items-start">
+            <div className="bg-red-50 dark:bg-red-900/20 w-10 h-10 rounded-lg flex items-center justify-center text-red-600">
+              <Ban className="w-5 h-5" />
+            </div>
+            <span className="text-3xl font-bold text-slate-900 dark:text-white group-hover:text-red-600 transition-colors">
+              {counts.suspendu}
+            </span>
+          </div>
+          <span className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-3">Suspendues</span>
+        </div>
+      </div>
+
+      {/* Success/Error Message */}
+      {message && (
+        <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm ${
+          message.type === 'success' 
+            ? 'bg-emerald-50/80 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' 
+            : 'bg-red-50/80 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+        }`}>
+          {message.type === 'success' ? (
+            <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+          )}
+          <p className={`${message.type === 'success' ? 'text-emerald-800 dark:text-emerald-200' : 'text-red-800 dark:text-red-200'} text-sm flex-1`}>
+            {message.text}
+          </p>
+          <button 
+            onClick={() => setMessage(null)}
+            className={`${message.type === 'success' ? 'text-emerald-400 hover:text-emerald-600' : 'text-red-400 hover:text-red-600'}`}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        {/* Filters */}
+        <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/50">
+          <div className="relative w-full md:w-96">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="w-5 h-5 text-slate-400" />
+            </span>
+            <input
+              type="text"
+              placeholder="Rechercher par nom, NIF, email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2.5 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-blue-600 focus:border-blue-600 text-sm shadow-sm placeholder-slate-400 transition-shadow"
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as EntrepriseStatus | '')}
+              className="form-select pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-sm focus:ring-blue-600 focus:border-blue-600 shadow-sm cursor-pointer"
+            >
+              <option value="">Tous les statuts</option>
+              <option value="valide">Validée</option>
+              <option value="en_attente">En attente</option>
+              <option value="suspendu">Suspendue</option>
+            </select>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="form-select pl-3 pr-10 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-sm focus:ring-blue-600 focus:border-blue-600 shadow-sm cursor-pointer"
+            >
+              <option value="">Toutes les catégories</option>
+              <option value="btp">BTP</option>
+              <option value="informatique">Informatique</option>
+              <option value="services">Services</option>
+            </select>
+            <button className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+              <Filter className="w-4 h-4" />
+              Filtres
+            </button>
+          </div>
+        </div>
+
+        {/* Table Content */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4">Entreprise</th>
+                <th className="px-6 py-4">Statut</th>
+                <th className="px-6 py-4">Catégorie</th>
+                <th className="px-6 py-4">Contact</th>
+                <th className="px-6 py-4">Plan & NIF</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              {filteredEntreprises.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <Building2 className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">Aucune entreprise trouvée</p>
+                    <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
+                      {searchQuery || statusFilter || categoryFilter ? 'Essayez de modifier vos filtres' : 'Les entreprises inscrites apparaîtront ici'}
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                filteredEntreprises.map((entreprise) => (
+                  <tr key={entreprise.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 text-blue-600">
+                          <Building2 className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-slate-900 dark:text-white">{entreprise.name}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Inscrit le {new Date(entreprise.created_at).toLocaleDateString('fr-FR')}
                           </div>
                         </div>
                       </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-                        {/* Subscription Controls */}
-                        {entreprise.status === 'valide' && (
-                          <>
-                            {entreprise.hasActiveSubscription ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDeactivateSubscription(entreprise.id, entreprise.name)}
-                                disabled={actionLoading === entreprise.id}
-                                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
-                              >
-                                <Pause className="w-4 h-4 mr-2" />
-                                {actionLoading === entreprise.id ? '...' : 'Désactiver'}
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                onClick={() => openActivationModal(entreprise.id, entreprise.name)}
-                                disabled={actionLoading === entreprise.id}
-                                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200"
-                              >
-                                <Play className="w-4 h-4 mr-2" />
-                                Activer
-                              </Button>
-                            )}
-                          </>
-                        )}
-
-                        {/* Other Action Buttons */}
-                        <Button
-                          size="sm"
-                          variant="outline"
+                    </td>
+                    <td className="px-6 py-4">
+                      {getStatusBadge(entreprise.status)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-slate-700 dark:text-slate-300">{entreprise.sector}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">Secteur d'activité</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                          <Mail className="w-3.5 h-3.5" />
+                          <span className="truncate max-w-[150px]">{entreprise.email}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                          <Phone className="w-3.5 h-3.5" />
+                          <span>{entreprise.phone}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col items-start gap-1">
+                        {getPlanBadge(entreprise.currentSubscription?.plan)}
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                          NIF: {entreprise.nif || 'Non renseigné'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
                           onClick={() => handleChangePassword(entreprise.id, entreprise.name)}
-                          className="border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                          className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 dark:hover:text-slate-300 transition-colors"
+                          title="Accès Sécurité"
                         >
                           <Key className="w-4 h-4" />
-                        </Button>
-
-                        {/* Status Action Buttons */}
+                        </button>
+                        
                         {entreprise.status === 'en_attente' && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleValidate(entreprise.id)}
-                            disabled={actionLoading === entreprise.id}
-                            className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all duration-200"
-                          >
-                            {actionLoading === entreprise.id ? '...' : 'Valider'}
-                          </Button>
+                          <>
+                            <button
+                              onClick={() => handleValidate(entreprise.id)}
+                              disabled={actionLoading === entreprise.id}
+                              className="p-1.5 rounded-md text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400 transition-colors"
+                              title="Valider"
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleReject(entreprise.id)}
+                              disabled={actionLoading === entreprise.id}
+                              className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+                              title="Rejeter"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </>
                         )}
+                        
                         {entreprise.status === 'valide' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
+                          <button
                             onClick={() => handleSuspend(entreprise.id)}
                             disabled={actionLoading === entreprise.id}
-                            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
+                            className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+                            title="Suspendre"
                           >
-                            {actionLoading === entreprise.id ? '...' : 'Suspendre'}
-                          </Button>
+                            <Ban className="w-4 h-4" />
+                          </button>
                         )}
+                        
                         {entreprise.status === 'suspendu' && (
-                          <Button
-                            size="sm"
+                          <button
                             onClick={() => handleValidate(entreprise.id)}
                             disabled={actionLoading === entreprise.id}
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200"
+                            className="p-1.5 rounded-md text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400 transition-colors"
+                            title="Réactiver"
                           >
-                            {actionLoading === entreprise.id ? '...' : 'Réactiver'}
-                          </Button>
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
                         )}
+                        
+                        <button className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 dark:hover:text-slate-300 transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
                       </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+          <div className="text-sm text-slate-500 dark:text-slate-400">
+            Affichage de <span className="font-medium text-slate-900 dark:text-white">1</span> à{' '}
+            <span className="font-medium text-slate-900 dark:text-white">{filteredEntreprises.length}</span> sur{' '}
+            <span className="font-medium text-slate-900 dark:text-white">{filteredEntreprises.length}</span> résultats
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50"
+              disabled
+            >
+              Précédent
+            </button>
+            <button
+              className="px-3 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50"
+              disabled
+            >
+              Suivant
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Floating Add Button */}
+      <button className="fixed bottom-8 right-8 w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+        <Plus className="w-6 h-6" />
+      </button>
 
       {/* Change Password Modal */}
       <ChangePasswordModal
@@ -628,111 +548,6 @@ export default function AdminEntreprisesPage() {
         onSuccess={handlePasswordChangeSuccess}
         onError={handlePasswordChangeError}
       />
-
-      {/* Subscription Activation Modal */}
-      <Dialog open={activationModal.isOpen} onOpenChange={(open) => {
-        if (!open) {
-          setActivationModal({ isOpen: false, entrepriseId: '', entrepriseName: '' })
-        }
-      }}>
-        <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
-          <DialogHeader className="text-center pb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-              <CreditCard className="w-8 h-8 text-blue-600" />
-            </div>
-            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
-              Activer un abonnement
-            </DialogTitle>
-            <DialogDescription className="text-gray-600">
-              Configurer l'abonnement pour <span className="font-semibold text-gray-900">{activationModal.entrepriseName}</span>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="plan" className="text-sm font-semibold text-gray-700 mb-3 block">Plan d'abonnement</Label>
-              <Select value={activationData.plan} onValueChange={(value) => 
-                setActivationData(prev => ({ ...prev, plan: value }))
-              }>
-                <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20">
-                  <SelectValue placeholder="Sélectionner un plan" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-0 shadow-xl">
-                  <SelectItem value="starter" className="rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                      <div>
-                        <div className="font-medium">Starter</div>
-                        <div className="text-xs text-gray-500">3 offres • 5000 MRU</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="business" className="rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                      <div>
-                        <div className="font-medium">Business</div>
-                        <div className="text-xs text-gray-500">10 offres • 12000 MRU</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="premium" className="rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
-                      <div>
-                        <div className="font-medium">Premium</div>
-                        <div className="text-xs text-gray-500">Illimité • 25000 MRU</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="duration" className="text-sm font-semibold text-gray-700 mb-3 block">Durée (jours)</Label>
-              <Input
-                id="duration"
-                type="number"
-                min="1"
-                max="365"
-                value={activationData.duration}
-                onChange={(e) => setActivationData(prev => ({ 
-                  ...prev, 
-                  duration: parseInt(e.target.value) || 30 
-                }))}
-                className="h-12 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
-              />
-            </div>
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-              <div className="flex items-center gap-3 text-sm text-blue-800">
-                <Calendar className="w-5 h-5 text-blue-600" />
-                <div>
-                  <div className="font-medium">Période d'activation</div>
-                  <div className="text-blue-600">
-                    Du {new Date().toLocaleDateString('fr-FR')} au{' '}
-                    {new Date(Date.now() + activationData.duration * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <DialogFooter className="pt-6">
-            <Button
-              variant="outline"
-              onClick={() => setActivationModal({ isOpen: false, entrepriseId: '', entrepriseName: '' })}
-              className="rounded-xl"
-            >
-              Annuler
-            </Button>
-            <Button
-              onClick={handleActivateSubscription}
-              disabled={actionLoading !== null}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl shadow-lg shadow-blue-500/25"
-            >
-              {actionLoading ? 'Activation...' : 'Activer l\'abonnement'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

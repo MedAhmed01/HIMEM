@@ -64,6 +64,7 @@ export interface Profile {
   subscription_expiry: string | null
   diploma_file_path: string | null
   cni_file_path: string | null
+  cv_url: string | null
   is_admin: boolean
   created_at: string
   updated_at: string

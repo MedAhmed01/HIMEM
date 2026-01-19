@@ -104,21 +104,33 @@ export default function AdminAbonnementsEntreprisesPage() {
       
       // Fetch pending subscriptions
       const pendingResponse = await fetch('/api/admin/subscriptions/pending')
-      const pendingData = await pendingResponse.json()
-
+      
       if (!pendingResponse.ok) {
-        console.error('Pending subscriptions error:', pendingData)
-        throw new Error(pendingData.error || 'Erreur lors du chargement des demandes en attente')
+        const pendingData = await pendingResponse.json().catch(() => ({ error: 'Erreur de réseau' }))
+        console.error('Pending subscriptions error:', {
+          status: pendingResponse.status,
+          statusText: pendingResponse.statusText,
+          data: pendingData
+        })
+        throw new Error(pendingData.error || `Erreur HTTP ${pendingResponse.status}: ${pendingResponse.statusText}`)
       }
+
+      const pendingData = await pendingResponse.json()
 
       // Fetch active subscriptions
       const activeResponse = await fetch('/api/admin/subscriptions/active')
-      const activeData = await activeResponse.json()
-
+      
       if (!activeResponse.ok) {
-        console.error('Active subscriptions error:', activeData)
-        throw new Error(activeData.error || 'Erreur lors du chargement des abonnements actifs')
+        const activeData = await activeResponse.json().catch(() => ({ error: 'Erreur de réseau' }))
+        console.error('Active subscriptions error:', {
+          status: activeResponse.status,
+          statusText: activeResponse.statusText,
+          data: activeData
+        })
+        throw new Error(activeData.error || `Erreur HTTP ${activeResponse.status}: ${activeResponse.statusText}`)
       }
+
+      const activeData = await activeResponse.json()
 
       console.log('Subscriptions loaded:', {
         pending: pendingData.subscriptions?.length || 0,
@@ -129,7 +141,7 @@ export default function AdminAbonnementsEntreprisesPage() {
       setActiveSubscriptions(activeData.subscriptions || [])
     } catch (err: any) {
       console.error('Fetch subscriptions error:', err)
-      setError(err.message)
+      setError(err.message || 'Erreur lors du chargement des abonnements')
     } finally {
       setIsLoading(false)
     }

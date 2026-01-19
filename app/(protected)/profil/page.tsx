@@ -28,7 +28,9 @@ import {
   Globe,
   School,
   LogOut,
-  Key
+  Key,
+  Download,
+  Trash2
 } from 'lucide-react'
 import type { Domain, ExerciseMode } from '@/lib/types/database'
 import { useRouter } from 'next/navigation'
@@ -56,6 +58,7 @@ interface ProfileData {
   status: string
   subscription_expiry: string | null
   profile_image_url?: string
+  cv_url?: string
   sponsorships_count?: number
 }
 
@@ -119,6 +122,7 @@ export default function ProfilPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingCV, setUploadingCV] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   
@@ -196,6 +200,75 @@ export default function ProfilPage() {
       setMessage({ type: 'error', text: 'Erreur lors du téléchargement de l\'image' })
     } finally {
       setUploadingImage(false)
+    }
+  }
+
+  const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type (PDF only)
+    if (file.type !== 'application/pdf') {
+      setMessage({ type: 'error', text: 'Veuillez sélectionner un fichier PDF' })
+      return
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'Le CV ne doit pas dépasser 10MB' })
+      return
+    }
+
+    setUploadingCV(true)
+    setMessage(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('cv', file)
+
+      const res = await fetch('/api/profile/cv', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setProfile(prev => prev ? { ...prev, cv_url: data.cvUrl } : null)
+        setMessage({ type: 'success', text: 'CV téléchargé avec succès' })
+      } else {
+        setMessage({ type: 'error', text: data.error })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Erreur lors du téléchargement du CV' })
+    } finally {
+      setUploadingCV(false)
+    }
+  }
+
+  const handleCVDelete = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer votre CV ?')) return
+
+    setUploadingCV(true)
+    setMessage(null)
+
+    try {
+      const res = await fetch('/api/profile/cv', {
+        method: 'DELETE'
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        setProfile(prev => prev ? { ...prev, cv_url: undefined } : null)
+        setMessage({ type: 'success', text: 'CV supprimé avec succès' })
+      } else {
+        setMessage({ type: 'error', text: data.error })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Erreur lors de la suppression du CV' })
+    } finally {
+      setUploadingCV(false)
     }
   }
 
@@ -746,6 +819,113 @@ export default function ProfilPage() {
                   })}
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* CV Section */}
+          <Card className="glass border-0 shadow-xl overflow-hidden">
+            <div className="h-1.5 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500"></div>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow-md">
+                  <FileText className="w-5 h-5 text-white" />
+                </div>
+                Curriculum Vitae
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {profile.cv_url ? (
+                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-emerald-800">CV téléchargé</h4>
+                      <p className="text-sm text-emerald-600">Votre CV est disponible pour les employeurs</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(profile.cv_url, '_blank')}
+                      className="border-emerald-300 text-emerald-700 hover:bg-emerald-100"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Voir
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCVDelete}
+                      disabled={uploadingCV}
+                      className="border-red-300 text-red-600 hover:bg-red-50"
+                    >
+                      {uploadingCV ? (
+                        <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center p-8 border-2 border-dashed border-slate-300 rounded-2xl hover:border-slate-400 transition-colors">
+                  <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                    <Upload className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">Aucun CV téléchargé</h3>
+                  <p className="text-slate-600 mb-4">Téléchargez votre CV en format PDF pour améliorer vos candidatures</p>
+                  <label className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all cursor-pointer shadow-lg shadow-purple-500/25">
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleCVUpload}
+                      className="hidden"
+                      disabled={uploadingCV}
+                    />
+                    {uploadingCV ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Téléchargement...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Télécharger mon CV
+                      </>
+                    )}
+                  </label>
+                  <p className="text-xs text-slate-500 mt-2">Format PDF uniquement, taille max: 10MB</p>
+                </div>
+              )}
+
+              {/* Replace CV Option */}
+              {profile.cv_url && (
+                <div className="text-center">
+                  <label className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 rounded-xl hover:from-slate-200 hover:to-slate-300 transition-all cursor-pointer border border-slate-300">
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleCVUpload}
+                      className="hidden"
+                      disabled={uploadingCV}
+                    />
+                    {uploadingCV ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
+                        Remplacement...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Remplacer le CV
+                      </>
+                    )}
+                  </label>
+                </div>
+              )}
             </CardContent>
           </Card>
 

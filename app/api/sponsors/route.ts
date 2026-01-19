@@ -7,7 +7,7 @@ export async function GET() {
     
     const { data: sponsors, error } = await supabase
       .from('sponsors')
-      .select('id, name, logo_url, website_url, display_order')
+      .select('id, name, logo_url, website_url')
       .eq('is_active', true)
       .order('display_order', { ascending: true })
 

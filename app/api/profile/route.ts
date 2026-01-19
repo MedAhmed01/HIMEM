@@ -18,7 +18,7 @@ export async function GET() {
     // Use admin client to bypass RLS issues
     const { data: profile, error } = await adminClient
       .from('profiles')
-      .select('*')
+      .select('id, nni, full_name, phone, email, diploma, grad_year, domain, exercise_mode, status, subscription_expiry, diploma_file_path, cni_file_path, profile_image_url, cv_url, is_admin, created_at, updated_at')
       .eq('id', user.id)
       .single()
 

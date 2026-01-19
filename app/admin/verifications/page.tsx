@@ -191,9 +191,20 @@ export default function VerificationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Documents en attente de vérification</h1>
-        <p className="text-gray-500 text-sm mt-1">{engineers.length} document{engineers.length !== 1 ? 's' : ''} à vérifier</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Documents en attente de vérification</h1>
+          <p className="text-gray-500 text-sm mt-1">{engineers.length} document{engineers.length !== 1 ? 's' : ''} à vérifier</p>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => window.open('/admin/verifications/workspace', '_blank')}
+            className="bg-teal-600 hover:bg-teal-700 text-white"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Advanced Workspace
+          </Button>
+        </div>
       </div>
 
       {/* Success/Error Message */}

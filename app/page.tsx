@@ -1,137 +1,357 @@
+'use client'
+
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Header } from '@/components/layout/Header'
+import { useState, useEffect } from 'react'
 import { PublicSearchBar } from '@/components/search/PublicSearchBar'
-import { LatestArticles } from '@/components/layout/LatestArticles'
-import { CheckCircle, Users, FileText, Briefcase, ArrowRight, Shield, Sparkles, Star } from 'lucide-react'
+import LatestArticles from '@/components/LatestArticles'
+
+interface Sponsor {
+  id: string
+  name: string
+  logo_url: string
+  website_url?: string | null
+}
 
 export default function Home() {
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [sponsors, setSponsors] = useState<Sponsor[]>([])
+
+  useEffect(() => {
+    loadSponsors()
+  }, [])
+
+  const loadSponsors = async () => {
+    try {
+      const res = await fetch('/api/sponsors')
+      const data = await res.json()
+      setSponsors(data.sponsors || [])
+    } catch (error) {
+      console.error('Error loading sponsors:', error)
+    }
+  }
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2)
+  }
+
+  const getColorFromName = (name: string) => {
+    const colors = [
+      'text-red-600',
+      'text-blue-600', 
+      'text-green-600',
+      'text-yellow-600',
+      'text-purple-600',
+      'text-pink-600',
+      'text-indigo-600',
+      'text-orange-600'
+    ]
+    const index = name.charCodeAt(0) % colors.length
+    return colors[index]
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <Header />
-      
-      <main className="flex-1">
-        {/* Search Section - Right after sponsors */}
-        <section className="py-3 sm:py-5 md:py-6 bg-gray-50 border-b border-gray-100">
-          <div className="container mx-auto">
-            <div className="max-w-3xl mx-auto">
-              <div className="bg-white rounded-lg md:rounded-xl border border-gray-200 p-3 sm:p-4 md:p-6 shadow-sm">
-                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-[#139a9d] flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+    <div className={`font-body bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
+      {/* Navigation */}
+      <header className="fixed top-0 w-full z-50 glass-header transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center flex-shrink-0 group cursor-pointer">
+              <div className="h-10 w-10 bg-[#14919B] rounded-full flex items-center justify-center text-white mr-3 transition-transform group-hover:scale-105 shadow-md">
+                <span className="material-icons-outlined text-[20px]">engineering</span>
+              </div>
+              <div className="flex flex-col justify-center">
+                <span className="text-xl font-bold text-slate-800 dark:text-white leading-none tracking-tight">OMIGEC</span>
+                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">Ordre Mauritanien</span>
+              </div>
+            </div>
+            <div className="hidden lg:flex items-center space-x-1">
+              <nav className="flex items-center space-x-1 mr-6">
+                <Link className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#14919B] dark:hover:text-[#14919B] transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-slate-800" href="/">Accueil</Link>
+                <Link className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#14919B] dark:hover:text-[#14919B] transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-slate-800" href="/articles">Articles</Link>
+                <Link className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#14919B] dark:hover:text-[#14919B] transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-slate-800" href="/services">Services</Link>
+                <Link className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#14919B] dark:hover:text-[#14919B] transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-slate-800" href="/offres-emploi">Emplois</Link>
+                <Link className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#14919B] dark:hover:text-[#14919B] transition-colors rounded-md hover:bg-slate-100 dark:hover:bg-slate-800" href="/contact">Contact</Link>
+              </nav>
+              <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+              <div className="flex items-center space-x-3 ml-4">
+                <Link className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-[#14919B] dark:hover:text-[#14919B] transition-colors px-3 py-2" href="/connexion">Connexion</Link>
+                <Link className="group relative flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-[#14919B] rounded-full hover:bg-[#0e6b73] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#14919B] shadow-sm hover:shadow-md" href="/inscription">
+                  <span className="material-icons-outlined text-lg mr-1.5 group-hover:animate-pulse">person_add</span>
+                  Inscription
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center lg:hidden">
+              <button className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white transition-colors" type="button">
+                <span className="sr-only">Open menu</span>
+                <span className="material-icons-outlined text-2xl">menu</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <div className="relative pt-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#D4F5F5]/30 to-transparent dark:from-[#0E646C]/10 dark:to-background-dark pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 lg:pt-24 lg:pb-32">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#14919B]/10 text-[#14919B] dark:bg-[#14919B]/20 dark:text-[#14919B] text-xs font-semibold tracking-wide uppercase mb-6">
+                <span className="material-icons-outlined text-sm">verified</span>
+                Plateforme Officielle
+              </div>
+              <h1 className="font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[0.9] text-slate-900 dark:text-white mb-8">
+                Ordre <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14919B] to-[#0E646C]">Mauritanien</span> <br/>
+                des Ingénieurs
+              </h1>
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed mb-10 border-l-4 border-[#14919B] pl-6">
+                La plateforme digitale officielle pour la gestion, la vérification et l'accompagnement des ingénieurs en génie civil en Mauritanie.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-2xl text-white bg-[#14919B] hover:bg-[#0E646C] transition-all shadow-xl shadow-[#14919B]/25 transform hover:-translate-y-1" href="/inscription">
+                  <span className="material-icons-outlined mr-2">group_add</span>
+                  Rejoindre l'OMIGEC
+                </Link>
+                <Link className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-2xl text-slate-700 bg-white dark:bg-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all transform hover:-translate-y-1" href="/connexion">
+                  Se connecter
+                  <span className="material-icons-outlined ml-2">arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+            <div className="lg:col-span-5 relative">
+              <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#14919B]/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-overlay animate-pulse"></div>
+              <div className="absolute -bottom-20 -left-10 w-64 h-64 bg-[#D4F5F5] rounded-full blur-3xl mix-blend-multiply dark:bg-[#0E646C]/20 dark:mix-blend-overlay"></div>
+              <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/20 dark:border-slate-700 p-8 rounded-3xl shadow-2xl">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="p-3 bg-[#14919B]/10 rounded-xl text-[#14919B]">
+                    <span className="material-icons-outlined text-3xl">verified_user</span>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 truncate">
-                      Vérifier un Ingénieur
-                    </h2>
-                    <p className="text-gray-600 text-xs mt-0.5">
-                      Recherchez par NNI ou nom
-                    </p>
+                  <div>
+                    <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white">Vérifier un Ingénieur</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Recherchez instantanément par NNI ou nom dans notre base de données officielle.</p>
                   </div>
                 </div>
                 <PublicSearchBar />
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* Latest Articles Section */}
-        <LatestArticles />
-
-        {/* Hero Section */}
-        <section className="py-10 sm:py-14 md:py-16 lg:py-20">
-          <div className="container mx-auto">
-            <div className="max-w-3xl mx-auto text-center px-2">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#139a9d]/10 border border-[#139a9d]/30 mb-5 sm:mb-6 md:mb-8">
-                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#139a9d]" />
-                <span className="text-xs sm:text-sm font-semibold text-[#139a9d]">Plateforme Officielle</span>
-                <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500 fill-yellow-500" />
-              </div>
-              
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-5 md:mb-6 leading-tight text-gray-900 px-2">
-                L'Ordre Mauritanien des{' '}
-                <span className="text-[#139a9d]">Ingénieurs en Génie Civil</span>
-              </h1>
-              
-              <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed px-2">
-                La plateforme digitale officielle pour la gestion, la vérification et l'accompagnement des ingénieurs en génie civil en Mauritanie.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2">
-                <Link href="/inscription" className="w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto h-11 sm:h-12 md:h-13 px-5 sm:px-6 md:px-8 text-sm sm:text-base rounded-lg sm:rounded-xl bg-[#139a9d] hover:bg-[#0f7a7d] text-white font-semibold shadow-md hover:shadow-lg transition-all">
-                    <Sparkles className="w-4 h-4 sm:w-4.5 sm:h-4.5 mr-2" />
-                    Rejoindre l'OMIGEC
-                  </Button>
-                </Link>
-                <Link href="/connexion" className="w-full sm:w-auto">
-                  <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-12 md:h-13 px-5 sm:px-6 md:px-8 text-sm sm:text-base rounded-lg sm:rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold">
-                    Se connecter
-                    <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="py-10 sm:py-14 md:py-16 lg:py-20 bg-gray-50">
-          <div className="container mx-auto">
-            <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2">
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#139a9d]/10 border border-[#139a9d]/30 mb-3 sm:mb-4">
-                <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#139a9d]" />
-                <span className="text-xs sm:text-sm font-medium text-[#139a9d]">Nos Services</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
-                Une plateforme complète
-              </h2>
-              <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto">
-                Tout ce dont vous avez besoin pour gérer votre carrière d'ingénieur
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 max-w-6xl mx-auto">
-              {[
-                { icon: CheckCircle, title: 'Inscription', desc: 'Inscrivez-vous en ligne et soumettez vos documents facilement', color: 'bg-[#139a9d]' },
-                { icon: Users, title: 'Validation', desc: 'Système de parrainage par des ingénieurs agréés', color: 'bg-purple-600' },
-                { icon: FileText, title: 'Vérification', desc: 'Vérifiez le statut d\'un ingénieur en temps réel', color: 'bg-orange-500' },
-                { icon: Briefcase, title: 'Emplois', desc: 'Accédez aux offres d\'emploi réservées aux membres', color: 'bg-green-600' },
-              ].map((item, index) => (
-                <div 
-                  key={index}
-                  className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-lg transition-all hover:-translate-y-1"
-                >
-                  <div className={`w-11 h-11 sm:w-12 sm:h-12 md:w-13 md:h-13 rounded-lg sm:rounded-xl ${item.color} flex items-center justify-center mb-3 sm:mb-4`}>
-                    <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+      {/* Partners Marquee */}
+      <div className="w-full bg-white dark:bg-slate-900 py-8 border-y border-slate-100 dark:border-slate-800 overflow-hidden">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600 mb-6">
+          Nos Partenaires de Confiance
+        </p>
+        {sponsors.length > 0 ? (
+          <div className="marquee-container relative w-full overflow-hidden">
+            <div className="flex w-[200%] animate-marquee">
+              {/* First set of sponsors */}
+              <div className="flex items-center justify-around w-1/2 px-4 gap-12">
+                {sponsors.map((sponsor) => (
+                  <div 
+                    key={`first-${sponsor.id}`}
+                    className="group cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300"
+                    onClick={() => sponsor.website_url && window.open(`https://${sponsor.website_url}`, '_blank')}
+                  >
+                    <div className="flex items-center justify-center min-w-[120px] h-16">
+                      {sponsor.logo_url ? (
+                        <img 
+                          src={sponsor.logo_url} 
+                          alt={sponsor.name}
+                          className="h-12 w-auto object-contain max-w-[140px] transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className={`w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center ${getColorFromName(sponsor.name)} text-sm font-bold border-2 border-current`}>
+                            {getInitials(sponsor.name)}
+                          </div>
+                          <span className="font-display font-bold text-lg text-slate-800 dark:text-slate-200">
+                            {sponsor.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1.5 sm:mb-2">{item.title}</h3>
-                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
+                ))}
+              </div>
+              
+              {/* Second set of sponsors (duplicate for seamless loop) */}
+              <div className="flex items-center justify-around w-1/2 px-4 gap-12">
+                {sponsors.map((sponsor) => (
+                  <div 
+                    key={`second-${sponsor.id}`}
+                    className="group cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300"
+                    onClick={() => sponsor.website_url && window.open(`https://${sponsor.website_url}`, '_blank')}
+                  >
+                    <div className="flex items-center justify-center min-w-[120px] h-16">
+                      {sponsor.logo_url ? (
+                        <img 
+                          src={sponsor.logo_url} 
+                          alt={sponsor.name}
+                          className="h-12 w-auto object-contain max-w-[140px] transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className={`w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center ${getColorFromName(sponsor.name)} text-sm font-bold border-2 border-current`}>
+                            {getInitials(sponsor.name)}
+                          </div>
+                          <span className="font-display font-bold text-lg text-slate-800 dark:text-slate-200">
+                            {sponsor.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-10 sm:py-14 md:py-16 lg:py-20 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]">
-          <div className="container mx-auto text-center px-2">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 md:mb-6 px-2">
-              Prêt à rejoindre l'OMIGEC ?
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg text-white/80 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto px-2 leading-relaxed">
-              Inscrivez-vous dès maintenant et faites partie de l'ordre professionnel des ingénieurs en génie civil
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-slate-400 dark:text-slate-600 text-sm">
+              Aucun partenaire configuré pour le moment
             </p>
-            <Link href="/inscription">
-              <Button className="h-11 sm:h-12 md:h-13 px-6 sm:px-8 md:px-10 text-sm sm:text-base rounded-lg sm:rounded-xl bg-white text-[#139a9d] hover:bg-gray-50 font-semibold shadow-lg hover:shadow-xl transition-all">
-                Commencer l'inscription
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-              </Button>
-            </Link>
           </div>
-        </section>
-      </main>
+        )}
+      </div>
+
+      {/* Services Section */}
+      <section className="py-24 bg-slate-50 dark:bg-slate-800/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <span className="text-[#14919B] font-bold tracking-wider uppercase text-sm">Services Numériques</span>
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-slate-900 dark:text-white mt-3 mb-6">Une plateforme complète</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400">Tout ce dont vous avez besoin pour gérer votre carrière d'ingénieur, centralisé en un seul endroit sécurisé.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-800 hover:-translate-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl">how_to_reg</span>
+              </div>
+              <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Inscription</h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">Inscrivez-vous en ligne et soumettez vos documents facilement sans déplacement.</p>
+            </div>
+            <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-800 hover:-translate-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl">verified</span>
+              </div>
+              <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Validation</h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">Système de parrainage par des ingénieurs agréés et validation rapide.</p>
+            </div>
+            <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-800 hover:-translate-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl">assignment_turned_in</span>
+              </div>
+              <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Vérification</h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">Vérifiez le statut d'un ingénieur en temps réel pour garantir la conformité.</p>
+            </div>
+            <div className="group bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-800 hover:-translate-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl">work_outline</span>
+              </div>
+              <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white mb-3">Emplois</h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">Accédez aux offres d'emploi réservées aux membres et postulez directement.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* News Section */}
+      <LatestArticles />
+
+      {/* CTA Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto bg-[#14919B] rounded-[2.5rem] overflow-hidden relative shadow-2xl shadow-[#14919B]/30">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-900 opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+          <div className="relative z-10 flex flex-col items-center justify-center text-center py-20 px-4 md:px-12">
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-6">Prêt à rejoindre l'OMIGEC ?</h2>
+            <p className="text-teal-50 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">Inscrivez-vous dès maintenant et faites partie de l'Ordre Mauritanien des Ingénieurs en génie civil pour accéder à tous nos services exclusifs.</p>
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Link href="/inscription" className="bg-white text-[#14919B] font-bold py-4 px-10 rounded-xl shadow-lg hover:shadow-xl hover:bg-teal-50 transition-all transform hover:-translate-y-1 flex items-center justify-center">
+                Commencer l'inscription
+                <span className="material-icons-outlined ml-2">arrow_forward</span>
+              </Link>
+              <Link href="/contact" className="bg-[#14919B] border-2 border-white/30 text-white font-bold py-4 px-10 rounded-xl hover:bg-[#14919B]/80 hover:border-white/50 transition-all flex items-center justify-center">
+                Nous contacter
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="bg-[#14919B] p-1.5 rounded text-white">
+                  <span className="material-icons-outlined text-xl">engineering</span>
+                </div>
+                <span className="font-display font-bold text-xl text-slate-900 dark:text-white">OMIGEC</span>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Ordre Mauritanien des Ingénieurs de Génie Civil œuvre pour l'excellence et l'éthique dans la profession d'ingénieur.</p>
+              <div className="flex gap-4 pt-2">
+                <a className="text-slate-400 hover:text-[#14919B] transition-colors" href="#">
+                  <span className="material-icons-outlined">facebook</span>
+                </a>
+                <a className="text-slate-400 hover:text-[#14919B] transition-colors" href="#">
+                  <span className="material-icons-outlined">share</span>
+                </a>
+                <a className="text-slate-400 hover:text-[#14919B] transition-colors" href="#">
+                  <span className="material-icons-outlined">alternate_email</span>
+                </a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4">Navigation</h4>
+              <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400">
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/">Accueil</Link></li>
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/about">À propos</Link></li>
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/services">Services</Link></li>
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/contact">Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4">Services</h4>
+              <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400">
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/inscription">Inscription au tableau</Link></li>
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/emplois">Offres d'emploi</Link></li>
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/recherche">Vérification ingénieur</Link></li>
+                <li><Link className="hover:text-[#14919B] transition-colors" href="/docs">Documentation</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-900 dark:text-white mb-4">Contact</h4>
+              <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400">
+                <li className="flex items-start gap-2">
+                  <span className="material-icons-outlined text-[#14919B] text-base mt-0.5">location_on</span>
+                  <span>Nouakchott, Mauritanie<br/>BP 1234</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="material-icons-outlined text-[#14919B] text-base">phone</span>
+                  <span>+222 45 00 00 00</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="material-icons-outlined text-[#14919B] text-base">email</span>
+                  <span>contact@omigec.mr</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-slate-400 text-center md:text-left">© 2026 OMIGEC. Tous droits réservés.</p>
+            <div className="flex gap-6 text-sm text-slate-400">
+              <Link className="hover:text-[#14919B] transition-colors" href="/privacy">Confidentialité</Link>
+              <Link className="hover:text-[#14919B] transition-colors" href="/terms">Conditions</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

@@ -2,25 +2,37 @@
   {
     "id": "1",
     "title": "Nouvelle réglementation pour les ingénieurs en génie civil",
-    "description": "L'OMIGEC annonce de nouvelles directives concernant les normes de construction et les certifications professionnelles pour 2026.",
-    "image": "/articles/1768337193505-69241271_9685306.jpg",
+    "description": "L'OMIGEC annonce de nouvelles directives concernant les normes de construction et les certifications professionnelles pour 2026. Ces changements visent à améliorer la sécurité structurelle.",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAnGrfu7_xCYnRBX9_yAgCHix6wxLEIrobhMTACH4x47JRwpdj96RrDe7Waqn_GRPtUHB7OB2CF22BfBDuOG2AhGo4Cx91FE4FIT_a-rsW4WFBZC4DeSCkN88jestGfkmZxt5EUmvthY6HWTgqg00mtSBKtwPmVYAoOXZPiKIO0w-LAVFWtzUAlxUOi5Scua1mYajMjLhRNFVAbbS9Qr1dDjp9j_562Pz5GbrsrkvTK2n9s4c36xOp25QLO-8wy1XfZtpq_x4sktI8",
     "date": "2026-01-10",
-    "published": true
+    "published": true,
+    "category": "reglementation"
   },
   {
     "id": "2",
     "title": "Formation continue: Inscriptions ouvertes",
-    "description": "Les inscriptions pour la session de formation continue du premier trimestre sont maintenant ouvertes. Places limitées.",
-    "image": "https://yhkuerjznwducxaaoilj.supabase.co/storage/v1/object/public/public-files/articles/1768342834358-82552441a258.jpg",
+    "description": "Les inscriptions pour la session de formation continue du premier trimestre sont maintenant ouvertes. Places limitées, inscrivez-vous rapidement pour garantir votre participation.",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAbhYnHlYKNQLKBNl6BiGzP7ihNBAx1qJ7yG7Eh4OJld3hLE68nRsbZkVwpUEYQiLmT-KFhe5WUo1QdsnCJMY5-ZfXx1bNEsz-nbdq1rQXDbLVF2jz8OWneoQsBzEtLIdPjrQ4_OSnF7I_SmYjqLmZhK3qqcun8HT35vrkf8IWYcUp2QegbvWBm-2m3Ut_LT6qCkrgC0qW1fJM2vvZyTiUMiN4pxAUcfThtvJaHlDELfGdoETKiQnfNm7zSaqJTvnicDPdzGSQKH6E",
     "date": "2026-01-08",
-    "published": true
+    "published": true,
+    "category": "formations"
   },
   {
     "id": "3",
     "title": "Assemblée générale annuelle 2026",
-    "description": "L'assemblée générale annuelle de l'OMIGEC se tiendra le 15 février 2026 à Nouakchott. Tous les membres sont conviés.",
-    "image": "https://yhkuerjznwducxaaoilj.supabase.co/storage/v1/object/public/public-files/articles/1768342898573-248095815286.jpg",
+    "description": "L'assemblée générale annuelle de l'OMIGEC se tiendra le 15 février 2026 à Nouakchott. Tous les membres sont conviés à cet événement majeur pour l'avenir de l'organisation.",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuC8QBVcnzRKPA2Nq6jpT5g7xdrVCua8MCo2Lap1UTF6-CyIQ9etRGPxY4biYstzW2u-ElJZnlDYSCgxxWBJoIefBUX_8r0omuEAWv290sgr-eE7xgjZFWbx9i_wyYYWPtYuSXA2cMCe9MDixvM9n2WQ11UMUimVleR_uxjefB_L04SYs5cNzROO5L0qh_Yaj62S0PItdDfOlaZSKxkcYEZwTR_LqIcmLlPLBbCjG2glcRul-llav3XYMGVxL8WgFNJhSsWTpGDwFoc",
     "date": "2026-01-05",
-    "published": true
+    "published": false,
+    "category": "evenements"
+  },
+  {
+    "id": "4",
+    "title": "Mise à jour des protocoles de sécurité",
+    "description": "Revue technique des nouveaux équipements de protection individuelle recommandés sur les chantiers de grande envergure.",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDuwnRFjWCoEOEsm7jg5HQhUrJt6xQYFO0Ak0O4IH93xxeGvDoJAzm7OIZJY-KBjwaTzKHG4H2WZqLBSqs88SiLivmX2_Rd1AywSCU9xbpas6ZskQNGGbfVFt_sOEl26FIdpV9mOCOnBb9X6Hi0eUgnDhFwq3UAbqHtsUlv7G9z-Im3DDAnnBqWKjRQGTolM8Z-LS0xPIfIFiMoC4CiJKlPJuCIlHPk1ozEYYwwJb0Bema8ojgiTweKZnmgohmFog18QExwF59baKA",
+    "date": "2026-01-02",
+    "published": true,
+    "category": "technique"
   }
 ]

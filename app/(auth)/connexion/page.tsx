@@ -3,12 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
-import { Mail, Lock, LogIn, Sparkles, ArrowLeft, Eye, EyeOff, Building2, User } from 'lucide-react'
 
 type UserType = 'ingenieur' | 'entreprise'
 
@@ -123,157 +118,228 @@ function ConnexionForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="w-full max-w-md">
-        {/* Back Link */}
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-[#139a9d] mb-8 transition-colors group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Retour à l'accueil
-        </Link>
-
-        <Card className="border-0 shadow-2xl overflow-hidden">
-          {/* Turquoise Top Bar */}
-          <div className="h-2 bg-[#139a9d]"></div>
-          
-          <CardHeader className="space-y-4 text-center pt-8">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-[#139a9d] flex items-center justify-center shadow-lg">
-              {userType === 'entreprise' ? (
-                <Building2 className="w-8 h-8 text-white" />
-              ) : (
-                <LogIn className="w-8 h-8 text-white" />
-              )}
+    <div className="min-h-screen bg-background-light dark:bg-background-dark font-sans transition-colors duration-300">
+      <div className="min-h-screen flex">
+        {/* Left Side - Hero Section */}
+        <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary">
+          <img 
+            alt="Architecture and Engineering" 
+            className="absolute inset-0 object-cover w-full h-full mix-blend-overlay opacity-50" 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI4f5p58dgu1DMYIvIdUJn4yjd7v6YY_aki5yAC1JpgErhzewLLr61YhHIkRynqOoU0q6tOPqhL7jTNxnNl9QmF9g7VM27IlTZALuStCKpt8RZG-W5jtiyXSybSoowxHGgIaGUav9rf_8njwFFZQvG5lJuGav0qMPXeW7_q-lxYzFgP7uGgk1w_9n7i5UpWlE6_aLP_uiyoDASy9WsTH9POx3A0k2DxtOCc9tpjT7n1DqnZDvtl01G7Pug0JN0cFKA65Hl_hCmudA"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-teal-900/90"></div>
+          <div className="relative z-10 flex flex-col justify-center px-16 xl:px-24">
+            <div className="mb-12">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-2xl mb-8">
+                <span className="material-symbols-outlined text-primary text-4xl">architecture</span>
+              </div>
+              <h1 className="font-display text-5xl xl:text-6xl text-white leading-tight mb-6">
+                Accédez à votre espace <br/>
+                <span className="italic">OMIGEC</span>
+              </h1>
+              <p className="text-teal-50 text-xl font-light max-w-md leading-relaxed">
+                Le portail d'excellence pour les ingénieurs et entreprises du secteur de la construction. Connectez-vous pour gérer vos projets et votre profil.
+              </p>
             </div>
-            <CardTitle className="text-3xl font-bold text-[#139a9d]">
-              Connexion
-            </CardTitle>
-            <CardDescription className="text-base">
-              {userType === 'entreprise' 
-                ? 'Connectez-vous à votre espace entreprise'
-                : 'Connectez-vous à votre compte OMIGEC'
-              }
-            </CardDescription>
+            <div className="flex gap-4 mt-8">
+              <div className="glass-effect p-4 rounded-xl border border-white/10">
+                <div className="text-white font-bold text-2xl">15k+</div>
+                <div className="text-teal-100 text-sm">Ingénieurs certifiés</div>
+              </div>
+              <div className="glass-effect p-4 rounded-xl border border-white/10">
+                <div className="text-white font-bold text-2xl">2.4k</div>
+                <div className="text-teal-100 text-sm">Entreprises</div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 p-12 text-white/40 text-xs tracking-widest uppercase">
+            © 2026 OMIGEC — L'ingénierie du futur
+          </div>
+        </div>
+
+        {/* Right Side - Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-20 bg-white dark:bg-slate-900">
+          <div className="w-full max-w-md">
+            {/* Mobile Logo */}
+            <div className="lg:hidden flex justify-center mb-8">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white">
+                <span className="material-symbols-outlined">login</span>
+              </div>
+            </div>
+
+            {/* Header */}
+            <div className="mb-10 text-center lg:text-left">
+              <Link 
+                className="inline-flex items-center text-sm text-slate-500 hover:text-primary transition-colors mb-8 group" 
+                href="/"
+              >
+                <span className="material-symbols-outlined mr-2 group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Retour à l'accueil
+              </Link>
+              <h2 className="text-3xl font-display text-slate-800 dark:text-white mb-2">Connexion</h2>
+              <p className="text-slate-500 dark:text-slate-400">Connectez-vous à votre compte OMIGEC</p>
+            </div>
 
             {/* User Type Toggle */}
-            <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
-              <button
-                type="button"
-                onClick={() => setUserType('ingenieur')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                  userType === 'ingenieur'
-                    ? 'bg-white text-[#139a9d] shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-8">
+              <button 
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${
+                  userType === 'ingenieur' 
+                    ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-primary'
                 }`}
+                onClick={() => setUserType('ingenieur')}
               >
-                <User className="w-4 h-4" />
+                <span className="material-symbols-outlined">person</span>
                 Ingénieur
               </button>
-              <button
-                type="button"
-                onClick={() => setUserType('entreprise')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                  userType === 'entreprise'
-                    ? 'bg-white text-[#139a9d] shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+              <button 
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${
+                  userType === 'entreprise' 
+                    ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-primary'
                 }`}
+                onClick={() => setUserType('entreprise')}
               >
-                <Building2 className="w-4 h-4" />
+                <span className="material-symbols-outlined">business</span>
                 Entreprise
               </button>
             </div>
-          </CardHeader>
-          
-          <CardContent className="pb-8">
-            <form onSubmit={handleLogin} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="identifier" className="text-slate-700 font-medium">Email ou Téléphone</Label>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
+                <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold">!</span>
+                </div>
+                <div>
+                  <p className="font-bold text-red-800 dark:text-red-200">Erreur</p>
+                  <p className="text-red-700 dark:text-red-300">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Login Form */}
+            <form className="space-y-5" onSubmit={handleLogin}>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="identifier">
+                  Email ou Téléphone
+                </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <Input
-                    id="identifier"
-                    name="identifier"
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400">mail</span>
+                  <input 
+                    className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-primary rounded-xl dark:text-white transition-all" 
+                    id="identifier" 
+                    placeholder="votre@email.com ou 06XXXXXXXX" 
                     type="text"
-                    autoComplete="username"
-                    placeholder="votre@email.com ou 06XXXXXXXX"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="pl-12 h-12 rounded-xl border-2 border-slate-200 focus:border-[#139a9d] transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-700 font-medium">Mot de passe</Label>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="password">
+                    Mot de passe
+                  </label>
+                  <Link className="text-xs text-primary hover:underline font-medium" href="/reset-password">
+                    Oublié ?
+                  </Link>
+                </div>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400">lock</span>
+                  <input 
+                    className="w-full pl-12 pr-12 py-3 bg-slate-50 dark:bg-slate-800 border-transparent focus:border-primary focus:ring-primary rounded-xl dark:text-white transition-all" 
+                    id="password" 
+                    placeholder="••••••••" 
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
-                    className="pl-12 pr-12 h-12 rounded-xl border-2 border-slate-200 focus:border-[#139a9d] transition-colors"
                   />
-                  <button
+                  <button 
+                    className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 hover:text-primary transition-colors" 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? 'visibility_off' : 'visibility'}
                   </button>
                 </div>
               </div>
 
-              {error && (
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200">
-                  <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-red-500 text-lg">!</span>
-                  </div>
-                  <p className="text-red-600 text-sm">{error}</p>
-                </div>
-              )}
-
-              <Button
+              <button 
+                className="w-full bg-primary hover:bg-teal-700 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" 
                 type="submit"
-                className="w-full h-12 bg-[#139a9d] hover:bg-[#0f7a7d] text-white rounded-xl text-base font-medium shadow-lg"
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
+                  <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     Connexion...
-                  </div>
+                  </>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <LogIn className="w-5 h-5" />
+                  <>
                     Se connecter
-                  </div>
+                    <span className="material-symbols-outlined">login</span>
+                  </>
                 )}
-              </Button>
+              </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-slate-200">
-              <p className="text-center text-slate-600">
+            {/* Divider */}
+            <div className="relative my-10">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 tracking-widest">Ou continuer avec</span>
+              </div>
+            </div>
+
+            {/* LinkedIn Login */}
+            <button className="w-full border-2 border-slate-100 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/50 py-3 rounded-xl flex items-center justify-center gap-3 transition-all font-medium text-slate-700 dark:text-slate-300">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path>
+              </svg>
+              Se connecter avec LinkedIn
+            </button>
+
+            {/* Footer Links */}
+            <div className="mt-10 text-center">
+              <p className="text-slate-500 dark:text-slate-400">
                 Pas encore de compte ?{' '}
                 {userType === 'entreprise' ? (
-                  <Link href="/inscription-entreprise" className="font-semibold text-[#139a9d] hover:text-[#0f7a7d] transition-colors inline-flex items-center gap-1">
-                    <Building2 className="w-4 h-4" />
+                  <Link className="text-primary font-bold hover:underline inline-flex items-center gap-1" href="/inscription-entreprise">
                     Inscrivez votre entreprise
+                    <span className="material-symbols-outlined text-[16px]">business</span>
                   </Link>
                 ) : (
-                  <Link href="/inscription" className="font-semibold text-[#139a9d] hover:text-[#0f7a7d] transition-colors inline-flex items-center gap-1">
-                    <Sparkles className="w-4 h-4" />
+                  <Link className="text-primary font-bold hover:underline inline-flex items-center gap-1" href="/inscription">
                     Inscrivez-vous
+                    <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
                   </Link>
                 )}
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
+
+      {/* Theme Toggle Button */}
+      <button 
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95 group" 
+        onClick={() => {
+          document.documentElement.classList.toggle('dark')
+        }}
+      >
+        <span className="material-symbols-outlined text-slate-600 dark:text-slate-300 group-hover:rotate-12 transition-transform">
+          dark_mode
+        </span>
+      </button>
     </div>
   )
 }
@@ -281,16 +347,8 @@ function ConnexionForm() {
 export default function ConnexionPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="w-full max-w-md">
-          <Card className="border-0 shadow-2xl overflow-hidden">
-            <div className="h-2 bg-[#139a9d]"></div>
-            <CardContent className="py-16 text-center">
-              <div className="w-8 h-8 border-2 border-[#139a9d] border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-slate-600">Chargement...</p>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <ConnexionForm />

@@ -56,12 +56,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/recherche" className="text-slate-400 text-xs sm:text-sm hover:text-cyan-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-slate-600 group-hover:bg-cyan-400 transition-colors"></span>
-                  Rechercher un Ingénieur
-                </Link>
-              </li>
-              <li>
                 <Link href="/inscription" className="text-slate-400 text-xs sm:text-sm hover:text-cyan-400 transition-colors flex items-center gap-2 group">
                   <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-slate-600 group-hover:bg-cyan-400 transition-colors"></span>
                   Inscription

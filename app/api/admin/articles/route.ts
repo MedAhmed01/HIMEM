@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
       description: body.description,
       image: body.image || '/articles/default.jpg',
       date: new Date().toISOString().split('T')[0],
-      published: body.published ?? true
+      published: body.published ?? true,
+      category: body.category || 'actualites'
     }
     articles.unshift(newArticle)
     saveArticles(articles)

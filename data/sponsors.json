@@ -2,11 +2,51 @@
   {
     "id": "sponsor_1768332988635",
     "name": "Sedad",
-    "logo_url": "/sponsors/sponsor_1768332988632.png",
-    "logo_filename": "sponsor_1768332988632.png",
-    "website_url": "https://web.sedad.sbs/",
+    "logo_url": "https://lh3.googleusercontent.com/aida-public/AB6AXuDPad4JKUPHRtlYwBo_ILaFq9OwUIEJMznYIQ3snh460QU5MRkhwYEhmTV064727j2mx9gXy4JL4GhkKN1chdR3ET8nvsbHtgogNIp9wOKIzkAHzKMap8qHk9sB5HbA00AJJqsTjMqT7s-NrTrVaujPrJA4tUEBpJMoOGMXqb7HB63LO4nbR1Zr-JNIiGrOCHVFWpJM36dkdIyOnWqSpzH8WJYXvF0buGsx6m4-qerHF3ohxY4pxtA4b9iDOydDB_6GEp8biozdT-hl",
+    "logo_filename": "sedad_logo.png",
+    "website_url": "web.sedad.sbs",
     "order": 1,
     "is_active": true,
     "created_at": "2026-01-13T19:36:28.635Z"
+  },
+  {
+    "id": "sponsor_bamis_001",
+    "name": "bamis",
+    "logo_url": null,
+    "logo_filename": null,
+    "website_url": "bamis.mr",
+    "order": 2,
+    "is_active": true,
+    "created_at": "2026-01-19T10:00:00.000Z"
+  },
+  {
+    "id": "sponsor_bimbank_001",
+    "name": "bimbank",
+    "logo_url": null,
+    "logo_filename": null,
+    "website_url": "bimbank.mr",
+    "order": 3,
+    "is_active": true,
+    "created_at": "2026-01-19T10:05:00.000Z"
+  },
+  {
+    "id": "sponsor_bmci_001",
+    "name": "BMCI",
+    "logo_url": null,
+    "logo_filename": null,
+    "website_url": "bmci.mr",
+    "order": 4,
+    "is_active": true,
+    "created_at": "2026-01-19T10:10:00.000Z"
+  },
+  {
+    "id": "sponsor_genie_001",
+    "name": "GÉNIE CIVIL",
+    "logo_url": null,
+    "logo_filename": null,
+    "website_url": "genie-civil.mr",
+    "order": 5,
+    "is_active": true,
+    "created_at": "2026-01-19T10:15:00.000Z"
   }
 ]

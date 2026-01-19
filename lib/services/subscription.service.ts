@@ -214,9 +214,9 @@ export class SubscriptionService {
         payment_status,
         entreprises (
           id,
-          nom,
+          name,
           email,
-          telephone,
+          phone,
           status
         )
       `)
