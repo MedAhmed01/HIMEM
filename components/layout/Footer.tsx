@@ -126,7 +126,10 @@ export function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">Téléphone</p>
-                  <a href="tel:+22200000000" className="text-xs sm:text-sm hover:text-pink-400 transition-colors">+222 XX XX XX XX</a>
+                  <div className="flex flex-col">
+                    <a href="tel:+22234235365" className="text-xs sm:text-sm hover:text-pink-400 transition-colors">+222 34 23 53 65</a>
+                    <a href="tel:+22246992720" className="text-xs sm:text-sm hover:text-pink-400 transition-colors">+222 46 99 27 20</a>
+                  </div>
                 </div>
               </li>
               <li className="flex items-start gap-2.5 text-slate-400">
@@ -135,7 +138,7 @@ export function Footer() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">Adresse</p>
-                  <span className="text-xs sm:text-sm">Nouakchott, Mauritanie</span>
+                  <span className="text-xs sm:text-sm">ZRB N°0170 (Zone carrefour Bana Blanc), Nouakchott, Mauritanie</span>
                 </div>
               </li>
             </ul>

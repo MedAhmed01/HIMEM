@@ -56,7 +56,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 hero-pattern"></div>
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute -bottom-8 -left-20 w-80 h-80 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        
+
         {/* Navigation */}
         <nav className="absolute top-0 left-0 right-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,7 +70,7 @@ export default function ContactPage() {
                   <span className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mt-0.5">Ordre Mauritanien</span>
                 </div>
               </Link>
-              
+
               <div className="hidden lg:flex items-center space-x-1">
                 <nav className="flex items-center space-x-1 mr-6">
                   <Link className="px-3 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors rounded-md hover:bg-white/10" href="/">Accueil</Link>
@@ -91,7 +91,7 @@ export default function ContactPage() {
             </div>
           </div>
         </nav>
-        
+
         <div className="relative max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">Contactez-nous</h1>
           <p className="max-w-2xl mx-auto text-lg md:text-xl text-teal-50 leading-relaxed font-light">
@@ -134,9 +134,14 @@ export default function ContactPage() {
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Téléphone</h3>
                   <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Lun-Ven de 8h à 17h</p>
-                  <a className="text-[#0F766E] hover:text-[#0D9488] font-medium transition-colors" href="tel:+22245678901">
-                    +222 45 67 89 01
-                  </a>
+                  <div className="flex flex-col">
+                    <a className="text-[#0F766E] hover:text-[#0D9488] font-medium transition-colors" href="tel:+22234235365">
+                      +222 34 23 53 65
+                    </a>
+                    <a className="text-[#0F766E] hover:text-[#0D9488] font-medium transition-colors" href="tel:+22246992720">
+                      +222 46 99 27 20
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -152,8 +157,8 @@ export default function ContactPage() {
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Adresse</h3>
                   <p className="text-slate-600 dark:text-slate-300">
-                    Nouakchott, Mauritanie<br/>
-                    Zone Industrielle, B.P. 505
+                    ZRB N°0170 (Zone carrefour Bana Blanc)<br />
+                    Nouakchott, Mauritanie
                   </p>
                 </div>
               </div>
@@ -170,7 +175,7 @@ export default function ContactPage() {
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Horaires</h3>
                   <p className="text-slate-600 dark:text-slate-300">
-                    Lundi - Vendredi: 08h00 - 17h00<br/>
+                    Lundi - Vendredi: 08h00 - 17h00<br />
                     Samedi - Dimanche: Fermé
                   </p>
                 </div>
@@ -241,11 +246,11 @@ export default function ContactPage() {
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="name">
                         Nom complet <span className="text-red-500">*</span>
                       </label>
-                      <input 
+                      <input
                         className="block w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#0F766E] focus:ring-[#0F766E] sm:text-sm transition-shadow duration-200"
-                        id="name" 
-                        name="name" 
-                        placeholder="Votre nom" 
+                        id="name"
+                        name="name"
+                        placeholder="Votre nom"
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleChange('name', e.target.value)}
@@ -256,11 +261,11 @@ export default function ContactPage() {
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="email">
                         Email <span className="text-red-500">*</span>
                       </label>
-                      <input 
+                      <input
                         className="block w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#0F766E] focus:ring-[#0F766E] sm:text-sm transition-shadow duration-200"
-                        id="email" 
-                        name="email" 
-                        placeholder="votre.email@example.com" 
+                        id="email"
+                        name="email"
+                        placeholder="votre.email@example.com"
                         type="email"
                         value={formData.email}
                         onChange={(e) => handleChange('email', e.target.value)}
@@ -274,11 +279,11 @@ export default function ContactPage() {
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="phone">
                         Téléphone
                       </label>
-                      <input 
+                      <input
                         className="block w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#0F766E] focus:ring-[#0F766E] sm:text-sm transition-shadow duration-200"
-                        id="phone" 
-                        name="phone" 
-                        placeholder="+222 XX XX XX XX" 
+                        id="phone"
+                        name="phone"
+                        placeholder="+222 XX XX XX XX"
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => handleChange('phone', e.target.value)}
@@ -288,11 +293,11 @@ export default function ContactPage() {
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="subject">
                         Sujet
                       </label>
-                      <input 
+                      <input
                         className="block w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#0F766E] focus:ring-[#0F766E] sm:text-sm transition-shadow duration-200"
-                        id="subject" 
-                        name="subject" 
-                        placeholder="Objet de votre message" 
+                        id="subject"
+                        name="subject"
+                        placeholder="Objet de votre message"
                         type="text"
                         value={formData.subject}
                         onChange={(e) => handleChange('subject', e.target.value)}
@@ -304,11 +309,11 @@ export default function ContactPage() {
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="message">
                       Message <span className="text-red-500">*</span>
                     </label>
-                    <textarea 
+                    <textarea
                       className="block w-full px-4 py-3 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#0F766E] focus:ring-[#0F766E] sm:text-sm transition-shadow duration-200 resize-none"
-                      id="message" 
-                      name="message" 
-                      placeholder="Votre message..." 
+                      id="message"
+                      name="message"
+                      placeholder="Votre message..."
                       rows={6}
                       value={formData.message}
                       onChange={(e) => handleChange('message', e.target.value)}
@@ -317,7 +322,7 @@ export default function ContactPage() {
                   </div>
 
                   <div className="pt-4">
-                    <button 
+                    <button
                       className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-full shadow-glow text-base font-semibold text-white bg-[#0F766E] hover:bg-[#0D9488] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F766E] transition-all duration-300 transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
                       type="submit"
                       disabled={isSubmitting}
@@ -347,7 +352,7 @@ export default function ContactPage() {
 
       {/* Dark Mode Toggle */}
       <div className="fixed bottom-6 right-6 z-50">
-        <button 
+        <button
           className="bg-slate-800 dark:bg-white text-white dark:text-slate-900 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform"
           onClick={() => setIsDarkMode(!isDarkMode)}
         >

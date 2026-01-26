@@ -332,11 +332,14 @@ export default function Home() {
               <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="material-icons-outlined text-[#14919B] text-base mt-0.5">location_on</span>
-                  <span>Nouakchott, Mauritanie<br />BP 1234</span>
+                  <span>ZRB N°0170 (Zone carrefour Bana Blanc)<br />Nouakchott, Mauritanie</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="material-icons-outlined text-[#14919B] text-base">phone</span>
-                  <span>+222 45 00 00 00</span>
+                  <div className="flex flex-col">
+                    <span>+222 34 23 53 65</span>
+                    <span>+222 46 99 27 20</span>
+                  </div>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="material-icons-outlined text-[#14919B] text-base">email</span>
