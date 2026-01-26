@@ -56,9 +56,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center flex-shrink-0 group cursor-pointer">
-              <div className="h-10 w-10 bg-[#14919B] rounded-full flex items-center justify-center text-white mr-3 transition-transform group-hover:scale-105 shadow-md overflow-hidden">
-                <img src="/Icon.png" alt="OMIGEC Icon" className="w-full h-full object-contain p-1.5" />
-              </div>
+              <img
+                src="/Icon1.png"
+                alt="OMIGEC Logo"
+                className="w-10 h-10 mr-3 transition-transform group-hover:scale-105 object-contain"
+              />
               <div className="flex flex-col justify-center">
                 <span className="text-xl font-bold text-slate-800 dark:text-white leading-none tracking-tight">OMIGEC</span>
                 <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">Ordre Mauritanien des Ingénieurs en Génie Civil</span>

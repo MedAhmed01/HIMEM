@@ -77,9 +77,11 @@ export default function AdminLayout({
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-teal-600 dark:bg-teal-900 z-50 flex items-center justify-between px-6 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-black/20 rounded-lg flex items-center justify-center overflow-hidden">
-            <img src="/Icon.png" alt="OMIGEC Icon" className="w-full h-full object-contain p-1.5" />
-          </div>
+          <img
+            src="/Icon1.png"
+            alt="OMIGEC Logo"
+            className="w-10 h-10 object-contain"
+          />
           <div>
             <h1 className="text-white font-bold text-lg leading-tight">OMIGEC</h1>
             <p className="text-teal-100 text-[10px] uppercase tracking-wider">Ordre Mauritanien des Ingénieurs en Génie Civil</p>
