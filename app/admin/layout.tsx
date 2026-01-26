@@ -77,8 +77,8 @@ export default function AdminLayout({
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-teal-600 dark:bg-teal-900 z-50 flex items-center justify-between px-6 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-            <Building2 className="text-white w-6 h-6" />
+          <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+            <img src="/Icon.png" alt="OMIGEC Icon" className="w-full h-full object-cover" />
           </div>
           <div>
             <h1 className="text-white font-bold text-lg leading-tight">OMIGEC</h1>
@@ -121,8 +121,8 @@ export default function AdminLayout({
                 key={item.name}
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg group transition-all ${isActive
-                    ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border-r-4 border-teal-600 dark:border-teal-400'
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border-r-4 border-teal-600 dark:border-teal-400'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
               >
                 <Icon className="w-5 h-5" />

@@ -56,8 +56,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center flex-shrink-0 group cursor-pointer">
-              <div className="h-10 w-10 bg-[#14919B] rounded-full flex items-center justify-center text-white mr-3 transition-transform group-hover:scale-105 shadow-md">
-                <span className="material-icons-outlined text-[20px]">engineering</span>
+              <div className="h-10 w-10 bg-[#14919B] rounded-full flex items-center justify-center text-white mr-3 transition-transform group-hover:scale-105 shadow-md overflow-hidden">
+                <img src="/Icon.png" alt="OMIGEC Icon" className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col justify-center">
                 <span className="text-xl font-bold text-slate-800 dark:text-white leading-none tracking-tight">OMIGEC</span>
