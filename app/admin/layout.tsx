@@ -3,17 +3,17 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { 
-  FileText, 
-  Users, 
-  UserCheck, 
-  LayoutDashboard, 
-  Home, 
-  LogOut, 
-  Building2, 
-  CreditCard, 
-  Mail, 
-  Newspaper, 
+import {
+  FileText,
+  Users,
+  UserCheck,
+  LayoutDashboard,
+  Home,
+  LogOut,
+  Building2,
+  CreditCard,
+  Mail,
+  Newspaper,
   Image,
   Sun,
   Moon,
@@ -82,7 +82,7 @@ export default function AdminLayout({
           </div>
           <div>
             <h1 className="text-white font-bold text-lg leading-tight">OMIGEC</h1>
-            <p className="text-teal-100 text-[10px] uppercase tracking-wider">Ordre des Ingénieurs</p>
+            <p className="text-teal-100 text-[10px] uppercase tracking-wider">Ordre Mauritanien des Ingénieurs en Génie Civil</p>
           </div>
         </div>
 
@@ -91,16 +91,16 @@ export default function AdminLayout({
             <UserCheck className="w-4 h-4" />
             <span>Mode Administrateur</span>
           </div>
-          
-          <Link 
-            href="/" 
+
+          <Link
+            href="/"
             className="flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
           >
             <Home className="w-4 h-4" />
             <span>Retour au site</span>
           </Link>
 
-          <button 
+          <button
             onClick={toggleTheme}
             className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
           >
@@ -115,16 +115,15 @@ export default function AdminLayout({
           {navigation.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
-            
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg group transition-all ${
-                  isActive 
-                    ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border-r-4 border-teal-600 dark:border-teal-400' 
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg group transition-all ${isActive
+                    ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border-r-4 border-teal-600 dark:border-teal-400'
                     : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 <span className={isActive ? 'font-semibold' : ''}>{item.name}</span>
@@ -138,7 +137,7 @@ export default function AdminLayout({
           })}
 
           <div className="pt-10 pb-4 border-t border-slate-100 dark:border-slate-800 mt-10">
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all w-full"
             >
@@ -156,7 +155,7 @@ export default function AdminLayout({
 
       {/* Floating Theme Toggle */}
       <div className="fixed bottom-6 right-6 z-50">
-        <button 
+        <button
           onClick={toggleTheme}
           className="w-14 h-14 bg-teal-600 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
         >

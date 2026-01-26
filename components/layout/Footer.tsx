@@ -10,21 +10,21 @@ export function Footer() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl"></div>
       </div>
-      
+
       <div className="container mx-auto py-10 sm:py-12 md:py-14 lg:py-16 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-2.5 mb-4 sm:mb-5 group">
-              <img 
-                src="/logo.png" 
-                alt="OMIGEC Logo" 
+              <img
+                src="/logo.png"
+                alt="OMIGEC Logo"
                 className="w-10 h-10 sm:w-11 sm:h-11 object-contain group-hover:scale-105 transition-transform"
               />
               <div className="text-xl sm:text-2xl font-bold text-white">OMIGEC</div>
             </Link>
             <p className="text-slate-400 text-xs sm:text-sm mb-4 sm:mb-5 leading-relaxed">
-              Ordre Mauritanien des Ingénieurs en Génie Civil - La plateforme digitale pour la gestion des ingénieurs.
+              Ordre Mauritanien des Ingénieurs en Génie Civil - Plateforme Officielle.
             </p>
             <div className="flex space-x-2 sm:space-x-2.5">
               <a href="#" className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/10 hover:bg-gradient-to-br hover:from-[#139a9d] hover:to-[#0f7a7d] flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300">

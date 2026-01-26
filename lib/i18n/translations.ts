@@ -15,11 +15,11 @@ export const translations = {
       admin: 'Administration',
       company: 'Espace Entreprise'
     },
-    
+
     // Home page
     home: {
       hero: {
-        title: 'Ordre Mauritanien des Ingénieurs Génie Civil',
+        title: 'Ordre Mauritanien des Ingénieurs en Génie Civil',
         subtitle: 'Votre partenaire pour l\'excellence en génie civil',
         cta: 'Rejoignez-nous',
         learnMore: 'En savoir plus'
@@ -34,7 +34,7 @@ export const translations = {
         resourcesDesc: 'Accédez à nos documents et guides'
       }
     },
-    
+
     // Dashboard
     dashboard: {
       welcome: 'Bienvenue',
@@ -60,7 +60,7 @@ export const translations = {
       adminPanel: 'Accéder au panneau admin',
       loading: 'Chargement...'
     },
-    
+
     // Auth
     auth: {
       login: 'Connexion',
@@ -78,7 +78,7 @@ export const translations = {
       domain: 'Domaine',
       gradYear: 'Année de diplôme'
     },
-    
+
     // Jobs
     jobs: {
       title: 'Offres d\'emploi',
@@ -94,7 +94,7 @@ export const translations = {
       requirements: 'Exigences',
       noJobs: 'Aucune offre disponible'
     },
-    
+
     // Contact
     contact: {
       title: 'Contactez-nous',
@@ -106,7 +106,7 @@ export const translations = {
       success: 'Message envoyé avec succès',
       error: 'Erreur lors de l\'envoi'
     },
-    
+
     // Common
     common: {
       save: 'Enregistrer',
@@ -127,7 +127,7 @@ export const translations = {
       close: 'Fermer'
     }
   },
-  
+
   ar: {
     // Navigation
     nav: {
@@ -144,7 +144,7 @@ export const translations = {
       admin: 'الإدارة',
       company: 'مساحة الشركة'
     },
-    
+
     // Home page
     home: {
       hero: {
@@ -163,7 +163,7 @@ export const translations = {
         resourcesDesc: 'الوصول إلى وثائقنا وأدلةنا'
       }
     },
-    
+
     // Dashboard
     dashboard: {
       welcome: 'مرحبا',
@@ -189,7 +189,7 @@ export const translations = {
       adminPanel: 'الوصول إلى لوحة الإدارة',
       loading: 'جاري التحميل...'
     },
-    
+
     // Auth
     auth: {
       login: 'تسجيل الدخول',
@@ -207,7 +207,7 @@ export const translations = {
       domain: 'المجال',
       gradYear: 'سنة التخرج'
     },
-    
+
     // Jobs
     jobs: {
       title: 'عروض العمل',
@@ -223,7 +223,7 @@ export const translations = {
       requirements: 'المتطلبات',
       noJobs: 'لا توجد عروض متاحة'
     },
-    
+
     // Contact
     contact: {
       title: 'اتصل بنا',
@@ -235,7 +235,7 @@ export const translations = {
       success: 'تم إرسال الرسالة بنجاح',
       error: 'خطأ في الإرسال'
     },
-    
+
     // Common
     common: {
       save: 'حفظ',

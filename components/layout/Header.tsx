@@ -18,13 +18,13 @@ export function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      
+
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         setIsHidden(true)
       } else {
         setIsHidden(false)
       }
-      
+
       setLastScrollY(currentScrollY)
     }
 
@@ -38,13 +38,13 @@ export function Header() {
         <div className="grid grid-cols-3 items-center h-14 sm:h-16 md:h-18">
           {/* Logo - Left */}
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 justify-self-start">
-            <img 
-              src="/Logo.png" 
-              alt="OMIGEC Logo" 
+            <img
+              src="/Logo.png"
+              alt="OMIGEC Logo"
               className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain"
             />
           </Link>
-          
+
           {/* Desktop Navigation - Center */}
           <nav className="hidden md:flex items-center justify-center gap-0.5">
             <Link href="/" className="px-3 py-1.5 rounded-full text-sm text-white font-medium hover:bg-white/10 transition-all duration-200">
@@ -55,6 +55,9 @@ export function Header() {
             </Link>
             <Link href="/emplois" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
               {t.nav.jobs}
+            </Link>
+            <Link href="/entreprises" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
+              Entreprises
             </Link>
             <Link href="/recherche" className="px-3 py-1.5 rounded-full text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all duration-200">
               {t.common.search}
@@ -73,10 +76,10 @@ export function Header() {
                 {t.nav.login}
               </Button>
             </Link>
-            
+
             {/* Dropdown Inscription */}
             <div className="relative inscription-dropdown">
-              <Button 
+              <Button
                 onClick={() => setIsInscriptionOpen(!isInscriptionOpen)}
                 className="h-9 px-4 rounded-full text-sm bg-white text-[#139a9d] hover:bg-white/90 font-medium shadow-md hover:shadow-lg transition-all duration-200"
               >
@@ -84,10 +87,10 @@ export function Header() {
                 {t.nav.register}
                 <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
               </Button>
-              
+
               {isInscriptionOpen && (
                 <div className={`absolute ${language === 'ar' ? 'left-0' : 'right-0'} mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50`}>
-                  <Link 
+                  <Link
                     href="/inscription"
                     onClick={() => setIsInscriptionOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-[#139a9d]/10 transition-colors"
@@ -100,7 +103,7 @@ export function Header() {
                       <p className="text-xs text-gray-500">{language === 'ar' ? 'تسجيل فردي' : 'Inscription individuelle'}</p>
                     </div>
                   </Link>
-                  <Link 
+                  <Link
                     href="/inscription-entreprise"
                     onClick={() => setIsInscriptionOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors"
@@ -119,7 +122,7 @@ export function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
+          <button
             className="md:hidden p-2 rounded-full text-white hover:bg-white/10 transition-colors justify-self-end col-start-3"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
@@ -131,36 +134,43 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-3 border-t border-white/10 animate-in slide-in-from-top-2 duration-200">
             <nav className="flex flex-col gap-0.5">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="px-3 py-2.5 rounded-lg text-sm text-white font-medium hover:bg-white/10 transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.home}
               </Link>
-              <Link 
-                href="/services" 
+              <Link
+                href="/services"
                 className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.services}
               </Link>
-              <Link 
-                href="/emplois" 
+              <Link
+                href="/emplois"
                 className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.nav.jobs}
               </Link>
-              <Link 
-                href="/recherche" 
+              <Link
+                href="/entreprises"
+                className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Entreprises
+              </Link>
+              <Link
+                href="/recherche"
                 className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t.common.search}
               </Link>
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="px-3 py-2.5 rounded-lg text-sm text-white/90 font-medium hover:bg-white/10 hover:text-white transition-all text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -176,7 +186,7 @@ export function Header() {
                     {t.nav.login}
                   </Button>
                 </Link>
-                
+
                 {/* Inscription Options */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-white/70 px-3">{t.nav.register}</p>

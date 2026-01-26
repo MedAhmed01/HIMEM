@@ -37,7 +37,7 @@ export default function Home() {
   const getColorFromName = (name: string) => {
     const colors = [
       'text-red-600',
-      'text-blue-600', 
+      'text-blue-600',
       'text-green-600',
       'text-yellow-600',
       'text-purple-600',
@@ -61,7 +61,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col justify-center">
                 <span className="text-xl font-bold text-slate-800 dark:text-white leading-none tracking-tight">OMIGEC</span>
-                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">Ordre Mauritanien</span>
+                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">Ordre Mauritanien des Ingénieurs en Génie Civil</span>
               </div>
             </div>
             <div className="hidden lg:flex items-center space-x-1">
@@ -101,10 +101,10 @@ export default function Home() {
                 <span className="material-icons-outlined text-sm">verified</span>
                 Plateforme Officielle
               </div>
-              <h1 className="font-display font-bold text-5xl sm:text-6xl lg:text-7xl leading-[0.9] text-slate-900 dark:text-white mb-8">
-                Ordre <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14919B] to-[#0E646C]">Mauritanien</span> <br/>
-                des Ingénieurs
+              <h1 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] text-slate-900 dark:text-white mb-8">
+                Ordre Mauritanien des <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14919B] to-[#0E646C]">Ingénieurs</span> <br />
+                en Génie Civil
               </h1>
               <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed mb-10 border-l-4 border-[#14919B] pl-6">
                 La plateforme digitale officielle pour la gestion, la vérification et l'accompagnement des ingénieurs en génie civil en Mauritanie.
@@ -151,15 +151,15 @@ export default function Home() {
               {/* First set of sponsors */}
               <div className="flex items-center justify-around w-1/2 px-4 gap-12">
                 {sponsors.map((sponsor) => (
-                  <div 
+                  <div
                     key={`first-${sponsor.id}`}
                     className="group cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300"
                     onClick={() => sponsor.website_url && window.open(`https://${sponsor.website_url}`, '_blank')}
                   >
                     <div className="flex items-center justify-center min-w-[120px] h-16">
                       {sponsor.logo_url ? (
-                        <img 
-                          src={sponsor.logo_url} 
+                        <img
+                          src={sponsor.logo_url}
                           alt={sponsor.name}
                           className="h-12 w-auto object-contain max-w-[140px] transition-transform duration-300 group-hover:scale-105"
                         />
@@ -177,19 +177,19 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Second set of sponsors (duplicate for seamless loop) */}
               <div className="flex items-center justify-around w-1/2 px-4 gap-12">
                 {sponsors.map((sponsor) => (
-                  <div 
+                  <div
                     key={`second-${sponsor.id}`}
                     className="group cursor-pointer opacity-70 hover:opacity-100 transition-all duration-300"
                     onClick={() => sponsor.website_url && window.open(`https://${sponsor.website_url}`, '_blank')}
                   >
                     <div className="flex items-center justify-center min-w-[120px] h-16">
                       {sponsor.logo_url ? (
-                        <img 
-                          src={sponsor.logo_url} 
+                        <img
+                          src={sponsor.logo_url}
                           alt={sponsor.name}
                           className="h-12 w-auto object-contain max-w-[140px] transition-transform duration-300 group-hover:scale-105"
                         />
@@ -269,7 +269,7 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-900 opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
           <div className="relative z-10 flex flex-col items-center justify-center text-center py-20 px-4 md:px-12">
             <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-6">Prêt à rejoindre l'OMIGEC ?</h2>
-            <p className="text-teal-50 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">Inscrivez-vous dès maintenant et faites partie de l'Ordre Mauritanien des Ingénieurs en génie civil pour accéder à tous nos services exclusifs.</p>
+            <p className="text-teal-50 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">Inscrivez-vous dès maintenant et faites partie de l'Ordre Mauritanien des Ingénieurs en Génie Civil pour accéder à tous nos services exclusifs.</p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link href="/inscription" className="bg-white text-[#14919B] font-bold py-4 px-10 rounded-xl shadow-lg hover:shadow-xl hover:bg-teal-50 transition-all transform hover:-translate-y-1 flex items-center justify-center">
                 Commencer l'inscription
@@ -330,7 +330,7 @@ export default function Home() {
               <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400">
                 <li className="flex items-start gap-2">
                   <span className="material-icons-outlined text-[#14919B] text-base mt-0.5">location_on</span>
-                  <span>Nouakchott, Mauritanie<br/>BP 1234</span>
+                  <span>Nouakchott, Mauritanie<br />BP 1234</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="material-icons-outlined text-[#14919B] text-base">phone</span>
