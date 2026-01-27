@@ -110,6 +110,14 @@ export default function AdminLayout({
           </div>
 
           <Link
+            href="/profil"
+            className="flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
+          >
+            <Palette className="w-4 h-4" />
+            <span>Modifier mon profil</span>
+          </Link>
+
+          <Link
             href="/tableau-de-bord"
             className="flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
           >

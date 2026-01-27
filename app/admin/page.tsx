@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { 
-  FileText, 
-  Users, 
-  UserCheck, 
-  CheckCircle, 
+import {
+  FileText,
+  Users,
+  UserCheck,
+  CheckCircle,
   Calendar,
   TrendingUp,
   Clock,
@@ -13,7 +13,9 @@ import {
   FileCheck,
   UserPlus,
   Briefcase,
-  BarChart3
+  BarChart3,
+  Building2,
+  UserCircle
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -33,6 +35,7 @@ interface Activity {
   time: string
   status: 'pending' | 'approved' | 'system'
   avatar?: string
+  type?: 'engineer' | 'company' | 'job' | 'system'
 }
 
 const quickActions = [
@@ -70,40 +73,22 @@ const quickActions = [
   }
 ]
 
-// Mock activity data
-const mockActivities: Activity[] = [
-  {
-    id: '1',
-    user: 'Ahmed Salem',
-    action: 'A soumis ses documents de certification BAC+5.',
-    time: 'Il y a 2 min',
-    status: 'pending',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQMJOMc2ZWkfN8jhr6bosYmD9WUNoMq5LqM-lvgKDlN6BISPnZx3EiROvNcSd2m003ZWHiutM_2UzthDNLRECanjoqo302rUg2mvvdxiUeClFNZzPy4_B0VriCmIfkfZQedr2PzNhoZyzJDheUaAwNQtBVz-WfoXHEJS3AAJAcRnPL1imuYaJE-FBxtrHgptfVOlqitEEzdcZIBWmoC1MWU5wrNWKYahCiPz7ouNItPs0-w-3DAJE_CPPopkq1BcpgIrrSoob0Hzc'
-  },
-  {
-    id: '2',
-    user: 'Fatima Zehra',
-    action: 'A été validée comme Ingénieur Titulaire par le parrain.',
-    time: 'Il y a 1h',
-    status: 'approved',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnU3tHjAtsZFDo5BvsSCyMhXkD9HokExTkDsFSkIleAgKTgMkko2uRhDltsTbENDVxOmNNjt_DAnPsgAA6mHcOi9S34j6mH6kidqj2qRxjlfxSUz4mLWj-scyIt-y9raSGt64S6kwlMVp_qc-xy1N5jCOTC7ZkLcbEicm9t2W3v7DHIVySftkU4aJ7PAL4F44NMTxmMz2yCOHaNScod-bA-alYxf0USKgSM-TidqA26By9wXNBA0oV-o_uSvP3RZHw8THCIM2OUL8'
-  },
-  {
-    id: '3',
-    user: 'Système',
-    action: 'Rapport hebdomadaire généré avec succès.',
-    time: 'Il y a 3h',
-    status: 'system'
-  },
-  {
-    id: '4',
-    user: 'Mohamed Vall',
-    action: 'Nouvelle offre d\'emploi publiée : "Ingénieur Génie Civil Senior".',
-    time: 'Il y a 5h',
-    status: 'approved',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCcmD6G7_jfDxWrXJR4OkM8IjlRwgDdYggxbbHwABnrRIfJbmM_vQ4g5JWGbXA4AQIBFn9jiC5jRXR4MiEjPdstgb9M92NQJfiXI6ahbyVfgKwOLQP2Ehw8x7IuFSmYw6YMADeJdfEXMIRVAe4rGMxOoX4YJAUusoWx6LVGIr6x1rcAgBgKSCstiM5OhYEai6MYvHVeaDqRQzyOHUS4jRmf7EV71LZYISWA2qqVdYY5gUYlTv6d47uk6KXtpZgnaU5HUQ_6vejKj3w'
-  }
-]
+// Helper for relative time formatting
+const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+  if (diffInSeconds < 60) return `Il y a ${diffInSeconds} sec`
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) return `Il y a ${diffInHours}h`
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 30) return `Il y a ${diffInDays}j`
+
+  return date.toLocaleDateString('fr-FR')
+}
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats>({
@@ -115,10 +100,24 @@ export default function AdminDashboardPage() {
     totalEngineers: 1540
   })
   const [loading, setLoading] = useState(true)
+  const [activities, setActivities] = useState<Activity[]>([])
 
   useEffect(() => {
     loadStats()
+    loadActivities()
   }, [])
+
+  const loadActivities = async () => {
+    try {
+      const res = await fetch('/api/admin/activities')
+      const data = await res.json()
+      if (res.ok) {
+        setActivities(data.activities)
+      }
+    } catch (error) {
+      console.error('Error loading activities:', error)
+    }
+  }
 
   const loadStats = async () => {
     try {
@@ -276,7 +275,7 @@ export default function AdminDashboardPage() {
             <div className="h-48 flex items-end justify-between gap-2 px-2">
               {chartData.map((height, index) => (
                 <div key={index} className="w-full relative group">
-                  <div 
+                  <div
                     className="w-full bg-slate-100 dark:bg-slate-700 rounded-t-lg relative group cursor-pointer"
                     style={{ height: `${height}%` }}
                   >
@@ -304,34 +303,32 @@ export default function AdminDashboardPage() {
           </h3>
           <div className="relative space-y-6">
             <div className="absolute left-6 top-2 bottom-2 w-0.5 bg-slate-100 dark:bg-slate-700"></div>
-            {mockActivities.map((activity) => (
+            {activities.length === 0 && !loading ? (
+              <p className="text-center text-slate-500 text-sm py-4">Aucune activité récente</p>
+            ) : activities.map((activity) => (
               <div key={activity.id} className="relative flex gap-4">
                 <div className="w-12 h-12 rounded-full border-4 border-white dark:border-slate-800 z-10 overflow-hidden flex-shrink-0">
-                  {activity.avatar ? (
-                    <img 
-                      alt="Profile" 
-                      className="w-full h-full object-cover" 
-                      src={activity.avatar}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                      <Bell className="w-5 h-5 text-slate-400" />
-                    </div>
-                  )}
+                  <div className={`w-full h-full flex items-center justify-center ${activity.type === 'job' ? 'bg-rose-50' :
+                    activity.type === 'company' ? 'bg-sky-50' : 'bg-slate-100'
+                    } dark:bg-slate-700`}>
+                    {activity.type === 'engineer' ? <UserCircle className="w-6 h-6 text-indigo-500" /> :
+                      activity.type === 'company' ? <Building2 className="w-6 h-6 text-sky-500" /> :
+                        activity.type === 'job' ? <Briefcase className="w-6 h-6 text-rose-500" /> :
+                          <Bell className="w-5 h-5 text-slate-400" />}
+                  </div>
                 </div>
                 <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <p className="text-sm font-bold">{activity.user}</p>
-                    <span className="text-[10px] text-slate-400">{activity.time}</span>
+                  <div className="flex justify-between items-start text-left">
+                    <p className="text-sm font-bold text-slate-800 dark:text-white">{activity.user}</p>
+                    <span className="text-[10px] text-slate-400 whitespace-nowrap ml-2">{formatTimeAgo(activity.time)}</span>
                   </div>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{activity.action}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 text-left">{activity.action}</p>
                   {activity.status !== 'system' && (
                     <div className="mt-2 flex gap-2">
-                      <span className={`px-2 py-1 text-[10px] font-bold rounded ${
-                        activity.status === 'pending' 
-                          ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600'
-                          : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'
-                      }`}>
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${activity.status === 'pending'
+                        ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600'
+                        : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'
+                        }`}>
                         {activity.status === 'pending' ? 'En attente' : 'Validé'}
                       </span>
                     </div>
@@ -339,9 +336,11 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ))}
-            <button className="w-full py-3 text-sm text-teal-600 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors mt-4">
-              Voir tout l'historique
-            </button>
+            <Link href="/admin/activites" className="block">
+              <button className="w-full py-3 text-sm text-teal-600 font-bold hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl transition-colors mt-4">
+                Voir tout l'historique
+              </button>
+            </Link>
           </div>
         </div>
       </div>

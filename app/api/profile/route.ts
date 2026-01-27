@@ -8,45 +8,66 @@ export async function GET() {
   try {
     const supabase = await createClient()
     const adminClient = createAdminClient()
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+
     if (authError || !user) {
+      console.log('Profile API: Auth failed', authError)
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
+
+    console.log('Profile API: User found', user.id)
 
     // Use admin client to bypass RLS issues
     const { data: profile, error } = await adminClient
       .from('profiles')
-      .select('id, nni, full_name, phone, email, diploma, grad_year, domain, exercise_mode, status, subscription_expiry, diploma_file_path, cni_file_path, profile_image_url, cv_url, is_admin, created_at, updated_at')
+      .select('*')
       .eq('id', user.id)
       .single()
 
     if (error) {
-      console.error('Profile fetch error:', error)
-      return NextResponse.json({ error: `Erreur lors du chargement du profil: ${error.message}` }, { status: 500 })
-    }
+      console.error('Profile API: DB select error:', error)
 
-    if (!profile) {
-      return NextResponse.json({ error: 'Profil non trouvé' }, { status: 404 })
+      // If no profile found, we might want to return a more specific message
+      if (error.code === 'PGRST116') {
+        return NextResponse.json({
+          error: 'Profil non trouvé',
+          code: 'NO_PROFILE'
+        }, { status: 404 })
+      }
+
+      return NextResponse.json({
+        error: 'Erreur lors du chargement du profil',
+        details: error.message,
+        code: error.code
+      }, { status: 500 })
     }
 
     // Compter les parrainages effectués (verifications confirmées où cet ingénieur est la référence)
-    const { count: sponsorshipsCount } = await adminClient
+    const { count: sponsorshipsCount, error: countError } = await adminClient
       .from('verifications')
       .select('*', { count: 'exact', head: true })
       .eq('reference_id', user.id)
       .eq('status', 'confirmed')
 
-    return NextResponse.json({ 
+    if (countError) {
+      console.error('Profile API: Count error:', countError)
+    }
+
+    console.log('Profile API: Success fetching profile for', profile?.full_name || 'Inconnu')
+
+    return NextResponse.json({
       profile: {
         ...profile,
         sponsorships_count: sponsorshipsCount || 0
       }
     })
-  } catch (error) {
-    console.error('Profile GET error:', error)
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  } catch (error: any) {
+    console.error('Profile API: Global catch error:', error)
+    return NextResponse.json({
+      error: 'Erreur serveur',
+      details: error.message
+    }, { status: 500 })
   }
 }
 
@@ -55,7 +76,7 @@ export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient()
     const adminClient = createAdminClient()
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
@@ -112,7 +133,7 @@ export async function PUT(request: NextRequest) {
       'Sénégal', 'Burkina Faso', 'Côte d\'Ivoire', 'Ghana', 'Nigeria', 'France', 'Espagne', 'Allemagne',
       'Royaume-Uni', 'Canada', 'États-Unis', 'Jordanie', 'Liban', 'Syrie', 'Irak', 'Arabie Saoudite'
     ]
-    
+
     if (country && !validCountries.includes(country.trim())) {
       return NextResponse.json({ error: 'Pays non valide' }, { status: 400 })
     }
@@ -139,10 +160,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Erreur lors de la mise à jour du profil' }, { status: 500 })
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Profil mis à jour avec succès',
-      profile: updatedProfile 
+      profile: updatedProfile
     })
 
   } catch (error) {

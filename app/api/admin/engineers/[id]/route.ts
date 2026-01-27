@@ -21,7 +21,7 @@ export async function DELETE(
 
     // Verify admin access
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
@@ -93,19 +93,84 @@ export async function DELETE(
     if (deleteAuthError) {
       console.error('Error deleting auth user:', deleteAuthError)
       // Profile is already deleted, so we return partial success
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         warning: 'Profil supprimé mais erreur lors de la suppression du compte auth'
       })
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: `Ingénieur ${engineer.full_name} supprimé avec succès`
     })
 
   } catch (error) {
     console.error('Error deleting engineer:', error)
+    return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
+  }
+}
+
+/**
+ * Update engineer profile information (Admin only)
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: engineerId } = await params
+    const body = await request.json()
+    const { full_name, phone, diploma } = body
+
+    if (!engineerId) {
+      return NextResponse.json({ error: 'ID ingénieur manquant' }, { status: 400 })
+    }
+
+    const supabase = await createClient()
+    const adminClient = createAdminClient()
+
+    // Verify admin access
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+    }
+
+    const { data: adminProfile } = await adminClient
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+
+    if (!adminProfile?.is_admin) {
+      return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 })
+    }
+
+    // Update profile
+    const { data: updatedProfile, error: updateError } = await adminClient
+      .from('profiles')
+      .update({
+        full_name: full_name?.trim(),
+        phone: phone?.trim(),
+        diploma: diploma?.trim(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', engineerId)
+      .select()
+      .single()
+
+    if (updateError) {
+      console.error('Error updating profile:', updateError)
+      return NextResponse.json({ error: 'Erreur lors de la mise à jour du profil' }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Profil mis à jour avec succès',
+      profile: updatedProfile
+    })
+
+  } catch (error) {
+    console.error('Error updating engineer:', error)
     return NextResponse.json({ error: 'Une erreur est survenue' }, { status: 500 })
   }
 }

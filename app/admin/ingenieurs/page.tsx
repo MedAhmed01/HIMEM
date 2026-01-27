@@ -1,22 +1,24 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { 
-  Users, 
-  Check, 
-  X, 
-  Search, 
-  Filter, 
-  Mail, 
-  Phone, 
+import {
+  Users,
+  Check,
+  X,
+  Search,
+  Filter,
+  Mail,
+  Phone,
   Calendar,
   Key,
   Ban,
   Trash2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Edit3
 } from 'lucide-react'
 import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
+import EditEngineerModal from '@/components/admin/EditEngineerModal'
 
 interface Engineer {
   id: string
@@ -44,6 +46,13 @@ export default function IngenieursPage() {
     userId: '',
     userName: ''
   })
+  const [editModal, setEditModal] = useState<{
+    isOpen: boolean
+    engineer: Engineer | null
+  }>({
+    isOpen: false,
+    engineer: null
+  })
 
   const [deleteDialog, setDeleteDialog] = useState<{
     isOpen: boolean
@@ -56,12 +65,17 @@ export default function IngenieursPage() {
   })
 
   const loadEngineers = async () => {
-    const res = await fetch('/api/admin/engineers')
-    const data = await res.json()
-    if (data.engineers) {
-      setEngineers(data.engineers)
+    try {
+      const res = await fetch('/api/admin/engineers')
+      const data = await res.json()
+      if (data.engineers) {
+        setEngineers(data.engineers)
+      }
+    } catch (error) {
+      console.error('Error loading engineers:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -74,7 +88,7 @@ export default function IngenieursPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ engineerId, action })
     })
-    
+
     if (res.ok) {
       loadEngineers()
     }
@@ -96,14 +110,26 @@ export default function IngenieursPage() {
     setMessage({ type: 'error', text: error })
   }
 
+  const handleEdit = (engineer: Engineer) => {
+    setEditModal({
+      isOpen: true,
+      engineer
+    })
+  }
+
+  const handleEditSuccess = (message: string) => {
+    setMessage({ type: 'success', text: message })
+    loadEngineers()
+  }
+
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/admin/engineers/${deleteDialog.engineerId}`, {
         method: 'DELETE'
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         setMessage({ type: 'success', text: data.message || 'Ingénieur supprimé avec succès' })
         setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })
@@ -117,7 +143,6 @@ export default function IngenieursPage() {
     }
   }
 
-  // Clear message after 5 seconds
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => setMessage(null), 5000)
@@ -185,22 +210,14 @@ export default function IngenieursPage() {
 
   const getAvatarColor = (name: string) => {
     const colors = [
-      'bg-blue-600',
-      'bg-indigo-600', 
-      'bg-purple-600',
-      'bg-pink-600',
-      'bg-red-600',
-      'bg-orange-600',
-      'bg-yellow-600',
-      'bg-green-600',
-      'bg-teal-600',
-      'bg-cyan-600'
+      'bg-blue-600', 'bg-indigo-600', 'bg-purple-600', 'bg-pink-600', 'bg-red-600',
+      'bg-orange-600', 'bg-yellow-600', 'bg-green-600', 'bg-teal-600', 'bg-cyan-600'
     ]
     const index = name.charCodeAt(0) % colors.length
     return colors[index]
   }
 
-  const filteredEngineers = engineers.filter(eng => 
+  const filteredEngineers = engineers.filter(eng =>
     eng.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     eng.nni.includes(searchQuery) ||
     eng.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -225,7 +242,7 @@ export default function IngenieursPage() {
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Ingénieurs</h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Gérer tous les ingénieurs inscrits</p>
         </div>
-        
+
         {/* Search */}
         <div className="relative w-full md:w-1/2 lg:w-1/3 group">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -244,73 +261,53 @@ export default function IngenieursPage() {
         </div>
       </header>
 
-      {/* Success/Error Message */}
+      {/* Message Area */}
       {message && (
-        <div className={`flex items-center gap-3 p-4 rounded-xl border backdrop-blur-sm ${
-          message.type === 'success' 
-            ? 'bg-green-50/80 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
-            : 'bg-red-50/80 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-        }`}>
-          {message.type === 'success' ? (
-            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-          )}
-          <p className={`${message.type === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'} text-sm flex-1`}>
-            {message.text}
-          </p>
-          <button 
-            onClick={() => setMessage(null)}
-            className={`${message.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'}`}
-          >
-            <X className="w-5 h-5" />
-          </button>
+        <div className={`p-4 rounded-xl border backdrop-blur-sm flex items-center justify-between ${message.type === 'success'
+            ? 'bg-green-50/80 border-green-200 text-green-800'
+            : 'bg-red-50/80 border-red-200 text-red-800'
+          }`}>
+          <div className="flex items-center gap-2">
+            {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+            <span className="text-sm font-medium">{message.text}</span>
+          </div>
+          <button onClick={() => setMessage(null)}><X className="w-4 h-4" /></button>
         </div>
       )}
 
-      {/* Count Badge */}
+      {/* Stats */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+        <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
           {filteredEngineers.length} ingénieur{filteredEngineers.length !== 1 ? 's' : ''}
         </span>
       </div>
 
-      {/* Engineers Grid */}
+      {/* Grid */}
       <div className="grid grid-cols-1 gap-6">
         {filteredEngineers.length === 0 ? (
           <div className="text-center py-20">
-            <Users className="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-600 dark:text-slate-400 font-medium text-lg">Aucun ingénieur trouvé</p>
-            <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
-              {searchQuery ? 'Essayez avec d\'autres termes de recherche' : 'Aucun ingénieur inscrit'}
-            </p>
+            <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+            <p className="text-slate-600 font-medium text-lg">Aucun ingénieur trouvé</p>
           </div>
         ) : (
           filteredEngineers.map((engineer) => (
-            <div
-              key={engineer.id}
-              className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 border border-slate-100 dark:border-slate-700 relative"
-            >
+            <div key={engineer.id} className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
               <div className="flex flex-col md:flex-row gap-6">
-                {/* Avatar */}
                 <div className="flex-shrink-0">
                   <div className={`h-16 w-16 rounded-full ${getAvatarColor(engineer.full_name)} flex items-center justify-center text-white text-2xl font-semibold shadow-md`}>
                     {getInitials(engineer.full_name)}
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="flex-grow">
-                  {/* Header */}
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                     <div>
                       <h2 className="text-xl font-bold text-slate-900 dark:text-white">{engineer.full_name}</h2>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 font-mono mt-1">NNI: {engineer.nni}</p>
+                      <p className="text-sm text-slate-500 font-mono mt-1">NNI: {engineer.nni}</p>
                     </div>
                     {getStatusBadge(engineer.status)}
                   </div>
 
-                  {/* Contact Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-6 mt-5">
                     <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
                       <Mail className="text-slate-400 mr-2 w-4 h-4" />
@@ -328,33 +325,34 @@ export default function IngenieursPage() {
 
                   {/* Actions */}
                   <div className="mt-8 flex flex-wrap items-center gap-3">
-                    {/* Subscription Status */}
-                    {isSubscriptionActive(engineer.subscription_expiry) ? (
-                      <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800 mr-2">
-                        <CheckCircle className="w-4 h-4 mr-1.5" />
-                        À jour
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800 mr-2">
-                        <X className="w-4 h-4 mr-1.5" />
-                        Expiré
-                      </span>
-                    )}
+                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border ${isSubscriptionActive(engineer.subscription_expiry)
+                        ? 'bg-green-50 text-green-700 border-green-200'
+                        : 'bg-red-50 text-red-700 border-red-200'
+                      }`}>
+                      {isSubscriptionActive(engineer.subscription_expiry) ? <CheckCircle className="w-4 h-4 mr-1.5" /> : <X className="w-4 h-4 mr-1.5" />}
+                      {isSubscriptionActive(engineer.subscription_expiry) ? 'À jour' : 'Expiré'}
+                    </span>
 
-                    {/* Change Password */}
                     <button
                       onClick={() => handleChangePassword(engineer.id, engineer.full_name)}
-                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition-colors"
                     >
                       <Key className="w-4 h-4 mr-2" />
                       Mot de passe
                     </button>
 
-                    {/* Activate/Deactivate */}
+                    <button
+                      onClick={() => handleEdit(engineer)}
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition-colors"
+                    >
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Modifier
+                    </button>
+
                     {!isSubscriptionActive(engineer.subscription_expiry) ? (
                       <button
                         onClick={() => handleSubscription(engineer.id, 'activate')}
-                        className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-sm"
+                        className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 transition-colors"
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Activer
@@ -362,17 +360,16 @@ export default function IngenieursPage() {
                     ) : (
                       <button
                         onClick={() => handleSubscription(engineer.id, 'deactivate')}
-                        className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-red-700 bg-white border border-red-200 hover:bg-red-50 dark:bg-slate-800 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/20 transition-colors shadow-sm"
+                        className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-red-700 bg-white border border-red-200 hover:bg-red-50 transition-colors"
                       >
                         <Ban className="w-4 h-4 mr-2" />
                         Désactiver
                       </button>
                     )}
 
-                    {/* Delete */}
                     <button
                       onClick={() => setDeleteDialog({ isOpen: true, engineerId: engineer.id, engineerName: engineer.full_name })}
-                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900/50"
+                      className="p-2 rounded-lg text-slate-400 hover:text-red-600 transition-colors"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -384,7 +381,7 @@ export default function IngenieursPage() {
         )}
       </div>
 
-      {/* Change Password Modal */}
+      {/* Modals */}
       <ChangePasswordModal
         isOpen={changePasswordModal.isOpen}
         onClose={() => setChangePasswordModal({ isOpen: false, userId: '', userName: '' })}
@@ -395,29 +392,24 @@ export default function IngenieursPage() {
         onError={handlePasswordChangeError}
       />
 
-      {/* Delete Confirmation Dialog */}
+      <EditEngineerModal
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ isOpen: false, engineer: null })}
+        engineer={editModal.engineer}
+        onSuccess={handleEditSuccess}
+        onError={(err) => setMessage({ type: 'error', text: err })}
+      />
+
       {deleteDialog.isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl border border-slate-200 dark:border-slate-700">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Supprimer l'ingénieur</h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Êtes-vous sûr de vouloir supprimer définitivement <span className="font-semibold text-slate-900 dark:text-white">{deleteDialog.engineerName}</span> ? 
-              Cette action est irréversible et supprimera toutes les données associées.
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200">
+            <h3 className="text-lg font-semibold mb-2">Supprimer l'ingénieur</h3>
+            <p className="text-slate-600 mb-6">
+              Voulez-vous supprimer <span className="font-bold">{deleteDialog.engineerName}</span> ?
             </p>
             <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })}
-                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleDelete}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Supprimer définitivement
-              </button>
+              <button onClick={() => setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg">Annuler</button>
+              <button onClick={handleDelete} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg">Supprimer</button>
             </div>
           </div>
         </div>
