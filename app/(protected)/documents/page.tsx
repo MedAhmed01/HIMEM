@@ -95,22 +95,8 @@ export default function DocumentsPage() {
     }
   }
 
-  const getFileUrl = (filePath: string | null) => {
-    if (!filePath) return null
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-
-    // Si le chemin contient déjà l'URL complète, le retourner tel quel
-    if (filePath.startsWith('http')) {
-      return filePath
-    }
-
-    // Si le chemin commence par 'documents/', l'utiliser tel quel
-    if (filePath.startsWith('documents/')) {
-      return `${supabaseUrl}/storage/v1/object/public/${filePath}`
-    }
-
-    // Sinon, ajouter le préfixe documents/
-    return `${supabaseUrl}/storage/v1/object/public/documents/${filePath}`
+  const getDocumentUrl = (type: 'diploma' | 'cni' | 'payment') => {
+    return `/api/my-documents/${type}`
   }
 
   if (loading) {
@@ -174,7 +160,7 @@ export default function DocumentsPage() {
                   </div>
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => window.open(getFileUrl(profile.diploma_file_path)!, '_blank')}
+                      onClick={() => window.open(getDocumentUrl('diploma'), '_blank')}
                       className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
                     >
                       <Eye className="w-4 h-4 mr-2" />
@@ -234,7 +220,7 @@ export default function DocumentsPage() {
                   </div>
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => window.open(getFileUrl(profile.cni_file_path)!, '_blank')}
+                      onClick={() => window.open(getDocumentUrl('cni'), '_blank')}
                       className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                     >
                       <Eye className="w-4 h-4 mr-2" />
@@ -294,7 +280,7 @@ export default function DocumentsPage() {
                   </div>
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => window.open(getFileUrl(profile.payment_receipt_path)!, '_blank')}
+                      onClick={() => window.open(getDocumentUrl('payment'), '_blank')}
                       className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
                     >
                       <Eye className="w-4 h-4 mr-2" />

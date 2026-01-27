@@ -1,6 +1,8 @@
 'use client'
 
+
 import { useEffect, useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Users,
   Check,
@@ -29,6 +31,7 @@ interface Engineer {
   diploma: string
   status: string
   subscription_expiry: string | null
+  profile_image_url?: string
   created_at: string
 }
 
@@ -264,8 +267,8 @@ export default function IngenieursPage() {
       {/* Message Area */}
       {message && (
         <div className={`p-4 rounded-xl border backdrop-blur-sm flex items-center justify-between ${message.type === 'success'
-            ? 'bg-green-50/80 border-green-200 text-green-800'
-            : 'bg-red-50/80 border-red-200 text-red-800'
+          ? 'bg-green-50/80 border-green-200 text-green-800'
+          : 'bg-red-50/80 border-red-200 text-red-800'
           }`}>
           <div className="flex items-center gap-2">
             {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
@@ -294,9 +297,12 @@ export default function IngenieursPage() {
             <div key={engineer.id} className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-shrink-0">
-                  <div className={`h-16 w-16 rounded-full ${getAvatarColor(engineer.full_name)} flex items-center justify-center text-white text-2xl font-semibold shadow-md`}>
-                    {getInitials(engineer.full_name)}
-                  </div>
+                  <Avatar className="h-16 w-16 border-2 border-white shadow-md">
+                    <AvatarImage src={engineer.profile_image_url} alt={engineer.full_name} className="object-cover" />
+                    <AvatarFallback className={`${getAvatarColor(engineer.full_name)} text-white text-xl font-semibold`}>
+                      {getInitials(engineer.full_name)}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
 
                 <div className="flex-grow">
@@ -326,8 +332,8 @@ export default function IngenieursPage() {
                   {/* Actions */}
                   <div className="mt-8 flex flex-wrap items-center gap-3">
                     <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border ${isSubscriptionActive(engineer.subscription_expiry)
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-red-50 text-red-700 border-red-200'
+                      ? 'bg-green-50 text-green-700 border-green-200'
+                      : 'bg-red-50 text-red-700 border-red-200'
                       }`}>
                       {isSubscriptionActive(engineer.subscription_expiry) ? <CheckCircle className="w-4 h-4 mr-1.5" /> : <X className="w-4 h-4 mr-1.5" />}
                       {isSubscriptionActive(engineer.subscription_expiry) ? 'À jour' : 'Expiré'}

@@ -47,15 +47,15 @@ export async function GET(
     switch (type) {
       case 'diploma':
         filePath = engineer.diploma_file_path
-        fileName = 'diploma.pdf'
+        fileName = 'diploma'
         break
       case 'cni':
         filePath = engineer.cni_file_path
-        fileName = 'cni.pdf'
+        fileName = 'cni'
         break
       case 'payment':
         filePath = engineer.payment_receipt_path
-        fileName = 'payment_receipt.pdf'
+        fileName = 'payment_receipt'
         break
       default:
         return NextResponse.json({ error: 'Invalid document type' }, { status: 400 })
@@ -78,11 +78,15 @@ export async function GET(
     // Convert blob to array buffer
     const arrayBuffer = await fileData.arrayBuffer()
 
+    // Get correct extension from file path
+    const extension = filePath.split('.').pop() || 'pdf'
+    const finalFileName = `${fileName}.${extension}`
+
     // Return file with appropriate headers
     return new NextResponse(arrayBuffer, {
       headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${fileName}"`,
+        'Content-Type': fileData.type || 'application/pdf',
+        'Content-Disposition': `inline; filename="${finalFileName}"`,
         'Cache-Control': 'private, max-age=3600',
       },
     })

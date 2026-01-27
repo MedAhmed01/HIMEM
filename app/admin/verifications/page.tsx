@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { FileText, Download, CheckCircle, XCircle, UserCheck, Receipt, Mail, Phone, Trash2, AlertCircle, X, User } from 'lucide-react'
 import {
@@ -31,6 +32,7 @@ interface Engineer {
   parrain_id: string | null
   parrain_name?: string | null
   parrain_phone?: string | null
+  profile_image_url?: string
 }
 
 export default function VerificationsPage() {
@@ -38,7 +40,7 @@ export default function VerificationsPage() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-  
+
   // Reject dialog state
   const [rejectDialog, setRejectDialog] = useState<{ isOpen: boolean; engineerId: string; engineerName: string }>({
     isOpen: false,
@@ -46,7 +48,7 @@ export default function VerificationsPage() {
     engineerName: ''
   })
   const [rejectionReason, setRejectionReason] = useState('')
-  
+
   // Delete dialog state
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; engineerId: string; engineerName: string }>({
     isOpen: false,
@@ -91,9 +93,9 @@ export default function VerificationsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ engineerId, action: 'approve' })
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         setMessage({ type: 'success', text: 'Ingénieur approuvé avec succès' })
         loadEngineers()
@@ -119,15 +121,15 @@ export default function VerificationsPage() {
       const res = await fetch('/api/admin/verify-docs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          engineerId: rejectDialog.engineerId, 
+        body: JSON.stringify({
+          engineerId: rejectDialog.engineerId,
           action: 'reject',
-          rejectionReason 
+          rejectionReason
         })
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         setMessage({ type: 'success', text: 'Ingénieur rejeté avec succès' })
         setRejectDialog({ isOpen: false, engineerId: '', engineerName: '' })
@@ -150,9 +152,9 @@ export default function VerificationsPage() {
       const res = await fetch(`/api/admin/engineers/${deleteDialog.engineerId}`, {
         method: 'DELETE'
       })
-      
+
       const data = await res.json()
-      
+
       if (res.ok) {
         setMessage({ type: 'success', text: data.message || 'Ingénieur supprimé avec succès' })
         setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })
@@ -209,11 +211,10 @@ export default function VerificationsPage() {
 
       {/* Success/Error Message */}
       {message && (
-        <div className={`flex items-center gap-3 p-4 rounded-lg border ${
-          message.type === 'success' 
-            ? 'bg-green-50 border-green-200' 
+        <div className={`flex items-center gap-3 p-4 rounded-lg border ${message.type === 'success'
+            ? 'bg-green-50 border-green-200'
             : 'bg-red-50 border-red-200'
-        }`}>
+          }`}>
           {message.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
           ) : (
@@ -222,7 +223,7 @@ export default function VerificationsPage() {
           <p className={`${message.type === 'success' ? 'text-green-800' : 'text-red-800'} text-sm flex-1`}>
             {message.text}
           </p>
-          <button 
+          <button
             onClick={() => setMessage(null)}
             className={`${message.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'}`}
           >
@@ -248,10 +249,13 @@ export default function VerificationsPage() {
               {/* Header */}
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-semibold text-lg">
-                      {(engineer.full_name || 'U').charAt(0).toUpperCase()}
-                    </span>
+                  <div className="flex-shrink-0">
+                    <Avatar className="w-12 h-12 border border-blue-200">
+                      <AvatarImage src={engineer.profile_image_url} alt={engineer.full_name} className="object-cover" />
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold text-lg">
+                        {(engineer.full_name || 'U').charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -266,7 +270,7 @@ export default function VerificationsPage() {
                     </span>
                   </div>
                 </div>
-                
+
                 {/* Action Buttons */}
                 <div className="flex gap-2 flex-shrink-0">
                   <Button
