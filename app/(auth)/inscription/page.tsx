@@ -24,7 +24,7 @@ interface RegistrationData {
   country: string
   graduationYear: number | string
   domains: Domain[]
-  exerciseMode: ExerciseMode | ''
+  exerciseModes: ExerciseMode[]
   diplomaFile: File | null
   cniFile: File | null
   paymentReceiptFile: File | null
@@ -94,7 +94,7 @@ export default function InscriptionPage() {
     country: '',
     graduationYear: '',
     domains: [],
-    exerciseMode: '',
+    exerciseModes: [],
     diplomaFile: null,
     cniFile: null,
     paymentReceiptFile: null,
@@ -117,6 +117,13 @@ export default function InscriptionPage() {
       ? [...data.domains, domain]
       : data.domains.filter(d => d !== domain)
     handleChange('domains', newDomains)
+  }
+
+  const handleExerciseModeToggle = (mode: ExerciseMode, checked: boolean) => {
+    const newModes = checked
+      ? [...data.exerciseModes, mode]
+      : data.exerciseModes.filter(m => m !== mode)
+    handleChange('exerciseModes', newModes)
   }
 
   const validateFile = (file: File): string | null => {
@@ -161,7 +168,7 @@ export default function InscriptionPage() {
           !isNaN(Number(data.graduationYear))
         )
       case 3:
-        return data.domains.length > 0 && data.exerciseMode !== ''
+        return data.domains.length > 0 && data.exerciseModes.length > 0
       case 4:
         return !!(data.diplomaFile && data.cniFile && data.parrainId)
       default:
@@ -186,7 +193,7 @@ export default function InscriptionPage() {
       formData.append('country', data.country)
       formData.append('graduationYear', data.graduationYear.toString())
       formData.append('domains', JSON.stringify(data.domains))
-      formData.append('exerciseMode', data.exerciseMode)
+      formData.append('exerciseModes', JSON.stringify(data.exerciseModes))
       formData.append('parrainId', data.parrainId)
 
       console.log('Files to upload:', {
@@ -679,17 +686,17 @@ export default function InscriptionPage() {
 
                       {/* Exercise Mode */}
                       <div>
-                        <h4 className="text-base font-semibold mb-4">Mode d'Exercice *</h4>
+                        <h4 className="text-base font-semibold mb-4">Mode(s) d'Exercice *</h4>
+                        <p className="text-sm text-gray-500 mb-4">Vous pouvez sélectionner plusieurs modes</p>
                         <div className="space-y-3">
                           {EXERCISE_MODES.map((mode) => (
                             <div key={mode.value} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
                               <input
-                                type="radio"
+                                type="checkbox"
                                 id={mode.value}
-                                name="exerciseMode"
-                                checked={data.exerciseMode === mode.value}
-                                onChange={() => handleChange('exerciseMode', mode.value)}
-                                className="mt-1 h-5 w-5 border-gray-300 text-[#2a7b84] focus:ring-[#2a7b84]/20"
+                                checked={data.exerciseModes.includes(mode.value)}
+                                onChange={(e) => handleExerciseModeToggle(mode.value, e.target.checked)}
+                                className="mt-1 h-5 w-5 rounded border-gray-300 text-[#2a7b84] focus:ring-[#2a7b84]/20"
                               />
                               <div className="flex-1">
                                 <label htmlFor={mode.value} className="font-medium cursor-pointer">
@@ -700,6 +707,9 @@ export default function InscriptionPage() {
                             </div>
                           ))}
                         </div>
+                        {data.exerciseModes.length === 0 && (
+                          <p className="text-sm text-red-500 mt-2">Veuillez sélectionner au moins un mode d'exercice</p>
+                        )}
                       </div>
                     </div>
 

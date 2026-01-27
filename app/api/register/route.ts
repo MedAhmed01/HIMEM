@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const country = formData.get('country') as string
     const graduationYear = parseInt(formData.get('graduationYear') as string)
     const domains = JSON.parse(formData.get('domains') as string)
-    const exerciseMode = formData.get('exerciseMode') as string
+    const exerciseModes = JSON.parse(formData.get('exerciseModes') as string || '[]')
     const parrainId = formData.get('parrainId') as string
     const diplomaFile = formData.get('diplomaFile') as File
     const cniFile = formData.get('cniFile') as File
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
       country: country || null,
       grad_year: graduationYear || null,
       domain: domains || [],
-      exercise_mode: exerciseMode || null,
+      exercise_mode: exerciseModes || [],
       status: 'pending_docs' as const,
       diploma_file_path: diplomaPath,
       cni_file_path: cniPath,
