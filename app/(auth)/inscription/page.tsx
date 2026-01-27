@@ -120,8 +120,9 @@ export default function InscriptionPage() {
   }
 
   const validateFile = (file: File): string | null => {
-    if (file.type !== 'application/pdf') {
-      return 'Seuls les fichiers PDF sont acceptés'
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg']
+    if (!validTypes.includes(file.type)) {
+      return 'Seuls les fichiers PDF et Images (JPG, PNG) sont acceptés'
     }
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
@@ -162,7 +163,7 @@ export default function InscriptionPage() {
       case 3:
         return data.domains.length > 0 && data.exerciseMode !== ''
       case 4:
-        return !!(data.diplomaFile && data.cniFile && data.paymentReceiptFile && data.parrainId)
+        return !!(data.diplomaFile && data.cniFile && data.parrainId)
       default:
         return false
     }
@@ -196,7 +197,9 @@ export default function InscriptionPage() {
 
       formData.append('diplomaFile', data.diplomaFile!)
       formData.append('cniFile', data.cniFile!)
-      formData.append('paymentReceiptFile', data.paymentReceiptFile!)
+      if (data.paymentReceiptFile) {
+        formData.append('paymentReceiptFile', data.paymentReceiptFile)
+      }
 
       const response = await fetch('/api/register', {
         method: 'POST',
@@ -797,11 +800,11 @@ export default function InscriptionPage() {
                               <input
                                 id="diplomaFile"
                                 type="file"
-                                accept=".pdf"
+                                accept=".pdf, .jpg, .jpeg, .png"
                                 onChange={handleFileChange('diplomaFile')}
                                 className="hidden"
                               />
-                              <p className="text-xs text-gray-500">PDF uniquement, max 5 MB</p>
+                              <p className="text-xs text-gray-500">PDF ou Images (JPG, PNG), max 5 MB</p>
                             </div>
                           ) : (
                             <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between">
@@ -838,11 +841,11 @@ export default function InscriptionPage() {
                               <input
                                 id="cniFile"
                                 type="file"
-                                accept=".pdf"
+                                accept=".pdf, .jpg, .jpeg, .png"
                                 onChange={handleFileChange('cniFile')}
                                 className="hidden"
                               />
-                              <p className="text-xs text-gray-500">PDF uniquement, max 5 MB</p>
+                              <p className="text-xs text-gray-500">PDF ou Images (JPG, PNG), max 5 MB</p>
                             </div>
                           ) : (
                             <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between">
@@ -866,7 +869,7 @@ export default function InscriptionPage() {
 
                         {/* Payment Receipt File */}
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Reçu de Paiement *</h4>
+                          <h4 className="text-base font-semibold mb-2">Reçu de Paiement (Optionnel)</h4>
                           <p className="text-sm text-gray-500 mb-4">Preuve de paiement des frais d'inscription</p>
                           {!data.paymentReceiptFile ? (
                             <div className="border-2 border-dashed border-gray-200 rounded-xl p-10 flex flex-col items-center justify-center gap-4 hover:border-[#2a7b84]/50 transition-colors cursor-pointer group">
@@ -879,11 +882,11 @@ export default function InscriptionPage() {
                               <input
                                 id="paymentReceiptFile"
                                 type="file"
-                                accept=".pdf"
+                                accept=".pdf, .jpg, .jpeg, .png"
                                 onChange={handleFileChange('paymentReceiptFile')}
                                 className="hidden"
                               />
-                              <p className="text-xs text-gray-500">PDF uniquement, max 5 MB</p>
+                              <p className="text-xs text-gray-500">PDF ou Images (JPG, PNG), max 5 MB</p>
                             </div>
                           ) : (
                             <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between">

@@ -37,8 +37,9 @@ export function DocumentUploadStep({ data, onChange }: DocumentUploadStepProps) 
   }, [])
 
   const validateFile = (file: File): string | null => {
-    if (file.type !== 'application/pdf') {
-      return 'Seuls les fichiers PDF sont acceptés'
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png']
+    if (!validTypes.includes(file.type)) {
+      return 'Seuls les fichiers PDF et images (JPG, PNG) sont acceptés'
     }
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
@@ -67,15 +68,16 @@ export function DocumentUploadStep({ data, onChange }: DocumentUploadStepProps) 
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
-  const FileUpload = ({ 
-    id, 
-    label, 
-    description, 
-    file, 
-    error, 
-    onFileChange, 
-    onRemove 
-  }: { 
+  const FileUpload = ({
+    id,
+    label,
+    description,
+    file,
+    error,
+    onFileChange,
+    onRemove,
+    required
+  }: {
     id: string
     label: string
     description: string
@@ -83,10 +85,11 @@ export function DocumentUploadStep({ data, onChange }: DocumentUploadStepProps) 
     error: string | null
     onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     onRemove: () => void
+    required?: boolean
   }) => (
     <div className="space-y-3">
       <Label htmlFor={id}>
-        {label} <span className="text-red-500">*</span>
+        {label} {required && <span className="text-red-500">*</span>}
       </Label>
       <p className="text-sm text-gray-500">{description}</p>
 
@@ -96,8 +99,8 @@ export function DocumentUploadStep({ data, onChange }: DocumentUploadStepProps) 
           <Label htmlFor={id} className="cursor-pointer text-primary hover:text-primary/80">
             Cliquez pour télécharger
           </Label>
-          <Input id={id} type="file" accept=".pdf" onChange={onFileChange} className="hidden" />
-          <p className="text-xs text-gray-500 mt-2">PDF uniquement, max 5 MB</p>
+          <Input id={id} type="file" accept=".pdf, .jpg, .jpeg, .png" onChange={onFileChange} className="hidden" />
+          <p className="text-xs text-gray-500 mt-2">PDF ou Images (JPG, PNG), max 5 MB</p>
         </div>
       ) : (
         <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between">
@@ -159,6 +162,7 @@ export function DocumentUploadStep({ data, onChange }: DocumentUploadStepProps) 
         error={diplomaError}
         onFileChange={handleFileChange('diplomaFile', setDiplomaError)}
         onRemove={() => onChange('diplomaFile', null)}
+        required={true}
       />
 
       <FileUpload
@@ -169,16 +173,18 @@ export function DocumentUploadStep({ data, onChange }: DocumentUploadStepProps) 
         error={cniError}
         onFileChange={handleFileChange('cniFile', setCniError)}
         onRemove={() => onChange('cniFile', null)}
+        required={true}
       />
 
       <FileUpload
         id="paymentReceiptFile"
-        label="Reçu de Paiement"
+        label="Reçu de Paiement (Optionnel)"
         description="Preuve de paiement des frais d'inscription"
         file={data.paymentReceiptFile}
         error={paymentError}
         onFileChange={handleFileChange('paymentReceiptFile', setPaymentError)}
         onRemove={() => onChange('paymentReceiptFile', null)}
+        required={false}
       />
 
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
