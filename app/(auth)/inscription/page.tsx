@@ -173,6 +173,7 @@ export default function InscriptionPage() {
     setIsSubmitting(true)
 
     try {
+      console.log('Starting registration submission...')
       const formData = new FormData()
       formData.append('fullName', data.fullName)
       formData.append('nni', data.nni)
@@ -186,24 +187,33 @@ export default function InscriptionPage() {
       formData.append('domains', JSON.stringify(data.domains))
       formData.append('exerciseMode', data.exerciseMode)
       formData.append('parrainId', data.parrainId)
+
+      console.log('Files to upload:', {
+        diploma: data.diplomaFile ? `${data.diplomaFile.name} (${data.diplomaFile.size} bytes)` : 'missing',
+        cni: data.cniFile ? `${data.cniFile.name} (${data.cniFile.size} bytes)` : 'missing',
+        receipt: data.paymentReceiptFile ? `${data.paymentReceiptFile.name} (${data.paymentReceiptFile.size} bytes)` : 'missing'
+      })
+
       formData.append('diplomaFile', data.diplomaFile!)
       formData.append('cniFile', data.cniFile!)
       formData.append('paymentReceiptFile', data.paymentReceiptFile!)
 
       const response = await fetch('/api/register', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
       })
 
       const result = await response.json()
 
       if (!response.ok) {
-        setError(result.error || 'Une erreur est survenue')
+        console.error('Registration failed:', result)
+        setError(result.error || result.details || 'Une erreur est survenue lors de l\'inscription')
         return
       }
 
       setSuccess(true)
-      
+
       setTimeout(() => {
         router.push('/connexion')
       }, 3000)
@@ -280,25 +290,24 @@ export default function InscriptionPage() {
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-8 lg:py-12">
         <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
           <div className="flex flex-col">
-            
+
             {/* Step 1: Personal Information */}
             <div className="border-b border-gray-100">
-              <input 
-                checked={currentStep === 1} 
-                className="hidden peer" 
-                id="step1" 
-                name="step-accordion" 
+              <input
+                checked={currentStep === 1}
+                className="hidden peer"
+                id="step1"
+                name="step-accordion"
                 type="radio"
                 onChange={() => setCurrentStep(1)}
               />
-              <label 
-                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors" 
+              <label
+                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors"
                 htmlFor="step1"
               >
                 <div className="flex items-center gap-4">
-                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${
-                    currentStep === 1 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-[#2a7b84] text-[#2a7b84]'
-                  }`}>
+                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${currentStep === 1 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-[#2a7b84] text-[#2a7b84]'
+                    }`}>
                     01
                   </span>
                   <div>
@@ -310,22 +319,22 @@ export default function InscriptionPage() {
                   expand_more
                 </span>
               </label>
-              
+
               {currentStep === 1 && (
                 <div className="px-6 lg:px-16 pb-8 overflow-hidden">
                   <div className="max-w-2xl">
                     <div className="flex flex-col gap-8 pt-4">
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all" 
-                          id="fullName" 
-                          placeholder=" " 
-                          required 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          id="fullName"
+                          placeholder=" "
+                          required
                           type="text"
                           value={data.fullName}
                           onChange={(e) => handleChange('fullName', e.target.value)}
                         />
-                        <label 
+                        <label
                           htmlFor="fullName"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
@@ -334,17 +343,17 @@ export default function InscriptionPage() {
                       </div>
 
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all" 
-                          id="nni" 
-                          placeholder=" " 
-                          required 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          id="nni"
+                          placeholder=" "
+                          required
                           type="text"
                           value={data.nni}
                           onChange={(e) => handleChange('nni', e.target.value)}
                           maxLength={20}
                         />
-                        <label 
+                        <label
                           htmlFor="nni"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
@@ -353,34 +362,34 @@ export default function InscriptionPage() {
                       </div>
 
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all" 
-                          id="phone" 
-                          placeholder=" " 
-                          required 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          id="phone"
+                          placeholder=" "
+                          required
                           type="tel"
                           value={data.phone}
                           onChange={(e) => handleChange('phone', e.target.value)}
                         />
-                        <label 
+                        <label
                           htmlFor="phone"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
                           Téléphone *
                         </label>
                       </div>
-                      
+
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all pr-10" 
-                          id="email" 
-                          placeholder=" " 
-                          required 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all pr-10"
+                          id="email"
+                          placeholder=" "
+                          required
                           type="email"
                           value={data.email}
                           onChange={(e) => handleChange('email', e.target.value)}
                         />
-                        <label 
+                        <label
                           htmlFor="email"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
@@ -390,25 +399,25 @@ export default function InscriptionPage() {
                           <span className="material-symbols-outlined text-xl">mail</span>
                         </span>
                       </div>
-                      
+
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all pr-10" 
-                          id="password" 
-                          placeholder=" " 
-                          required 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all pr-10"
+                          id="password"
+                          placeholder=" "
+                          required
                           type={showPassword ? "text" : "password"}
                           value={data.password}
                           onChange={(e) => handleChange('password', e.target.value)}
                           minLength={8}
                         />
-                        <label 
+                        <label
                           htmlFor="password"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
                           Mot de passe *
                         </label>
-                        <span 
+                        <span
                           className="absolute right-0 top-4 text-gray-400 cursor-pointer"
                           onClick={() => setShowPassword(!showPassword)}
                         >
@@ -419,22 +428,22 @@ export default function InscriptionPage() {
                       </div>
 
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all pr-10" 
-                          id="confirmPassword" 
-                          placeholder=" " 
-                          required 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all pr-10"
+                          id="confirmPassword"
+                          placeholder=" "
+                          required
                           type={showConfirmPassword ? "text" : "password"}
                           value={data.confirmPassword}
                           onChange={(e) => handleChange('confirmPassword', e.target.value)}
                         />
-                        <label 
+                        <label
                           htmlFor="confirmPassword"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
                           Confirmer le mot de passe *
                         </label>
-                        <span 
+                        <span
                           className="absolute right-0 top-4 text-gray-400 cursor-pointer"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
@@ -447,7 +456,7 @@ export default function InscriptionPage() {
                       {data.password && data.confirmPassword && data.password !== data.confirmPassword && (
                         <p className="text-sm text-red-500">Les mots de passe ne correspondent pas</p>
                       )}
-                      
+
                       <div className="pt-4">
                         <button
                           type="button"
@@ -467,22 +476,21 @@ export default function InscriptionPage() {
 
             {/* Step 2: Professional Information */}
             <div className="border-b border-gray-100">
-              <input 
-                checked={currentStep === 2} 
-                className="hidden peer" 
-                id="step2" 
-                name="step-accordion" 
+              <input
+                checked={currentStep === 2}
+                className="hidden peer"
+                id="step2"
+                name="step-accordion"
                 type="radio"
                 onChange={() => setCurrentStep(2)}
               />
-              <label 
-                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors" 
+              <label
+                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors"
                 htmlFor="step2"
               >
                 <div className="flex items-center gap-4">
-                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${
-                    currentStep === 2 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-gray-200 text-gray-400'
-                  }`}>
+                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${currentStep === 2 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-gray-200 text-gray-400'
+                    }`}>
                     02
                   </span>
                   <div>
@@ -494,21 +502,21 @@ export default function InscriptionPage() {
                   expand_more
                 </span>
               </label>
-              
+
               {currentStep === 2 && (
                 <div className="px-6 lg:px-16 pb-8">
                   <div className="max-w-2xl pt-4">
                     <div className="grid grid-cols-1 gap-8">
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all" 
-                          id="diplomaTitle" 
-                          placeholder=" " 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          id="diplomaTitle"
+                          placeholder=" "
                           type="text"
                           value={data.diplomaTitle}
                           onChange={(e) => handleChange('diplomaTitle', e.target.value)}
                         />
-                        <label 
+                        <label
                           htmlFor="diplomaTitle"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
@@ -517,15 +525,15 @@ export default function InscriptionPage() {
                       </div>
 
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all" 
-                          id="university" 
-                          placeholder=" " 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          id="university"
+                          placeholder=" "
                           type="text"
                           value={data.university}
                           onChange={(e) => handleChange('university', e.target.value)}
                         />
-                        <label 
+                        <label
                           htmlFor="university"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
@@ -547,17 +555,17 @@ export default function InscriptionPage() {
                       </div>
 
                       <div className="underline-input relative">
-                        <input 
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all" 
-                          id="graduationYear" 
-                          placeholder=" " 
+                        <input
+                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          id="graduationYear"
+                          placeholder=" "
                           type="number"
                           value={data.graduationYear}
                           onChange={(e) => handleChange('graduationYear', parseInt(e.target.value) || '')}
                           min={currentYear - 50}
                           max={currentYear}
                         />
-                        <label 
+                        <label
                           htmlFor="graduationYear"
                           className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
                         >
@@ -575,8 +583,8 @@ export default function InscriptionPage() {
                             {currentYear - Number(data.graduationYear) < 5
                               ? '1 500 MRU'
                               : currentYear - Number(data.graduationYear) <= 15
-                              ? '3 000 MRU'
-                              : '5 000 MRU'}
+                                ? '3 000 MRU'
+                                : '5 000 MRU'}
                           </p>
                         </div>
                       )}
@@ -607,22 +615,21 @@ export default function InscriptionPage() {
 
             {/* Step 3: Domain and Exercise Mode */}
             <div className="border-b border-gray-100">
-              <input 
-                checked={currentStep === 3} 
-                className="hidden peer" 
-                id="step3" 
-                name="step-accordion" 
+              <input
+                checked={currentStep === 3}
+                className="hidden peer"
+                id="step3"
+                name="step-accordion"
                 type="radio"
                 onChange={() => setCurrentStep(3)}
               />
-              <label 
-                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors" 
+              <label
+                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors"
                 htmlFor="step3"
               >
                 <div className="flex items-center gap-4">
-                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${
-                    currentStep === 3 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-gray-200 text-gray-400'
-                  }`}>
+                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${currentStep === 3 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-gray-200 text-gray-400'
+                    }`}>
                     03
                   </span>
                   <div>
@@ -634,7 +641,7 @@ export default function InscriptionPage() {
                   expand_more
                 </span>
               </label>
-              
+
               {currentStep === 3 && (
                 <div className="px-6 lg:px-16 pb-8">
                   <div className="max-w-2xl pt-4">
@@ -719,22 +726,21 @@ export default function InscriptionPage() {
 
             {/* Step 4: Documents and Sponsorship */}
             <div>
-              <input 
-                checked={currentStep === 4} 
-                className="hidden peer" 
-                id="step4" 
-                name="step-accordion" 
+              <input
+                checked={currentStep === 4}
+                className="hidden peer"
+                id="step4"
+                name="step-accordion"
                 type="radio"
                 onChange={() => setCurrentStep(4)}
               />
-              <label 
-                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors" 
+              <label
+                className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-gray-50/50 transition-colors"
                 htmlFor="step4"
               >
                 <div className="flex items-center gap-4">
-                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${
-                    currentStep === 4 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-gray-200 text-gray-400'
-                  }`}>
+                  <span className={`step-number w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold transition-all ${currentStep === 4 ? 'border-[#2a7b84] bg-[#2a7b84] text-white shadow-lg shadow-[#2a7b84]/30' : 'border-gray-200 text-gray-400'
+                    }`}>
                     04
                   </span>
                   <div>
@@ -746,7 +752,7 @@ export default function InscriptionPage() {
                   expand_more
                 </span>
               </label>
-              
+
               {currentStep === 4 && (
                 <div className="px-6 lg:px-16">
                   <div className="max-w-2xl pt-4 pb-10">
@@ -916,10 +922,10 @@ export default function InscriptionPage() {
                         <span className="material-symbols-outlined text-lg">arrow_back</span>
                         <span>Précédent</span>
                       </button>
-                      <button 
+                      <button
                         onClick={handleRegistration}
                         disabled={!validateStep(4) || isSubmitting}
-                        className="w-full sm:w-auto bg-[#2a7b84] hover:bg-[#236870] text-white px-12 py-4 rounded-full font-bold shadow-xl shadow-[#2a7b84]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                        className="w-full sm:w-auto bg-[#2a7b84] hover:bg-[#236870] text-white px-12 py-4 rounded-full font-bold shadow-xl shadow-[#2a7b84]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         type="button"
                       >
                         {isSubmitting ? (

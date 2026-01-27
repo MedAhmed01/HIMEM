@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     // Check if email already exists in auth
     const { data: existingUsers } = await adminClient.auth.admin.listUsers()
     const emailExists = existingUsers?.users?.some(u => u.email?.toLowerCase() === email.toLowerCase())
-    
+
     if (emailExists) {
       return NextResponse.json(
         { error: 'Cet email est déjà utilisé' },
@@ -95,10 +95,21 @@ export async function POST(request: NextRequest) {
 
     console.log('Uploading documents:', { diplomaPath, cniPath, paymentPath })
 
+    // Helper to upload with Buffer conversion
+    const uploadFile = async (path: string, file: File) => {
+      const arrayBuffer = await file.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      return adminClient.storage
+        .from('documents')
+        .upload(path, buffer, {
+          contentType: file.type || 'application/pdf',
+          upsert: false
+        })
+    }
+
     // Upload diploma
-    const { error: diplomaUploadError } = await adminClient.storage
-      .from('documents')
-      .upload(diplomaPath, diplomaFile)
+    console.log(`Uploading diploma: ${diplomaFile.name} (${diplomaFile.size} bytes)`)
+    const { error: diplomaUploadError } = await uploadFile(diplomaPath, diplomaFile)
 
     if (diplomaUploadError) {
       console.error('Diploma upload error:', diplomaUploadError)
@@ -110,9 +121,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload CNI
-    const { error: cniUploadError } = await adminClient.storage
-      .from('documents')
-      .upload(cniPath, cniFile)
+    console.log(`Uploading CNI: ${cniFile.name} (${cniFile.size} bytes)`)
+    const { error: cniUploadError } = await uploadFile(cniPath, cniFile)
 
     if (cniUploadError) {
       console.error('CNI upload error:', cniUploadError)
@@ -125,9 +135,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload payment receipt
-    const { error: paymentUploadError } = await adminClient.storage
-      .from('documents')
-      .upload(paymentPath, paymentReceiptFile)
+    console.log(`Uploading receipt: ${paymentReceiptFile.name} (${paymentReceiptFile.size} bytes)`)
+    const { error: paymentUploadError } = await uploadFile(paymentPath, paymentReceiptFile)
 
     if (paymentUploadError) {
       console.error('Payment receipt upload error:', paymentUploadError)

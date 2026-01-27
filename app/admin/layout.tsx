@@ -18,7 +18,8 @@ import {
   Sun,
   Moon,
   Palette,
-  Award
+  Award,
+  UserCircle
 } from 'lucide-react'
 
 const navigation = [
@@ -39,6 +40,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const [isDark, setIsDark] = useState(false)
+  const [profile, setProfile] = useState<any>(null)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -49,7 +51,20 @@ export default function AdminLayout({
       setIsDark(true)
       document.documentElement.classList.add('dark')
     }
+    loadProfile()
   }, [])
+
+  const loadProfile = async () => {
+    try {
+      const res = await fetch('/api/profile')
+      const data = await res.json()
+      if (res.ok) {
+        setProfile(data.profile)
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+    }
+  }
 
   const toggleTheme = () => {
     const newTheme = !isDark
@@ -91,15 +106,15 @@ export default function AdminLayout({
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full text-white text-sm">
             <UserCheck className="w-4 h-4" />
-            <span>Mode Administrateur</span>
+            <span>{profile?.full_name || 'Mode Administrateur'}</span>
           </div>
 
           <Link
-            href="/"
+            href="/tableau-de-bord"
             className="flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
           >
-            <Home className="w-4 h-4" />
-            <span>Retour au site</span>
+            <UserCircle className="w-4 h-4" />
+            <span>Basculer vers Profil Ingénieur</span>
           </Link>
 
           <button

@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { 
-  User, 
-  FileText, 
-  CreditCard, 
-  Briefcase, 
-  Settings, 
-  Bell, 
-  CheckCircle, 
+import {
+  User,
+  FileText,
+  CreditCard,
+  Briefcase,
+  Settings,
+  Bell,
+  CheckCircle,
   Clock,
   ArrowRight,
   Sparkles,
@@ -49,7 +49,7 @@ export default function TableauDeBordPage() {
     try {
       const res = await fetch('/api/profile')
       const data = await res.json()
-      
+
       if (res.ok) {
         setProfile(data.profile)
       }
@@ -101,8 +101,8 @@ export default function TableauDeBordPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <Link href="/profil" className="flex items-center gap-3 sm:gap-4 group cursor-pointer">
             <Avatar className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-white shadow-xl ring-2 ring-[#139a9d]/20 group-hover:ring-[#139a9d]/40 transition-all">
-              <AvatarImage 
-                src={profile?.profile_image_url} 
+              <AvatarImage
+                src={profile?.profile_image_url}
                 alt={profile?.full_name || 'User'}
                 className="object-cover"
               />
@@ -117,7 +117,7 @@ export default function TableauDeBordPage() {
               <p className="text-sm sm:text-base text-slate-500 group-hover:text-slate-600 transition-colors">{t.dashboard.personalSpace}</p>
             </div>
           </Link>
-          
+
           {/* Logout Button */}
           <Button
             onClick={handleLogout}
@@ -242,10 +242,13 @@ export default function TableauDeBordPage() {
 
         {/* Admin Link */}
         {profile?.is_admin && (
-          <div className="text-center">
-            <Link href="/admin" className="inline-flex items-center gap-2 text-[#139a9d] hover:text-[#0f7a7d] font-medium transition-colors">
-              <Settings className="w-4 h-4" />
-              {t.dashboard.adminPanel}
+          <div className="text-center pt-8">
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-3 bg-slate-900 text-white px-6 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all shadow-lg hover:shadow-slate-200/50 group"
+            >
+              <Settings className="w-5 h-5 text-[#139a9d] group-hover:rotate-90 transition-transform duration-500" />
+              {t.nav.switchToAdmin}
             </Link>
           </div>
         )}

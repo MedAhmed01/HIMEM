@@ -13,7 +13,9 @@ export const translations = {
       profile: 'Profil',
       logout: 'Déconnexion',
       admin: 'Administration',
-      company: 'Espace Entreprise'
+      company: 'Espace Entreprise',
+      switchToAdmin: 'Basculer vers Administration',
+      switchToEngineer: 'Basculer vers Profil Ingénieur'
     },
 
     // Home page
@@ -142,7 +144,9 @@ export const translations = {
       profile: 'الملف الشخصي',
       logout: 'تسجيل الخروج',
       admin: 'الإدارة',
-      company: 'مساحة الشركة'
+      company: 'مساحة الشركة',
+      switchToAdmin: 'التبديل إلى الإدارة',
+      switchToEngineer: 'التبديل إلى ملف المهندس'
     },
 
     // Home page

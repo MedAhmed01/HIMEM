@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
@@ -8,15 +8,16 @@ export async function GET(
 ) {
   try {
     const supabase = await createClient()
+    const adminClient = createAdminClient()
 
-    // Check if user is admin
+    // Check if user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check admin status
-    const { data: profile } = await supabase
+    // Check admin status using adminClient to bypass RLS
+    const { data: profile } = await adminClient
       .from('profiles')
       .select('is_admin')
       .eq('id', user.id)
@@ -28,15 +29,15 @@ export async function GET(
 
     const { id, type } = await params
 
-    // Get engineer data
-    const { data: engineer, error: engineerError } = await supabase
-      .from('engineers')
+    // Get engineer data from profiles table (typo fixed)
+    const { data: engineer, error: engineerError } = await adminClient
+      .from('profiles')
       .select('diploma_file_path, cni_file_path, payment_receipt_path')
       .eq('id', id)
       .single()
 
     if (engineerError || !engineer) {
-      return NextResponse.json({ error: 'Engineer not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Engineer profile not found' }, { status: 404 })
     }
 
     // Determine file path based on type
@@ -64,9 +65,9 @@ export async function GET(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Download file from Supabase Storage
-    const { data: fileData, error: downloadError } = await supabase.storage
-      .from('engineer-documents')
+    // Download file from Supabase Storage using adminClient
+    const { data: fileData, error: downloadError } = await adminClient.storage
+      .from('documents')
       .download(filePath)
 
     if (downloadError || !fileData) {

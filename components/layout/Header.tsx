@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { SponsorCarousel } from './SponsorCarousel'
-import { Menu, X, User, LogIn, ChevronDown, Building2, UserCircle } from 'lucide-react'
+import { Menu, X, User, LogIn, ChevronDown, Building2, UserCircle, UserCheck } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { LanguageToggle } from '@/components/LanguageToggle'
 
@@ -13,6 +13,9 @@ export function Header() {
   const [isInscriptionOpen, setIsInscriptionOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
+  const [profile, setProfile] = useState<any>(null)
+  const [userType, setUserType] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const { t, language } = useLanguage()
 
   useEffect(() => {
@@ -31,6 +34,30 @@ export function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [lastScrollY])
+
+  useEffect(() => {
+    const fetchAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/check-user-type')
+        const data = await res.json()
+        if (res.ok) {
+          setUserType(data.type)
+          if (data.type === 'ingenieur' || data.type === 'admin') {
+            const profileRes = await fetch('/api/profile')
+            const profileData = await profileRes.json()
+            if (profileRes.ok) {
+              setProfile(profileData.profile)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Header auth check error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAuth()
+  }, [])
 
   return (
     <header className={`sticky top-0 z-50 bg-[#139a9d] border-b border-[#0f7a7d] shadow-sm transition-transform duration-300 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}>
@@ -70,55 +97,77 @@ export function Header() {
           {/* Desktop Auth Buttons - Right */}
           <div className="hidden md:flex items-center gap-2 justify-self-end">
             <LanguageToggle />
-            <Link href="/connexion">
-              <Button variant="ghost" className="h-9 px-4 rounded-full text-sm text-white hover:bg-white/10 font-medium">
-                <LogIn className="w-3.5 h-3.5 mr-1.5" />
-                {t.nav.login}
-              </Button>
-            </Link>
 
-            {/* Dropdown Inscription */}
-            <div className="relative inscription-dropdown">
-              <Button
-                onClick={() => setIsInscriptionOpen(!isInscriptionOpen)}
-                className="h-9 px-4 rounded-full text-sm bg-white text-[#139a9d] hover:bg-white/90 font-medium shadow-md hover:shadow-lg transition-all duration-200"
-              >
-                <User className="w-3.5 h-3.5 mr-1.5" />
-                {t.nav.register}
-                <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
-              </Button>
+            {loading ? (
+              <div className="h-9 w-24 bg-white/10 rounded-full animate-pulse" />
+            ) : userType ? (
+              <div className="flex items-center gap-2">
+                <Link href={userType === 'entreprise' ? '/entreprise/tableau-de-bord' : '/tableau-de-bord'}>
+                  <Button variant="ghost" className="h-9 px-4 rounded-full text-sm text-white hover:bg-white/10 font-medium">
+                    <UserCircle className="w-4 h-4 mr-2" />
+                    {profile?.full_name?.split(' ')[0] || (userType === 'entreprise' ? 'Dashboard' : 'Compte')}
+                  </Button>
+                </Link>
+                {userType === 'admin' && (
+                  <Link href="/admin">
+                    <Button variant="outline" className="h-9 px-4 rounded-full text-sm bg-white text-[#139a9d] hover:bg-white/90 font-medium shadow-md">
+                      {t.nav.admin}
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link href="/connexion">
+                  <Button variant="ghost" className="h-9 px-4 rounded-full text-sm text-white hover:bg-white/10 font-medium">
+                    <LogIn className="w-3.5 h-3.5 mr-1.5" />
+                    {t.nav.login}
+                  </Button>
+                </Link>
 
-              {isInscriptionOpen && (
-                <div className={`absolute ${language === 'ar' ? 'left-0' : 'right-0'} mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50`}>
-                  <Link
-                    href="/inscription"
-                    onClick={() => setIsInscriptionOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#139a9d]/10 transition-colors"
+                <div className="relative inscription-dropdown">
+                  <Button
+                    onClick={() => setIsInscriptionOpen(!isInscriptionOpen)}
+                    className="h-9 px-4 rounded-full text-sm bg-white text-[#139a9d] hover:bg-white/90 font-medium shadow-md hover:shadow-lg transition-all duration-200"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-[#139a9d]/20 flex items-center justify-center">
-                      <UserCircle className="w-5 h-5 text-[#139a9d]" />
+                    <User className="w-3.5 h-3.5 mr-1.5" />
+                    {t.nav.register}
+                    <ChevronDown className="w-3.5 h-3.5 ml-1.5" />
+                  </Button>
+
+                  {isInscriptionOpen && (
+                    <div className={`absolute ${language === 'ar' ? 'left-0' : 'right-0'} mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50`}>
+                      <Link
+                        href="/inscription"
+                        onClick={() => setIsInscriptionOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#139a9d]/10 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-[#139a9d]/20 flex items-center justify-center">
+                          <UserCircle className="w-5 h-5 text-[#139a9d]" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">{language === 'ar' ? 'مهندس' : 'Ingénieur'}</p>
+                          <p className="text-xs text-gray-500">{language === 'ar' ? 'تسجيل فردي' : 'Inscription individuelle'}</p>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/inscription-entreprise"
+                        onClick={() => setIsInscriptionOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                          <Building2 className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">{language === 'ar' ? 'شركة' : 'Entreprise'}</p>
+                          <p className="text-xs text-gray-500">{language === 'ar' ? 'حساب مهني' : 'Compte professionnel'}</p>
+                        </div>
+                      </Link>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{language === 'ar' ? 'مهندس' : 'Ingénieur'}</p>
-                      <p className="text-xs text-gray-500">{language === 'ar' ? 'تسجيل فردي' : 'Inscription individuelle'}</p>
-                    </div>
-                  </Link>
-                  <Link
-                    href="/inscription-entreprise"
-                    onClick={() => setIsInscriptionOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 text-sm">{language === 'ar' ? 'شركة' : 'Entreprise'}</p>
-                      <p className="text-xs text-gray-500">{language === 'ar' ? 'حساب مهني' : 'Compte professionnel'}</p>
-                    </div>
-                  </Link>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -180,29 +229,56 @@ export function Header() {
                 <div className="px-3 mb-2">
                   <LanguageToggle />
                 </div>
-                <Link href="/connexion" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full h-10 rounded-lg text-sm text-white hover:bg-white/10 font-medium">
-                    <LogIn className="w-4 h-4 mr-2" />
-                    {t.nav.login}
-                  </Button>
-                </Link>
 
-                {/* Inscription Options */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold text-white/70 px-3">{t.nav.register}</p>
-                  <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
-                      <UserCircle className="w-4 h-4 mr-2" />
-                      <span>{language === 'ar' ? 'مهندس' : 'Ingénieur'}</span>
-                    </Button>
-                  </Link>
-                  <Link href="/inscription-entreprise" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
-                      <Building2 className="w-4 h-4 mr-2" />
-                      <span>{language === 'ar' ? 'شركة' : 'Entreprise'}</span>
-                    </Button>
-                  </Link>
-                </div>
+                {loading ? (
+                  <div className="h-10 w-full bg-white/10 rounded-lg animate-pulse" />
+                ) : userType ? (
+                  <div className="space-y-2">
+                    <Link
+                      href={userType === 'entreprise' ? '/entreprise/tableau-de-bord' : '/tableau-de-bord'}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Button variant="outline" className="w-full h-11 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
+                        <UserCircle className="w-5 h-5 mr-3" />
+                        <span className="flex-1">{profile?.full_name || (userType === 'entreprise' ? 'Mon Tableau de bord' : 'Mon Compte')}</span>
+                      </Button>
+                    </Link>
+                    {userType === 'admin' && (
+                      <Link href="/admin" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full h-11 rounded-lg text-sm font-medium justify-start bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100">
+                          <UserCheck className="w-5 h-5 mr-3" />
+                          <span>Administration</span>
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <Link href="/connexion" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full h-10 rounded-lg text-sm text-white hover:bg-white/10 font-medium">
+                        <LogIn className="w-4 h-4 mr-2" />
+                        {t.nav.login}
+                      </Button>
+                    </Link>
+
+                    {/* Inscription Options */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-white/70 px-3">{t.nav.register}</p>
+                      <Link href="/inscription" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
+                          <UserCircle className="w-4 h-4 mr-2" />
+                          <span>{language === 'ar' ? 'مهندس' : 'Ingénieur'}</span>
+                        </Button>
+                      </Link>
+                      <Link href="/inscription-entreprise" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full h-10 rounded-lg text-sm font-medium justify-start bg-white text-[#139a9d] border-white hover:bg-white/90">
+                          <Building2 className="w-4 h-4 mr-2" />
+                          <span>{language === 'ar' ? 'شركة' : 'Entreprise'}</span>
+                        </Button>
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             </nav>
           </div>
