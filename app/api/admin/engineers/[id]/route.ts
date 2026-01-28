@@ -120,7 +120,7 @@ export async function PATCH(
   try {
     const { id: engineerId } = await params
     const body = await request.json()
-    const { full_name, phone, diploma } = body
+    const { full_name, phone, diploma, grad_year } = body
 
     if (!engineerId) {
       return NextResponse.json({ error: 'ID ingénieur manquant' }, { status: 400 })
@@ -152,6 +152,7 @@ export async function PATCH(
         full_name: full_name?.trim(),
         phone: phone?.trim(),
         diploma: diploma?.trim(),
+        grad_year: grad_year,
         updated_at: new Date().toISOString()
       })
       .eq('id', engineerId)

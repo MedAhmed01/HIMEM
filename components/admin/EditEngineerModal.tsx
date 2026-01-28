@@ -21,6 +21,7 @@ interface EditEngineerModalProps {
         full_name: string
         phone: string
         diploma: string
+        grad_year: number
         nni: string
         email: string
     } | null
@@ -38,7 +39,8 @@ export default function EditEngineerModal({
     const [formData, setFormData] = useState({
         full_name: '',
         phone: '',
-        diploma: ''
+        diploma: '',
+        grad_year: 0
     })
     const [loading, setLoading] = useState(false)
 
@@ -47,7 +49,8 @@ export default function EditEngineerModal({
             setFormData({
                 full_name: engineer.full_name || '',
                 phone: engineer.phone || '',
-                diploma: engineer.diploma || ''
+                diploma: engineer.diploma || '',
+                grad_year: engineer.grad_year || 0
             })
         }
     }, [engineer])
@@ -121,6 +124,16 @@ export default function EditEngineerModal({
                             id="diploma"
                             value={formData.diploma}
                             onChange={(e) => setFormData({ ...formData, diploma: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="grad_year">Année d'obtention (Promotion)</Label>
+                        <Input
+                            id="grad_year"
+                            type="number"
+                            value={formData.grad_year || ''}
+                            onChange={(e) => setFormData({ ...formData, grad_year: parseInt(e.target.value) || 0 })}
                             required
                         />
                     </div>

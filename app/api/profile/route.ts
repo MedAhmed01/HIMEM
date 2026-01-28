@@ -86,9 +86,6 @@ export async function PUT(request: NextRequest) {
     const {
       full_name,
       phone,
-      diploma,
-      university,
-      country,
       domain,
       exercise_mode
     } = body
@@ -100,10 +97,6 @@ export async function PUT(request: NextRequest) {
 
     if (!phone?.trim()) {
       return NextResponse.json({ error: 'Le téléphone est requis' }, { status: 400 })
-    }
-
-    if (!diploma?.trim()) {
-      return NextResponse.json({ error: 'Le diplôme est requis' }, { status: 400 })
     }
 
     if (!domain || !Array.isArray(domain) || domain.length === 0) {
@@ -127,26 +120,12 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Mode d\'exercice invalide' }, { status: 400 })
     }
 
-    // Validation du pays (optionnel)
-    const validCountries = [
-      'Mauritanie', 'Maroc', 'Algérie', 'Tunisie', 'Libye', 'Égypte', 'Soudan', 'Mali', 'Niger', 'Tchad',
-      'Sénégal', 'Burkina Faso', 'Côte d\'Ivoire', 'Ghana', 'Nigeria', 'France', 'Espagne', 'Allemagne',
-      'Royaume-Uni', 'Canada', 'États-Unis', 'Jordanie', 'Liban', 'Syrie', 'Irak', 'Arabie Saoudite'
-    ]
-
-    if (country && !validCountries.includes(country.trim())) {
-      return NextResponse.json({ error: 'Pays non valide' }, { status: 400 })
-    }
-
     // Use admin client to bypass RLS issues
     const { data: updatedProfile, error } = await adminClient
       .from('profiles')
       .update({
         full_name: full_name.trim(),
         phone: phone.trim(),
-        diploma: diploma.trim(),
-        university: university?.trim() || null,
-        country: country?.trim() || null,
         domain: domain,
         exercise_mode: exercise_mode,
         updated_at: new Date().toISOString()

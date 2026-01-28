@@ -17,7 +17,11 @@ import {
   Trash2,
   CheckCircle,
   AlertCircle,
-  Edit3
+  Edit3,
+  GraduationCap,
+  FileText,
+  Eye,
+  CreditCard
 } from 'lucide-react'
 import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
 import EditEngineerModal from '@/components/admin/EditEngineerModal'
@@ -29,9 +33,13 @@ interface Engineer {
   email: string
   phone: string
   diploma: string
+  grad_year: number
   status: string
   subscription_expiry: string | null
   profile_image_url?: string
+  diploma_file_path?: string
+  cni_file_path?: string
+  payment_receipt_path?: string
   created_at: string
 }
 
@@ -65,6 +73,13 @@ export default function IngenieursPage() {
     isOpen: false,
     engineerId: '',
     engineerName: ''
+  })
+  const [docsModal, setDocsModal] = useState<{
+    isOpen: boolean
+    engineer: Engineer | null
+  }>({
+    isOpen: false,
+    engineer: null
   })
 
   const loadEngineers = async () => {
@@ -324,6 +339,10 @@ export default function IngenieursPage() {
                       <span>{engineer.phone || '-'}</span>
                     </div>
                     <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                      <GraduationCap className="text-slate-400 mr-2 w-4 h-4" />
+                      <span>Promo: {engineer.grad_year || '-'}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
                       <Calendar className="text-slate-400 mr-2 w-4 h-4" />
                       <span>Exp: {formatDate(engineer.subscription_expiry)}</span>
                     </div>
@@ -374,6 +393,14 @@ export default function IngenieursPage() {
                     )}
 
                     <button
+                      onClick={() => setDocsModal({ isOpen: true, engineer })}
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 transition-colors"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Documents
+                    </button>
+
+                    <button
                       onClick={() => setDeleteDialog({ isOpen: true, engineerId: engineer.id, engineerName: engineer.full_name })}
                       className="p-2 rounded-lg text-slate-400 hover:text-red-600 transition-colors"
                     >
@@ -416,6 +443,75 @@ export default function IngenieursPage() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setDeleteDialog({ isOpen: false, engineerId: '', engineerName: '' })} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg">Annuler</button>
               <button onClick={handleDelete} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Documents Modal */}
+      {docsModal.isOpen && docsModal.engineer && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Documents - {docsModal.engineer.full_name}</h3>
+              <button onClick={() => setDocsModal({ isOpen: false, engineer: null })} className="text-slate-400 hover:text-slate-600">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                disabled={!docsModal.engineer.diploma_file_path}
+                onClick={() => window.open(`/api/admin/engineers/${docsModal.engineer?.id}/documents/diploma`, '_blank')}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${docsModal.engineer.diploma_file_path
+                  ? 'bg-slate-50 border-slate-200 hover:border-teal-500 hover:bg-teal-50/30'
+                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="w-5 h-5 text-teal-600" />
+                  <span className="font-semibold text-slate-700">Diplôme Professionnel</span>
+                </div>
+                {docsModal.engineer.diploma_file_path ? <Eye className="w-5 h-5 text-slate-400" /> : <X className="w-5 h-5 text-red-400" />}
+              </button>
+
+              <button
+                disabled={!docsModal.engineer.cni_file_path}
+                onClick={() => window.open(`/api/admin/engineers/${docsModal.engineer?.id}/documents/cni`, '_blank')}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${docsModal.engineer.cni_file_path
+                  ? 'bg-slate-50 border-slate-200 hover:border-teal-500 hover:bg-teal-50/30'
+                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-teal-600" />
+                  <span className="font-semibold text-slate-700">Pièce d'Identité</span>
+                </div>
+                {docsModal.engineer.cni_file_path ? <Eye className="w-5 h-5 text-slate-400" /> : <X className="w-5 h-5 text-red-400" />}
+              </button>
+
+              <button
+                disabled={!docsModal.engineer.payment_receipt_path}
+                onClick={() => window.open(`/api/admin/engineers/${docsModal.engineer?.id}/documents/payment`, '_blank')}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${docsModal.engineer.payment_receipt_path
+                  ? 'bg-slate-50 border-slate-200 hover:border-teal-500 hover:bg-teal-50/30'
+                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-teal-600" />
+                  <span className="font-semibold text-slate-700">Reçu de Paiement</span>
+                </div>
+                {docsModal.engineer.payment_receipt_path ? <Eye className="w-5 h-5 text-slate-400" /> : <X className="w-5 h-5 text-red-400" />}
+              </button>
+            </div>
+
+            <div className="mt-8">
+              <button
+                onClick={() => setDocsModal({ isOpen: false, engineer: null })}
+                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-all"
+              >
+                Fermer
+              </button>
             </div>
           </div>
         </div>

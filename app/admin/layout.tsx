@@ -32,6 +32,7 @@ const navigation = [
   { name: 'Abonnements', href: '/admin/abonnements-entreprises', icon: CreditCard },
   { name: 'Messages', href: '/admin/messages', icon: Mail, badge: 4 },
   { name: 'Articles', href: '/admin/articles', icon: Newspaper },
+  { name: 'Mes Documents', href: '/admin/mes-documents', icon: FileText },
 ]
 
 export default function AdminLayout({

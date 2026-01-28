@@ -9,15 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  GraduationCap, 
-  MapPin, 
-  Building, 
-  Save, 
-  AlertCircle, 
+import {
+  User,
+  Mail,
+  Phone,
+  GraduationCap,
+  MapPin,
+  Building,
+  Save,
+  AlertCircle,
   CheckCircle,
   Sparkles,
   Calendar,
@@ -125,7 +125,7 @@ export default function ProfilPage() {
   const [uploadingCV, setUploadingCV] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  
+
   // Password change dialog
   const [showPasswordDialog, setShowPasswordDialog] = useState(false)
   const [passwordData, setPasswordData] = useState({
@@ -143,7 +143,7 @@ export default function ProfilPage() {
     try {
       const res = await fetch('/api/profile')
       const data = await res.json()
-      
+
       if (res.ok) {
         console.log('Profile data loaded:', data.profile)
         console.log('grad_year:', data.profile.grad_year)
@@ -312,11 +312,11 @@ export default function ProfilPage() {
 
   const handleDomainToggle = (domain: Domain, checked: boolean) => {
     if (!profile) return
-    
+
     const newDomains = checked
       ? [...profile.domain, domain]
       : profile.domain.filter(d => d !== domain)
-    
+
     setProfile({ ...profile, domain: newDomains })
   }
 
@@ -439,20 +439,18 @@ export default function ProfilPage() {
   }
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#139a9d]/5 to-[#0f7a7d]/5 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-[#139a9d]/5 to-[#0f7a7d]/5 py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Success/Error Message */}
         {message && (
-          <div className={`flex items-center gap-3 p-4 rounded-2xl border shadow-lg ${
-            message.type === 'success' 
-              ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200' 
+          <div className={`flex items-center gap-3 p-4 rounded-2xl border shadow-lg ${message.type === 'success'
+              ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
               : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
-          }`}>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-              message.type === 'success'
+            }`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${message.type === 'success'
                 ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
                 : 'bg-gradient-to-br from-red-500 to-pink-500'
-            }`}>
+              }`}>
               {message.type === 'success' ? (
                 <CheckCircle className="w-5 h-5 text-white" />
               ) : (
@@ -462,7 +460,7 @@ export default function ProfilPage() {
             <p className={`${message.type === 'success' ? 'text-emerald-700' : 'text-red-700'} font-medium flex-1`}>
               {message.text}
             </p>
-            <button 
+            <button
               onClick={() => setMessage(null)}
               className={`${message.type === 'success' ? 'text-emerald-400 hover:text-emerald-600' : 'text-red-400 hover:text-red-600'} text-xl font-bold`}
             >
@@ -479,8 +477,8 @@ export default function ProfilPage() {
               {/* Profile Image */}
               <div className="relative">
                 <Avatar className="w-32 h-32 border-4 border-white shadow-2xl">
-                  <AvatarImage 
-                    src={profile.profile_image_url} 
+                  <AvatarImage
+                    src={profile.profile_image_url}
                     alt={profile.full_name}
                     className="object-cover"
                   />
@@ -488,7 +486,7 @@ export default function ProfilPage() {
                     {profile.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
-                
+
                 {/* Upload Button */}
                 <label className="absolute bottom-2 right-2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors">
                   <input
@@ -506,13 +504,13 @@ export default function ProfilPage() {
                 </label>
               </div>
             </div>
-            
+
             {/* Status Badge */}
             <div className="absolute top-6 right-6">
               {getStatusBadge(profile.status)}
             </div>
           </div>
-          
+
           {/* Profile Info - Now on white background */}
           <div className="pt-8 px-8 pb-4">
             <div className="ml-40"> {/* Offset to align with profile image */}
@@ -529,7 +527,7 @@ export default function ProfilPage() {
               </div>
             </div>
           </div>
-          
+
           {/* Profile Stats */}
           <CardContent className="pt-4 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -540,7 +538,7 @@ export default function ProfilPage() {
                 <p className="text-2xl font-bold text-slate-900">{calculateExperience(profile.grad_year)}</p>
                 <p className="text-sm text-slate-600">Années d'expérience</p>
               </div>
-              
+
               <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100">
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <User className="w-6 h-6 text-white" />
@@ -548,7 +546,7 @@ export default function ProfilPage() {
                 <p className="text-2xl font-bold text-slate-900">{profile.sponsorships_count || 0}</p>
                 <p className="text-sm text-slate-600">Parrainages effectués</p>
               </div>
-              
+
               <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-[#139a9d]/10 to-[#0f7a7d]/10 border border-[#139a9d]/30">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Calendar className="w-6 h-6 text-white" />
@@ -556,14 +554,14 @@ export default function ProfilPage() {
                 <p className="text-2xl font-bold text-slate-900">{profile.grad_year}</p>
                 <p className="text-sm text-slate-600">Année de sortie</p>
               </div>
-              
+
               <div className="text-center p-4 rounded-2xl bg-gradient-to-br from-[#139a9d]/10 to-[#0f7a7d]/10 border border-[#139a9d]/30">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#139a9d] to-[#0f7a7d] rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {profile.subscription_expiry ? 
-                    Math.ceil((new Date(profile.subscription_expiry).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) 
+                  {profile.subscription_expiry ?
+                    Math.ceil((new Date(profile.subscription_expiry).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
                     : 0
                   }
                 </p>
@@ -628,7 +626,7 @@ export default function ProfilPage() {
                     className="h-12 rounded-xl border-2 disabled:bg-slate-50"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="nni" className="text-sm font-semibold text-slate-700">NNI</Label>
                   <Input
@@ -639,7 +637,7 @@ export default function ProfilPage() {
                   />
                   <p className="text-xs text-slate-500">Le NNI ne peut pas être modifié</p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-sm font-semibold text-slate-700">Téléphone</Label>
                   <Input
@@ -650,7 +648,7 @@ export default function ProfilPage() {
                     className="h-12 rounded-xl border-2 disabled:bg-slate-50"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Email</Label>
                   <Input
@@ -679,16 +677,19 @@ export default function ProfilPage() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="diploma" className="text-sm font-semibold text-slate-700">Diplôme</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="diploma" className="text-sm font-semibold text-slate-700">Diplôme</Label>
+                    <Badge variant="outline" className="text-[10px] text-slate-500 uppercase tracking-wider">Contact Administration</Badge>
+                  </div>
                   <Input
                     id="diploma"
                     value={profile.diploma}
-                    onChange={(e) => setProfile({ ...profile, diploma: e.target.value })}
-                    disabled={!isEditing}
-                    className="h-12 rounded-xl border-2 disabled:bg-slate-50"
+                    disabled
+                    className="h-12 rounded-xl border-2 bg-slate-50 text-slate-500"
                   />
+                  <p className="text-xs text-slate-500">Le diplôme ne peut être modifié que par l'administration</p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="grad_year" className="text-sm font-semibold text-slate-700">Année de Sortie</Label>
                   <Input
@@ -699,37 +700,29 @@ export default function ProfilPage() {
                   />
                   <p className="text-xs text-slate-500">L'année de sortie ne peut pas être modifiée</p>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="university" className="text-sm font-semibold text-slate-700">Université</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="university" className="text-sm font-semibold text-slate-700">Université</Label>
+                    <Badge variant="outline" className="text-[10px] text-slate-500 uppercase tracking-wider">Archives</Badge>
+                  </div>
                   <Input
                     id="university"
                     value={profile.university || ''}
-                    onChange={(e) => setProfile({ ...profile, university: e.target.value })}
-                    disabled={!isEditing}
+                    disabled
                     placeholder="Ex: Université de Nouakchott"
-                    className="h-12 rounded-xl border-2 disabled:bg-slate-50"
+                    className="h-12 rounded-xl border-2 bg-slate-50 text-slate-500"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="country" className="text-sm font-semibold text-slate-700">Pays</Label>
-                  <Select
+                  <Input
+                    id="country"
                     value={profile.country || ''}
-                    onValueChange={(value) => setProfile({ ...profile, country: value })}
-                    disabled={!isEditing}
-                  >
-                    <SelectTrigger className="h-12 rounded-xl border-2 disabled:bg-slate-50">
-                      <SelectValue placeholder="Sélectionnez un pays" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COUNTRIES.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    disabled
+                    className="h-12 rounded-xl border-2 bg-slate-50 text-slate-500"
+                  />
                 </div>
               </div>
             </CardContent>
@@ -754,31 +747,28 @@ export default function ProfilPage() {
                   {DOMAINS.map((domain) => {
                     const isSelected = profile.domain.includes(domain.value)
                     return (
-                    <div key={domain.value} className={`p-4 rounded-2xl border-2 transition-all ${
-                      isSelected 
-                        ? `bg-gradient-to-r ${domain.color} border-current` 
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}>
-                      <div className="flex items-start space-x-3">
-                        <Checkbox
-                          id={domain.value}
-                          checked={isSelected}
-                          onCheckedChange={(checked) => handleDomainToggle(domain.value, checked as boolean)}
-                          disabled={!isEditing}
-                          className="mt-1"
-                        />
-                        <div className="flex-1">
-                          <Label htmlFor={domain.value} className={`font-semibold cursor-pointer ${
-                            isSelected ? 'text-white' : 'text-slate-900'
-                          }`}>
-                            {domain.label}
-                          </Label>
-                          <p className={`text-sm mt-1 ${
-                            isSelected ? 'text-white/90' : 'text-slate-600'
-                          }`}>{domain.description}</p>
+                      <div key={domain.value} className={`p-4 rounded-2xl border-2 transition-all ${isSelected
+                          ? `bg-gradient-to-r ${domain.color} border-current`
+                          : 'border-slate-200 hover:border-slate-300'
+                        }`}>
+                        <div className="flex items-start space-x-3">
+                          <Checkbox
+                            id={domain.value}
+                            checked={isSelected}
+                            onCheckedChange={(checked) => handleDomainToggle(domain.value, checked as boolean)}
+                            disabled={!isEditing}
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <Label htmlFor={domain.value} className={`font-semibold cursor-pointer ${isSelected ? 'text-white' : 'text-slate-900'
+                              }`}>
+                              {domain.label}
+                            </Label>
+                            <p className={`text-sm mt-1 ${isSelected ? 'text-white/90' : 'text-slate-600'
+                              }`}>{domain.description}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
                     )
                   })}
                 </div>
@@ -794,19 +784,17 @@ export default function ProfilPage() {
                     return (
                       <div
                         key={mode.value}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                          isSelected 
-                            ? 'bg-gradient-to-r from-[#139a9d]/10 to-[#0f7a7d]/10 border-[#139a9d]/50' 
+                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${isSelected
+                            ? 'bg-gradient-to-r from-[#139a9d]/10 to-[#0f7a7d]/10 border-[#139a9d]/50'
                             : 'border-slate-200 hover:border-slate-300'
-                        } ${!isEditing ? 'cursor-not-allowed opacity-60' : ''}`}
+                          } ${!isEditing ? 'cursor-not-allowed opacity-60' : ''}`}
                         onClick={() => isEditing && setProfile({ ...profile, exercise_mode: mode.value })}
                       >
                         <div className="flex items-start space-x-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                            isSelected 
-                              ? 'bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]' 
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isSelected
+                              ? 'bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]'
                               : 'bg-slate-100'
-                          }`}>
+                            }`}>
                             <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-slate-600'}`} />
                           </div>
                           <div className="flex-1">
