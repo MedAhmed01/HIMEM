@@ -40,6 +40,10 @@ interface Engineer {
   diploma_file_path?: string
   cni_file_path?: string
   payment_receipt_path?: string
+  university?: string
+  country?: string
+  domain?: string[]
+  exercise_mode?: string
   created_at: string
 }
 
