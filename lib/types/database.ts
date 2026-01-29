@@ -66,6 +66,9 @@ export interface Profile {
   cni_file_path: string | null
   cv_url: string | null
   is_admin: boolean
+  university: string | null
+  country: string | null
+  parrain_id: string | null
   created_at: string
   updated_at: string
 }

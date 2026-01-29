@@ -29,7 +29,7 @@ export async function GET() {
       .from('profiles')
       .select(`
         *,
-        parrain:profiles!parrain_id (
+        parrain_details:profiles!parrain_id (
           full_name,
           phone
         )
@@ -37,16 +37,21 @@ export async function GET() {
       .order('created_at', { ascending: false })
 
     if (error) {
+      console.error('API Admin Engineers - Database error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     // Flatten parrain information
-    const engineers = engineersData?.map(eng => ({
-      ...eng,
-      parrain_name: eng.parrain?.full_name || null,
-      parrain_phone: eng.parrain?.phone || null,
-      parrain: undefined // Remove the nested parrain object
-    }))
+    const engineers = (engineersData as any[])?.map(eng => {
+      // Supabase might return parrain_details as an object or an array of size 1
+      const parrain = Array.isArray(eng.parrain_details) ? eng.parrain_details[0] : eng.parrain_details
+      return {
+        ...eng,
+        parrain_name: parrain?.full_name || null,
+        parrain_phone: parrain?.phone || null,
+        parrain_details: undefined // Remove the nested object
+      }
+    })
 
     return NextResponse.json({ engineers })
   } catch (error) {

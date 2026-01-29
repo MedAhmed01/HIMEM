@@ -39,6 +39,7 @@ interface Engineer {
   parrain_phone?: string | null
   country?: string | null
   grad_year?: number | null
+  exercise_mode?: string[]
 }
 
 interface DocumentType {
@@ -325,8 +326,8 @@ export default function VerificationWorkspace() {
                     setCurrentDocumentType('diploma') // Reset to diploma when switching engineers
                   }}
                   className={`p-4 rounded-xl shadow-md border-l-4 cursor-pointer transition-all ${isSelected
-                      ? 'bg-white dark:bg-slate-800 border-teal-600 ring-2 ring-teal-600/10 dark:ring-teal-600/20'
-                      : 'bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-transparent hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800/50'
+                    ? 'bg-white dark:bg-slate-800 border-teal-600 ring-2 ring-teal-600/10 dark:ring-teal-600/20'
+                    : 'bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-transparent hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800/50'
                     }`}
                 >
                   <div className="flex justify-between items-start mb-2">
@@ -381,8 +382,8 @@ export default function VerificationWorkspace() {
                         key={docType.id}
                         onClick={() => setCurrentDocumentType(docType.type)}
                         className={`px-2 py-1 text-xs rounded-md transition-colors ${currentDocumentType === docType.type
-                            ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                          ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                           }`}
                       >
                         {docType.id.toUpperCase()}

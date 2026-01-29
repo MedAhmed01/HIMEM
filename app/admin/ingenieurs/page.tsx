@@ -43,7 +43,9 @@ interface Engineer {
   university?: string
   country?: string
   domain?: string[]
-  exercise_mode?: string
+  exercise_mode?: string[]
+  parrain_name?: string | null
+  parrain_phone?: string | null
   created_at: string
 }
 
