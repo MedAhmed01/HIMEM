@@ -9,7 +9,7 @@ export async function GET() {
 
     // Verify admin access
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
@@ -25,14 +25,28 @@ export async function GET() {
     }
 
     // Fetch all engineers (inclut les admins qui sont aussi ingénieurs)
-    const { data: engineers, error } = await adminClient
+    const { data: engineersData, error } = await adminClient
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        parrain:profiles!parrain_id (
+          full_name,
+          phone
+        )
+      `)
       .order('created_at', { ascending: false })
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    // Flatten parrain information
+    const engineers = engineersData?.map(eng => ({
+      ...eng,
+      parrain_name: eng.parrain?.full_name || null,
+      parrain_phone: eng.parrain?.phone || null,
+      parrain: undefined // Remove the nested parrain object
+    }))
 
     return NextResponse.json({ engineers })
   } catch (error) {

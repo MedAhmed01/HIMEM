@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  Search, 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCcw, 
-  RotateCw, 
-  Maximize, 
-  Check, 
-  X, 
-  FileText, 
-  CreditCard, 
-  GraduationCap, 
+import {
+  Search,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  RotateCw,
+  Maximize,
+  Check,
+  X,
+  FileText,
+  CreditCard,
+  GraduationCap,
   Wrench,
   Bell,
   Sun,
@@ -37,6 +37,8 @@ interface Engineer {
   parrain_id: string | null
   parrain_name?: string | null
   parrain_phone?: string | null
+  country?: string | null
+  grad_year?: number | null
 }
 
 interface DocumentType {
@@ -54,7 +56,7 @@ const documentTypes: DocumentType[] = [
 
 const rejectionReasons = [
   'Blurry / Unreadable',
-  'Expired Document', 
+  'Expired Document',
   'Name Mismatch',
   'Other (See comments)'
 ]
@@ -116,31 +118,31 @@ export default function VerificationWorkspace() {
 
   const handleApprove = async () => {
     if (!selectedEngineer) return
-    
+
     try {
       const res = await fetch('/api/admin/verify-docs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          engineerId: selectedEngineer.id, 
+        body: JSON.stringify({
+          engineerId: selectedEngineer.id,
           action: 'approve',
-          comments: adminComments 
+          comments: adminComments
         })
       })
-      
+
       if (res.ok) {
         // Move to next engineer
         const currentIndex = engineers.findIndex(e => e.id === selectedEngineer.id)
         const remainingEngineers = engineers.filter(e => e.id !== selectedEngineer.id)
         setEngineers(remainingEngineers)
-        
+
         if (remainingEngineers.length > 0) {
           const nextIndex = currentIndex < remainingEngineers.length ? currentIndex : 0
           setSelectedEngineer(remainingEngineers[nextIndex])
         } else {
           setSelectedEngineer(null)
         }
-        
+
         // Reset form
         setAdminComments('')
         setSelectedRejectionReason('Other (See comments)')
@@ -152,31 +154,31 @@ export default function VerificationWorkspace() {
 
   const handleReject = async () => {
     if (!selectedEngineer || !adminComments.trim()) return
-    
+
     try {
       const res = await fetch('/api/admin/verify-docs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          engineerId: selectedEngineer.id, 
+        body: JSON.stringify({
+          engineerId: selectedEngineer.id,
           action: 'reject',
           rejectionReason: `${selectedRejectionReason}: ${adminComments}`
         })
       })
-      
+
       if (res.ok) {
         // Move to next engineer
         const currentIndex = engineers.findIndex(e => e.id === selectedEngineer.id)
         const remainingEngineers = engineers.filter(e => e.id !== selectedEngineer.id)
         setEngineers(remainingEngineers)
-        
+
         if (remainingEngineers.length > 0) {
           const nextIndex = currentIndex < remainingEngineers.length ? currentIndex : 0
           setSelectedEngineer(remainingEngineers[nextIndex])
         } else {
           setSelectedEngineer(null)
         }
-        
+
         // Reset form
         setAdminComments('')
         setSelectedRejectionReason('Other (See comments)')
@@ -195,7 +197,7 @@ export default function VerificationWorkspace() {
     const now = new Date()
     const date = new Date(dateString)
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-    
+
     if (diffInHours < 1) return 'Just now'
     if (diffInHours < 24) return `${diffInHours}h ago`
     if (diffInHours < 48) return 'Yesterday'
@@ -209,7 +211,7 @@ export default function VerificationWorkspace() {
 
   const getCurrentDocumentPath = () => {
     if (!selectedEngineer) return null
-    
+
     switch (currentDocumentType) {
       case 'diploma':
         return selectedEngineer.diploma_file_path
@@ -224,12 +226,12 @@ export default function VerificationWorkspace() {
 
   const getAvailableDocuments = () => {
     if (!selectedEngineer) return []
-    
+
     const available = []
     if (selectedEngineer.diploma_file_path) available.push(documentTypes[0])
     if (selectedEngineer.cni_file_path) available.push(documentTypes[1])
     if (selectedEngineer.payment_receipt_path) available.push(documentTypes[2])
-    
+
     return available
   }
 
@@ -257,23 +259,23 @@ export default function VerificationWorkspace() {
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Verification Workspace</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-6">
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             System Online
           </div>
-          
+
           <button className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400 relative">
             <Bell className="w-5 h-5" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
           </button>
-          
+
           <div className="flex items-center gap-3 pl-6 border-l border-slate-200 dark:border-slate-700">
-            <img 
-              alt="Admin Avatar" 
-              className="w-9 h-9 rounded-full ring-2 ring-white dark:ring-slate-800 shadow-sm" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPwAC-GbivinjRCbOGjC-8shUljQU7EZMcJTx_TeQyAFA21R3CtaGrcyroUZg4X1Kx4XYBWkXiSRKK7aysuZIQt79syMIDPPzzn8-wacTYiPxG-n7HxT0JRai4qvQlQU4EuxzIsn_w8bglecxx4EyxaXGuHxoi1PzUdi92qrQxBawaOumEwDuQEbn1z-dXMDhOcjRH3fJTMjMwy3wCMPr-cEJE6xa81YUKoC5P_Fn47-alL7FFxz0kRepGKa84Fm-B9YLDSuNefcQ" 
+            <img
+              alt="Admin Avatar"
+              className="w-9 h-9 rounded-full ring-2 ring-white dark:ring-slate-800 shadow-sm"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPwAC-GbivinjRCbOGjC-8shUljQU7EZMcJTx_TeQyAFA21R3CtaGrcyroUZg4X1Kx4XYBWkXiSRKK7aysuZIQt79syMIDPPzzn8-wacTYiPxG-n7HxT0JRai4qvQlQU4EuxzIsn_w8bglecxx4EyxaXGuHxoi1PzUdi92qrQxBawaOumEwDuQEbn1z-dXMDhOcjRH3fJTMjMwy3wCMPr-cEJE6xa81YUKoC5P_Fn47-alL7FFxz0kRepGKa84Fm-B9YLDSuNefcQ"
             />
             <div className="hidden sm:block">
               <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">Sarah Jenkins</p>
@@ -295,12 +297,12 @@ export default function VerificationWorkspace() {
                 {engineers.length} Total
               </span>
             </div>
-            
+
             <div className="relative">
               <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
-              <input 
-                className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-teal-600 focus:border-transparent outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500 text-slate-700 dark:text-slate-200" 
-                placeholder="Search engineer..." 
+              <input
+                className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-teal-600 focus:border-transparent outline-none transition-all placeholder-slate-400 dark:placeholder-slate-500 text-slate-700 dark:text-slate-200"
+                placeholder="Search engineer..."
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -314,7 +316,7 @@ export default function VerificationWorkspace() {
               const isSelected = selectedEngineer?.id === engineer.id
               const isUrgent = index === 0
               const Icon = getDocumentIcon(index)
-              
+
               return (
                 <div
                   key={engineer.id}
@@ -322,18 +324,17 @@ export default function VerificationWorkspace() {
                     setSelectedEngineer(engineer)
                     setCurrentDocumentType('diploma') // Reset to diploma when switching engineers
                   }}
-                  className={`p-4 rounded-xl shadow-md border-l-4 cursor-pointer transition-all ${
-                    isSelected 
-                      ? 'bg-white dark:bg-slate-800 border-teal-600 ring-2 ring-teal-600/10 dark:ring-teal-600/20' 
+                  className={`p-4 rounded-xl shadow-md border-l-4 cursor-pointer transition-all ${isSelected
+                      ? 'bg-white dark:bg-slate-800 border-teal-600 ring-2 ring-teal-600/10 dark:ring-teal-600/20'
                       : 'bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-transparent hover:border-slate-300 dark:hover:border-slate-600 hover:bg-white/50 dark:hover:bg-slate-800/50'
-                  }`}
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-3">
-                      <img 
-                        alt="Engineer Avatar" 
+                      <img
+                        alt="Engineer Avatar"
                         className={`w-10 h-10 rounded-full ${isSelected ? '' : 'opacity-80'}`}
-                        src={`https://lh3.googleusercontent.com/aida-public/AB6AXuARxBb6egZVi9QJ5E_tpiuMPb1jkqwo35w6yHksLF5yqDHY5MwkpnGgkbbNi3hpSGSgKXhomy_04-SBf-PpfPEmA3uNrzvkXd0q5KTCgnZ5N-ebl4R2Dks_aYniSHOlyIujeWRY_C1B72lQsEnaxvEaeFY7dlK4b9GSoGAf_dyS-XGnEhqJX3Np5mA7nX6dUwqjs_6R2yikYSN-CO2OFgrCT-X03MhVYwBC2Y0SaZJKfx83lkA4Cuf43P7UKKkTkoJAU5PszifpTkc`} 
+                        src={`https://lh3.googleusercontent.com/aida-public/AB6AXuARxBb6egZVi9QJ5E_tpiuMPb1jkqwo35w6yHksLF5yqDHY5MwkpnGgkbbNi3hpSGSgKXhomy_04-SBf-PpfPEmA3uNrzvkXd0q5KTCgnZ5N-ebl4R2Dks_aYniSHOlyIujeWRY_C1B72lQsEnaxvEaeFY7dlK4b9GSoGAf_dyS-XGnEhqJX3Np5mA7nX6dUwqjs_6R2yikYSN-CO2OFgrCT-X03MhVYwBC2Y0SaZJKfx83lkA4Cuf43P7UKKkTkoJAU5PszifpTkc`}
                       />
                       <div>
                         <h3 className="font-semibold text-slate-900 dark:text-white text-sm">{engineer.full_name}</h3>
@@ -346,7 +347,7 @@ export default function VerificationWorkspace() {
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="mt-3 flex items-center justify-between text-xs">
                     <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
                       <Icon className="w-4 h-4" />
@@ -371,7 +372,7 @@ export default function VerificationWorkspace() {
                   {selectedEngineer ? `${selectedEngineer.full_name}_${currentDocumentType}.pdf` : 'No document selected'}
                 </h3>
                 <span className="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">2.4 MB</span>
-                
+
                 {/* Document Type Selector */}
                 {selectedEngineer && getAvailableDocuments().length > 1 && (
                   <div className="flex gap-1 ml-4">
@@ -379,11 +380,10 @@ export default function VerificationWorkspace() {
                       <button
                         key={docType.id}
                         onClick={() => setCurrentDocumentType(docType.type)}
-                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                          currentDocumentType === docType.type
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${currentDocumentType === docType.type
                             ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                        }`}
+                          }`}
                       >
                         {docType.id.toUpperCase()}
                       </button>
@@ -391,36 +391,36 @@ export default function VerificationWorkspace() {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => setZoom(Math.max(25, zoom - 25))}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors" 
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors"
                   title="Zoom Out"
                 >
                   <ZoomOut className="w-5 h-5" />
                 </button>
                 <span className="text-sm font-mono w-12 text-center text-slate-600 dark:text-slate-400">{zoom}%</span>
-                <button 
+                <button
                   onClick={() => setZoom(Math.min(200, zoom + 25))}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors" 
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors"
                   title="Zoom In"
                 >
                   <ZoomIn className="w-5 h-5" />
                 </button>
-                
+
                 <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2"></div>
-                
-                <button 
+
+                <button
                   onClick={() => setRotation(rotation - 90)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors" 
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors"
                   title="Rotate Left"
                 >
                   <RotateCcw className="w-5 h-5" />
                 </button>
-                <button 
+                <button
                   onClick={() => setRotation(rotation + 90)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors" 
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500 transition-colors"
                   title="Rotate Right"
                 >
                   <RotateCw className="w-5 h-5" />
@@ -438,7 +438,7 @@ export default function VerificationWorkspace() {
                   key={`${selectedEngineer.id}-${currentDocumentType}`}
                   src={`/api/admin/documents/${selectedEngineer.id}/${currentDocumentType}`}
                   className="w-full h-full border-0 rounded-lg shadow-2xl"
-                  style={{ 
+                  style={{
                     transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
                     transformOrigin: 'center',
                     minHeight: '600px'
@@ -446,9 +446,9 @@ export default function VerificationWorkspace() {
                   title="Document Preview"
                 />
               ) : (
-                <div 
+                <div
                   className="bg-white shadow-2xl shadow-slate-300/50 dark:shadow-black/50 max-w-full max-h-full aspect-[1/1.4] w-[500px] rounded-sm relative group overflow-hidden border border-slate-200 dark:border-slate-800 transition-transform duration-300"
-                  style={{ 
+                  style={{
                     transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
                     transformOrigin: 'center'
                   }}
@@ -462,17 +462,17 @@ export default function VerificationWorkspace() {
                         <div className="h-3 w-32 bg-slate-400 ml-auto"></div>
                       </div>
                     </div>
-                    
+
                     <div className="flex justify-center py-8">
                       <div className="h-8 w-64 bg-slate-800 mb-2"></div>
                     </div>
-                    
+
                     <div className="space-y-3 text-justify">
                       <div className="h-3 w-full bg-slate-300"></div>
                       <div className="h-3 w-full bg-slate-300"></div>
                       <div className="h-3 w-3/4 bg-slate-300"></div>
                     </div>
-                    
+
                     <div className="flex justify-between pt-16 mt-auto">
                       <div className="h-24 w-24 border-4 border-slate-300 rounded-full flex items-center justify-center">
                         <div className="transform -rotate-12 font-serif text-slate-300 text-xs font-bold border-2 border-slate-300 px-2 py-1">
@@ -488,7 +488,7 @@ export default function VerificationWorkspace() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
                     <span className="text-6xl font-bold transform -rotate-45">
                       {selectedEngineer ? 'NO DOCUMENT' : 'SELECT ENGINEER'}
@@ -531,7 +531,7 @@ export default function VerificationWorkspace() {
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                       Document Type
                     </label>
-                    <select 
+                    <select
                       className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm px-3 py-2 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-teal-600 focus:border-transparent outline-none"
                       value={selectedDocumentType}
                       onChange={(e) => setSelectedDocumentType(e.target.value)}
@@ -548,13 +548,13 @@ export default function VerificationWorkspace() {
                     </label>
                     <div className="space-y-2">
                       {rejectionReasons.map((reason) => (
-                        <label 
+                        <label
                           key={reason}
                           className="flex items-center gap-2 p-2 rounded-lg border border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group"
                         >
-                          <input 
-                            className="text-teal-600 focus:ring-teal-600 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600" 
-                            name="reason" 
+                          <input
+                            className="text-teal-600 focus:ring-teal-600 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600"
+                            name="reason"
                             type="radio"
                             checked={selectedRejectionReason === reason}
                             onChange={() => setSelectedRejectionReason(reason)}
@@ -571,9 +571,9 @@ export default function VerificationWorkspace() {
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                       Admin Comments
                     </label>
-                    <textarea 
-                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm px-3 py-2 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-teal-600 focus:border-transparent outline-none resize-none" 
-                      placeholder="Add specific details about the rejection here..." 
+                    <textarea
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm px-3 py-2 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-teal-600 focus:border-transparent outline-none resize-none"
+                      placeholder="Add specific details about the rejection here..."
                       rows={4}
                       value={adminComments}
                       onChange={(e) => setAdminComments(e.target.value)}
@@ -585,7 +585,7 @@ export default function VerificationWorkspace() {
               {/* Action Buttons */}
               <div className="p-5 border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 rounded-b-2xl">
                 <div className="grid grid-cols-2 gap-3">
-                  <button 
+                  <button
                     onClick={handleReject}
                     disabled={!selectedEngineer || !adminComments.trim()}
                     className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -593,7 +593,7 @@ export default function VerificationWorkspace() {
                     <X className="w-5 h-5" />
                     Reject
                   </button>
-                  <button 
+                  <button
                     onClick={handleApprove}
                     disabled={!selectedEngineer}
                     className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm shadow-lg shadow-teal-600/25 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -602,9 +602,9 @@ export default function VerificationWorkspace() {
                     Approve
                   </button>
                 </div>
-                
+
                 <div className="mt-3 flex justify-center">
-                  <button 
+                  <button
                     onClick={() => router.push('/admin/verifications')}
                     className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 underline underline-offset-2"
                   >
@@ -619,7 +619,7 @@ export default function VerificationWorkspace() {
 
       {/* Theme Toggle */}
       <div className="fixed bottom-6 right-6 z-50">
-        <button 
+        <button
           onClick={toggleTheme}
           className="w-12 h-12 bg-white dark:bg-slate-700 rounded-full shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:scale-110 transition-transform"
         >

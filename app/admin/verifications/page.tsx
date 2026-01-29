@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { FileText, Download, CheckCircle, XCircle, UserCheck, Receipt, Mail, Phone, Trash2, AlertCircle, X, User } from 'lucide-react'
+import { FileText, Download, CheckCircle, XCircle, UserCheck, Receipt, Mail, Phone, Trash2, AlertCircle, X, User, GraduationCap } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,8 @@ interface Engineer {
   parrain_id: string | null
   parrain_name?: string | null
   parrain_phone?: string | null
+  country?: string | null
+  grad_year?: number | null
   profile_image_url?: string
 }
 
@@ -212,8 +214,8 @@ export default function VerificationsPage() {
       {/* Success/Error Message */}
       {message && (
         <div className={`flex items-center gap-3 p-4 rounded-lg border ${message.type === 'success'
-            ? 'bg-green-50 border-green-200'
-            : 'bg-red-50 border-red-200'
+          ? 'bg-green-50 border-green-200'
+          : 'bg-red-50 border-red-200'
           }`}>
           {message.type === 'success' ? (
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -330,6 +332,28 @@ export default function VerificationsPage() {
                 <div>
                   <span className="text-xs text-gray-500 uppercase font-medium">Université</span>
                   <p className="text-sm font-semibold text-gray-900">{engineer.university || '-'}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500 uppercase font-medium">Pays</span>
+                  <p className="text-sm font-semibold text-gray-900">{engineer.country || '-'}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500 uppercase font-medium flex items-center gap-1">
+                    <GraduationCap className="w-3 h-3" />
+                    Année de sortie
+                  </span>
+                  <p className="text-sm font-semibold text-gray-900">{engineer.grad_year || '-'}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500 uppercase font-medium">Parrain</span>
+                  <p className="text-sm font-semibold text-gray-900">{engineer.parrain_name || 'Aucun'}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500 uppercase font-medium flex items-center gap-1">
+                    <Phone className="w-3 h-3" />
+                    Mobile Parrain
+                  </span>
+                  <p className="text-sm font-semibold text-gray-900">{engineer.parrain_phone || '-'}</p>
                 </div>
                 <div>
                   <span className="text-xs text-gray-500 uppercase font-medium">Soumis le</span>
