@@ -28,11 +28,25 @@ export async function POST(request: NextRequest) {
     const cniFile = formData.get('cniFile') as File
     const paymentReceiptFile = formData.get('paymentReceiptFile') as File
 
-    console.log('Registration attempt:', { fullName, nni, email, diplomaTitle, university, country, graduationYear, parrainId })
+    console.log('Registration - Data extracted:', {
+      fullName, nni, email,
+      hasDiploma: !!diplomaFile,
+      hasCni: !!cniFile,
+      hasReceipt: !!paymentReceiptFile,
+      parrainId
+    })
 
     // Validate required fields
-    if (!fullName || !nni || !email || !password || !diplomaFile || !cniFile || !paymentReceiptFile || !parrainId) {
-      console.error('Missing required fields')
+    if (!fullName || !nni || !email || !password || !diplomaFile || !cniFile || !parrainId) {
+      console.error('Registration - Missing required fields:', {
+        fullName: !!fullName,
+        nni: !!nni,
+        email: !!email,
+        password: !!password,
+        hasDiploma: !!diplomaFile,
+        hasCni: !!cniFile,
+        hasParrain: !!parrainId
+      })
       return NextResponse.json(
         { error: 'Tous les champs requis doivent être remplis' },
         { status: 400 }
@@ -91,7 +105,7 @@ export async function POST(request: NextRequest) {
     // Upload documents to storage
     const diplomaPath = generateFilePath(userId, 'diploma', diplomaFile.name)
     const cniPath = generateFilePath(userId, 'cni', cniFile.name)
-    const paymentPath = generateFilePath(userId, 'payment', paymentReceiptFile.name)
+    const paymentPath = paymentReceiptFile ? generateFilePath(userId, 'payment', paymentReceiptFile.name) : null
 
     console.log('Uploading documents:', { diplomaPath, cniPath, paymentPath })
 
@@ -134,18 +148,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Upload payment receipt
-    console.log(`Uploading receipt: ${paymentReceiptFile.name} (${paymentReceiptFile.size} bytes)`)
-    const { error: paymentUploadError } = await uploadFile(paymentPath, paymentReceiptFile)
+    // Upload payment receipt (if provided)
+    if (paymentReceiptFile && paymentPath) {
+      console.log(`Uploading receipt: ${paymentReceiptFile.name} (${paymentReceiptFile.size} bytes)`)
+      const { error: paymentUploadError } = await uploadFile(paymentPath, paymentReceiptFile)
 
-    if (paymentUploadError) {
-      console.error('Payment receipt upload error:', paymentUploadError)
-      await adminClient.auth.admin.deleteUser(userId)
-      await adminClient.storage.from('documents').remove([diplomaPath, cniPath])
-      return NextResponse.json(
-        { error: `Erreur lors du téléchargement du reçu de paiement: ${paymentUploadError.message}` },
-        { status: 500 }
-      )
+      if (paymentUploadError) {
+        console.error('Payment receipt upload error:', paymentUploadError)
+        await adminClient.auth.admin.deleteUser(userId)
+        await adminClient.storage.from('documents').remove([diplomaPath, cniPath])
+        return NextResponse.json(
+          { error: `Erreur lors du téléchargement du reçu de paiement: ${paymentUploadError.message}` },
+          { status: 500 }
+        )
+      }
+    } else {
+      console.log('No payment receipt provided, skipping upload')
     }
 
     console.log('All documents uploaded successfully')
@@ -179,7 +197,9 @@ export async function POST(request: NextRequest) {
     if (profileError) {
       console.error('Profile creation error:', profileError)
       await adminClient.auth.admin.deleteUser(userId)
-      await adminClient.storage.from('documents').remove([diplomaPath, cniPath, paymentPath])
+      const filesToRemove = [diplomaPath, cniPath]
+      if (paymentPath) filesToRemove.push(paymentPath)
+      await adminClient.storage.from('documents').remove(filesToRemove)
       return NextResponse.json(
         { error: `Erreur lors de la création du profil: ${profileError.message}` },
         { status: 500 }
@@ -194,10 +214,19 @@ export async function POST(request: NextRequest) {
       userId
     })
 
-  } catch (error) {
-    console.error('Registration error:', error)
+  } catch (error: any) {
+    console.error('Registration global catch error:', {
+      name: error?.name,
+      message: error?.message,
+      stack: error?.stack,
+      raw: error
+    })
     return NextResponse.json(
-      { error: 'Une erreur est survenue lors de l\'inscription' },
+      {
+        error: 'Une erreur est survenue lors de l\'inscription',
+        details: error?.message || 'Erreur inconnue',
+        stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+      },
       { status: 500 }
     )
   }

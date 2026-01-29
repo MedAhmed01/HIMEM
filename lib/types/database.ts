@@ -9,40 +9,40 @@ export type Json =
   | Json[]
 
 // Enum types
-export type EngineerStatus = 
+export type EngineerStatus =
   | 'pending_docs'
   | 'pending_reference'
   | 'validated'
   | 'suspended'
 
-export type ExerciseMode = 
+export type ExerciseMode =
   | 'personne_physique'
   | 'personne_morale'
   | 'employe_public'
   | 'employe_prive'
 
-export type VerificationStatus = 
+export type VerificationStatus =
   | 'pending'
   | 'confirmed'
   | 'rejected'
 
-export type Domain = 
+export type Domain =
   | 'infrastructure_transport'
   | 'batiment_constructions'
   | 'hydraulique_environnement'
 
 // Entreprise types
-export type EntrepriseStatus = 
+export type EntrepriseStatus =
   | 'en_attente'
   | 'valide'
   | 'suspendu'
 
-export type SubscriptionPlan = 
+export type SubscriptionPlan =
   | 'starter'
   | 'business'
   | 'premium'
 
-export type ContractType = 
+export type ContractType =
   | 'cdi'
   | 'cdd'
   | 'stage'
@@ -59,7 +59,7 @@ export interface Profile {
   diploma: string | null
   grad_year: number | null
   domain: string[]
-  exercise_mode: ExerciseMode | null
+  exercise_mode: ExerciseMode[]
   status: EngineerStatus
   subscription_expiry: string | null
   diploma_file_path: string | null
@@ -266,7 +266,7 @@ export interface Database {
     }
     Enums: {
       engineer_status: EngineerStatus
-      exercise_mode: ExerciseMode
+      exercise_mode: ExerciseMode[]
       verification_status: VerificationStatus
       entreprise_status: EntrepriseStatus
       subscription_plan: SubscriptionPlan

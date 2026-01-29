@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter only active engineers (validated + paid subscription)
-    const activeEngineers = profiles?.filter(profile => 
-      profile.status === 'validated' && 
-      profile.subscription_expiry && 
+    const activeEngineers = profiles?.filter(profile =>
+      profile.status === 'validated' &&
+      profile.subscription_expiry &&
       new Date(profile.subscription_expiry) > new Date()
     ) || []
 
@@ -77,7 +77,9 @@ export async function GET(request: NextRequest) {
       country: eng.country,
       profile_image_url: eng.profile_image_url,
       domains: eng.domain?.map((d: string) => domainLabels[d] || d) || [],
-      exercise_mode: exerciseModeLabels[eng.exercise_mode] || eng.exercise_mode
+      exercise_modes: Array.isArray(eng.exercise_mode)
+        ? eng.exercise_mode.map((m: string) => exerciseModeLabels[m] || m)
+        : eng.exercise_mode ? [exerciseModeLabels[eng.exercise_mode] || eng.exercise_mode] : []
     }))
 
     return NextResponse.json({

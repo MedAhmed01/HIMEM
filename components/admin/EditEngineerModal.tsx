@@ -30,7 +30,7 @@ interface EditEngineerModalProps {
         university?: string
         country?: string
         domain?: string[]
-        exercise_mode?: string
+        exercise_mode?: string[]
     } | null
     onSuccess: (message: string) => void
     onError: (error: string) => void
@@ -53,7 +53,7 @@ export default function EditEngineerModal({
         university: '',
         country: '',
         domain: [] as string[],
-        exercise_mode: '' as string
+        exercise_mode: [] as string[]
     })
     const [loading, setLoading] = useState(false)
 
@@ -69,7 +69,7 @@ export default function EditEngineerModal({
                 university: engineer.university || '',
                 country: engineer.country || '',
                 domain: engineer.domain || [],
-                exercise_mode: engineer.exercise_mode || ''
+                exercise_mode: Array.isArray(engineer.exercise_mode) ? engineer.exercise_mode : engineer.exercise_mode ? [engineer.exercise_mode] : []
             })
         }
     }, [engineer])
@@ -128,6 +128,13 @@ export default function EditEngineerModal({
             ? [...formData.domain, domain]
             : formData.domain.filter(d => d !== domain)
         setFormData({ ...formData, domain: newDomains })
+    }
+
+    const handleExerciseModeToggle = (mode: string, checked: boolean) => {
+        const newModes = checked
+            ? [...formData.exercise_mode, mode]
+            : formData.exercise_mode.filter(m => m !== mode)
+        setFormData({ ...formData, exercise_mode: newModes })
     }
 
     return (
@@ -228,21 +235,25 @@ export default function EditEngineerModal({
 
                     <div className="space-y-4 border-t pt-4">
                         <h4 className="font-semibold text-sm text-slate-500 uppercase tracking-wider">Domaines & Exercice</h4>
-                        <div className="space-y-2">
-                            <Label htmlFor="exercise_mode">Mode d'exercice</Label>
-                            <Select
-                                value={formData.exercise_mode}
-                                onValueChange={(value) => setFormData({ ...formData, exercise_mode: value })}
-                            >
-                                <SelectTrigger id="exercise_mode">
-                                    <SelectValue placeholder="Sélectionnez un mode" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {EXERCISE_MODES.map((m) => (
-                                        <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="space-y-3">
+                            <Label>Mode d'exercice</Label>
+                            <div className="grid grid-cols-1 gap-2">
+                                {EXERCISE_MODES.map((m) => (
+                                    <div key={m.value} className="flex items-center space-x-2 p-2 rounded hover:bg-slate-50 transition-colors">
+                                        <Checkbox
+                                            id={`mode-${m.value}`}
+                                            checked={formData.exercise_mode.includes(m.value)}
+                                            onCheckedChange={(checked) => handleExerciseModeToggle(m.value, checked as boolean)}
+                                        />
+                                        <Label
+                                            htmlFor={`mode-${m.value}`}
+                                            className="text-sm cursor-pointer font-normal"
+                                        >
+                                            {m.label}
+                                        </Label>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <div className="space-y-3">
                             <Label>Domaines d'expertise</Label>

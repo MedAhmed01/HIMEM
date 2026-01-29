@@ -54,7 +54,7 @@ interface ProfileData {
   university: string
   country: string
   domain: Domain[]
-  exercise_mode: ExerciseMode
+  exercise_mode: ExerciseMode[]
   status: string
   subscription_expiry: string | null
   profile_image_url?: string
@@ -320,6 +320,17 @@ export default function ProfilPage() {
     setProfile({ ...profile, domain: newDomains })
   }
 
+  const handleExerciseModeToggle = (mode: ExerciseMode, checked: boolean) => {
+    if (!profile) return
+
+    const currentModes = Array.isArray(profile.exercise_mode) ? profile.exercise_mode : [profile.exercise_mode]
+    const newModes = checked
+      ? [...currentModes, mode]
+      : currentModes.filter(m => m !== mode)
+
+    setProfile({ ...profile, exercise_mode: newModes })
+  }
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
@@ -444,12 +455,12 @@ export default function ProfilPage() {
         {/* Success/Error Message */}
         {message && (
           <div className={`flex items-center gap-3 p-4 rounded-2xl border shadow-lg ${message.type === 'success'
-              ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
-              : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+            ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
+            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
             }`}>
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${message.type === 'success'
-                ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
-                : 'bg-gradient-to-br from-red-500 to-pink-500'
+              ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
+              : 'bg-gradient-to-br from-red-500 to-pink-500'
               }`}>
               {message.type === 'success' ? (
                 <CheckCircle className="w-5 h-5 text-white" />
@@ -748,8 +759,8 @@ export default function ProfilPage() {
                     const isSelected = profile.domain.includes(domain.value)
                     return (
                       <div key={domain.value} className={`p-4 rounded-2xl border-2 transition-all ${isSelected
-                          ? `bg-gradient-to-r ${domain.color} border-current`
-                          : 'border-slate-200 hover:border-slate-300'
+                        ? `bg-gradient-to-r ${domain.color} border-current`
+                        : 'border-slate-200 hover:border-slate-300'
                         }`}>
                         <div className="flex items-start space-x-3">
                           <Checkbox
@@ -780,25 +791,34 @@ export default function ProfilPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {EXERCISE_MODES.map((mode) => {
                     const Icon = mode.icon
-                    const isSelected = profile.exercise_mode === mode.value
+                    const isSelected = Array.isArray(profile.exercise_mode)
+                      ? profile.exercise_mode.includes(mode.value)
+                      : profile.exercise_mode === mode.value
                     return (
                       <div
                         key={mode.value}
                         className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${isSelected
-                            ? 'bg-gradient-to-r from-[#139a9d]/10 to-[#0f7a7d]/10 border-[#139a9d]/50'
-                            : 'border-slate-200 hover:border-slate-300'
+                          ? 'bg-gradient-to-r from-[#139a9d]/10 to-[#0f7a7d]/10 border-[#139a9d]/50'
+                          : 'border-slate-200 hover:border-slate-300'
                           } ${!isEditing ? 'cursor-not-allowed opacity-60' : ''}`}
-                        onClick={() => isEditing && setProfile({ ...profile, exercise_mode: mode.value })}
+                        onClick={() => isEditing && handleExerciseModeToggle(mode.value, !isSelected)}
                       >
                         <div className="flex items-start space-x-3">
+                          <Checkbox
+                            id={`mode-${mode.value}`}
+                            checked={isSelected}
+                            onCheckedChange={(checked) => isEditing && handleExerciseModeToggle(mode.value, checked as boolean)}
+                            disabled={!isEditing}
+                            className="mt-1"
+                          />
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isSelected
-                              ? 'bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]'
-                              : 'bg-slate-100'
+                            ? 'bg-gradient-to-br from-[#139a9d] to-[#0f7a7d]'
+                            : 'bg-slate-100'
                             }`}>
                             <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-slate-600'}`} />
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-semibold text-slate-900">{mode.label}</h4>
+                            <h4 className={`font-semibold ${isSelected ? 'text-[#0f7a7d]' : 'text-slate-900'}`}>{mode.label}</h4>
                             <p className="text-sm text-slate-600 mt-1">{mode.description}</p>
                           </div>
                         </div>

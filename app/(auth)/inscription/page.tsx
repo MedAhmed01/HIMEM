@@ -181,7 +181,7 @@ export default function InscriptionPage() {
     setIsSubmitting(true)
 
     try {
-      console.log('Starting registration submission...')
+      console.log('Starting registration submission... (DEBUG VER: 3)')
       const formData = new FormData()
       formData.append('fullName', data.fullName)
       formData.append('nni', data.nni)
@@ -214,11 +214,23 @@ export default function InscriptionPage() {
         credentials: 'include'
       })
 
-      const result = await response.json()
+      const responseText = await response.text()
+      let result: any
+      try {
+        result = JSON.parse(responseText)
+      } catch (e) {
+        console.error('Failed to parse JSON response:', responseText)
+        result = { error: `Invalid JSON response from server`, details: responseText }
+      }
 
       if (!response.ok) {
-        console.error('Registration failed:', result)
-        setError(result.error || result.details || 'Une erreur est survenue lors de l\'inscription')
+        console.error('Registration failed details:', {
+          status: response.status,
+          statusText: response.statusText,
+          result: JSON.stringify(result, null, 2)
+        })
+        const errorMsg = result.error || result.details || `Erreur ${response.status}: Une erreur est survenue lors de l'inscription`
+        setError(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg))
         return
       }
 

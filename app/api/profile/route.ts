@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Au moins un domaine doit être sélectionné' }, { status: 400 })
     }
 
-    if (!exercise_mode) {
+    if (!exercise_mode || !Array.isArray(exercise_mode) || exercise_mode.length === 0) {
       return NextResponse.json({ error: 'Le mode d\'exercice est requis' }, { status: 400 })
     }
 
@@ -116,8 +116,9 @@ export async function PUT(request: NextRequest) {
 
     // Validation du mode d'exercice
     const validExerciseModes: ExerciseMode[] = ['personne_physique', 'personne_morale', 'employe_public', 'employe_prive']
-    if (!validExerciseModes.includes(exercise_mode as ExerciseMode)) {
-      return NextResponse.json({ error: 'Mode d\'exercice invalide' }, { status: 400 })
+    const invalidModes = exercise_mode.filter((m: string) => !validExerciseModes.includes(m as ExerciseMode))
+    if (invalidModes.length > 0) {
+      return NextResponse.json({ error: 'Modes d\'exercice invalides détectés' }, { status: 400 })
     }
 
     // Use admin client to bypass RLS issues

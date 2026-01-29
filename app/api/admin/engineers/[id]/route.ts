@@ -169,7 +169,7 @@ export async function PATCH(
         university: university?.trim() || null,
         country: country?.trim() || null,
         domain: domain || [],
-        exercise_mode: exercise_mode || null,
+        exercise_mode: exercise_mode || [],
         updated_at: new Date().toISOString()
       })
       .eq('id', engineerId)
