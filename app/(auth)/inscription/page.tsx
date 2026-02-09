@@ -81,6 +81,8 @@ export default function InscriptionPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [parrains, setParrains] = useState<Parrain[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [nniError, setNniError] = useState<string | null>(null)
+  const [isCheckingNni, setIsCheckingNni] = useState(false)
 
   const [data, setData] = useState<RegistrationData>({
     fullName: '',
@@ -107,6 +109,33 @@ export default function InscriptionPage() {
       .then(data => setParrains(data.parrains || []))
       .catch(console.error)
   }, [])
+
+  useEffect(() => {
+    const checkNni = async () => {
+      if (!data.nni || data.nni.length < 5) {
+        setNniError(null)
+        return
+      }
+
+      setIsCheckingNni(true)
+      try {
+        const res = await fetch(`/api/check-nni?nni=${encodeURIComponent(data.nni)}`)
+        const result = await res.json()
+        if (result.exists) {
+          setNniError('Ce numéro NNI est déjà inscrit sur la plateforme.')
+        } else {
+          setNniError(null)
+        }
+      } catch (e) {
+        console.error('Error checking NNI', e)
+      } finally {
+        setIsCheckingNni(false)
+      }
+    }
+
+    const timeoutId = setTimeout(checkNni, 500)
+    return () => clearTimeout(timeoutId)
+  }, [data.nni])
 
   const handleChange = (field: string, value: any) => {
     setData(prev => ({ ...prev, [field]: value }))
@@ -157,7 +186,10 @@ export default function InscriptionPage() {
           data.phone.trim() &&
           data.email.trim() &&
           data.password.length >= 8 &&
-          data.password === data.confirmPassword
+          data.password.length >= 8 &&
+          data.password === data.confirmPassword &&
+          !nniError &&
+          !isCheckingNni
         )
       case 2:
         return !!(
@@ -366,7 +398,7 @@ export default function InscriptionPage() {
 
                       <div className="underline-input relative">
                         <input
-                          className="text-lg text-[#121616] w-full border-none border-b-2 border-gray-200 pb-4 pt-4 bg-transparent focus:outline-none focus:border-[#2a7b84] transition-all"
+                          className={`text-lg text-[#121616] w-full border-none border-b-2 pb-4 pt-4 bg-transparent focus:outline-none transition-all ${nniError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-[#2a7b84]'}`}
                           id="nni"
                           placeholder=" "
                           required
@@ -377,10 +409,21 @@ export default function InscriptionPage() {
                         />
                         <label
                           htmlFor="nni"
-                          className="absolute left-0 top-4 text-gray-500 transition-all pointer-events-none"
+                          className={`absolute left-0 top-4 transition-all pointer-events-none ${nniError ? 'text-red-500' : 'text-gray-500'}`}
                         >
                           NNI (Numéro National d'Identification) *
                         </label>
+                        {isCheckingNni && (
+                          <div className="absolute right-0 top-4">
+                            <span className="material-symbols-outlined animate-spin text-gray-400 text-xl">progress_activity</span>
+                          </div>
+                        )}
+                        {nniError && (
+                          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-sm">error</span>
+                            {nniError}
+                          </p>
+                        )}
                       </div>
 
                       <div className="underline-input relative">
