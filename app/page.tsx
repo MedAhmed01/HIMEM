@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PublicSearchBar } from '@/components/search/PublicSearchBar'
 import LatestArticles from '@/components/LatestArticles'
+import VerifiedEngineersList from '@/components/VerifiedEngineersList'
 
 interface Sponsor {
   id: string
@@ -15,6 +16,15 @@ interface Sponsor {
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [showVerifiedList, setShowVerifiedList] = useState(false)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  const handleShowList = () => {
+    setShowVerifiedList(true)
+    setTimeout(() => {
+      listRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+  }
 
   useEffect(() => {
     loadSponsors()
@@ -136,6 +146,13 @@ export default function Home() {
                   </div>
                 </div>
                 <PublicSearchBar />
+                <button
+                  onClick={handleShowList}
+                  className="mt-5 w-full flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-bold text-white bg-[#0E646C] hover:bg-[#14919B] rounded-2xl transition-all duration-300 shadow-md shadow-[#0E646C]/10 hover:shadow-[#14919B]/20 transform hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <span className="material-icons-outlined text-lg">list</span>
+                  Liste des ingénieurs
+                </button>
               </div>
             </div>
           </div>
@@ -260,6 +277,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Verified Engineers Section */}
+      {showVerifiedList && (
+        <div ref={listRef}>
+          <VerifiedEngineersList />
+        </div>
+      )}
 
       {/* News Section */}
       <LatestArticles />

@@ -130,7 +130,8 @@ export async function PATCH(
       university,
       country,
       domain,
-      exercise_mode
+      exercise_mode,
+      profile_image_url
     } = body
 
     if (!engineerId) {
@@ -170,6 +171,7 @@ export async function PATCH(
         country: country?.trim() || null,
         domain: domain || [],
         exercise_mode: exercise_mode || [],
+        profile_image_url: profile_image_url?.trim() || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', engineerId)

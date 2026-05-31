@@ -31,7 +31,7 @@ export async function GET() {
     for (const ref of references || []) {
       const { data: engineer } = await adminClient
         .from('profiles')
-        .select('id, full_name, nni, email, grad_year')
+        .select('id, full_name, nni, email, grad_year, profile_image_url')
         .eq('id', ref.engineer_id)
         .single()
       
@@ -43,7 +43,7 @@ export async function GET() {
     // Get validated engineers (inclut les admins qui sont aussi ingénieurs)
     const { data: validatedEngineers } = await adminClient
       .from('profiles')
-      .select('id, full_name, nni, email, grad_year')
+      .select('id, full_name, nni, email, grad_year, profile_image_url')
       .eq('status', 'validated')
       .order('full_name')
 

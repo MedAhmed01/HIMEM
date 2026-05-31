@@ -12,6 +12,7 @@ import {
   Bell,
   Palette
 } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface Engineer {
   id: string
@@ -19,6 +20,7 @@ interface Engineer {
   nni: string
   email: string
   grad_year: number
+  profile_image_url?: string
 }
 
 interface Reference {
@@ -127,9 +129,12 @@ export default function ParrainsPage() {
               >
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
                   <div className="flex-shrink-0">
-                    <div className="h-14 w-14 rounded-full bg-green-500 flex items-center justify-center text-white text-xl font-bold shadow-md">
-                      {getInitials(ref.engineer.full_name)}
-                    </div>
+                    <Avatar className="h-14 w-14 border-2 border-slate-100 shadow-md">
+                      <AvatarImage src={ref.engineer.profile_image_url} alt={ref.engineer.full_name} className="object-cover" />
+                      <AvatarFallback className="bg-gradient-to-br from-teal-500 to-cyan-600 text-white text-lg font-bold">
+                        {getInitials(ref.engineer.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   
                   <div className="flex-1 min-w-0">
@@ -208,9 +213,12 @@ export default function ParrainsPage() {
               >
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
                   <div className="flex-shrink-0">
-                    <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-lg font-bold shadow-sm">
-                      {getInitials(engineer.full_name)}
-                    </div>
+                    <Avatar className="h-12 w-12 border-2 border-slate-100 shadow-sm">
+                      <AvatarImage src={engineer.profile_image_url} alt={engineer.full_name} className="object-cover" />
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-md font-bold">
+                        {getInitials(engineer.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   
                   <div className="flex-1 min-w-0">

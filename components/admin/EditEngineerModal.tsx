@@ -11,9 +11,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, Check } from 'lucide-react'
+import { Loader2, Check, Upload } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import type { Domain, ExerciseMode } from '@/lib/types/database'
 
 interface EditEngineerModalProps {
@@ -31,6 +32,7 @@ interface EditEngineerModalProps {
         country?: string
         domain?: string[]
         exercise_mode?: string[]
+        profile_image_url?: string
     } | null
     onSuccess: (message: string) => void
     onError: (error: string) => void
@@ -53,9 +55,11 @@ export default function EditEngineerModal({
         university: '',
         country: '',
         domain: [] as string[],
-        exercise_mode: [] as string[]
+        exercise_mode: [] as string[],
+        profile_image_url: ''
     })
     const [loading, setLoading] = useState(false)
+    const [uploadLoading, setUploadLoading] = useState(false)
 
     useEffect(() => {
         if (engineer) {
@@ -69,7 +73,8 @@ export default function EditEngineerModal({
                 university: engineer.university || '',
                 country: engineer.country || '',
                 domain: engineer.domain || [],
-                exercise_mode: Array.isArray(engineer.exercise_mode) ? engineer.exercise_mode : engineer.exercise_mode ? [engineer.exercise_mode] : []
+                exercise_mode: Array.isArray(engineer.exercise_mode) ? engineer.exercise_mode : engineer.exercise_mode ? [engineer.exercise_mode] : [],
+                profile_image_url: engineer.profile_image_url || ''
             })
         }
     }, [engineer])
@@ -144,6 +149,75 @@ export default function EditEngineerModal({
                     <DialogTitle>Modifier le profil complet</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6 py-4">
+                    {/* Photo de profil */}
+                    <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800 mb-2">
+                        <Avatar className="h-20 w-20 border-2 border-slate-200 shadow-md flex-shrink-0">
+                            <AvatarImage src={formData.profile_image_url} alt={formData.full_name} className="object-cover" />
+                            <AvatarFallback className="bg-teal-600 text-white text-2xl font-bold">
+                                {formData.full_name ? formData.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'PE'}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-grow w-full space-y-2">
+                            <Label className="text-sm font-semibold">Photo de profil</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    placeholder="URL de l'image (ex: https://...)"
+                                    value={formData.profile_image_url}
+                                    onChange={(e) => setFormData({ ...formData, profile_image_url: e.target.value })}
+                                    className="flex-grow text-xs"
+                                />
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="modal-avatar-upload"
+                                        className="sr-only"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0]
+                                            if (!file) return
+                                            
+                                            setUploadLoading(true)
+                                            try {
+                                                const uploadData = new FormData()
+                                                uploadData.append('file', file)
+                                                uploadData.append('type', 'profile_image')
+                                                
+                                                const res = await fetch('/api/upload', {
+                                                    method: 'POST',
+                                                    body: uploadData
+                                                })
+                                                
+                                                const resData = await res.json()
+                                                if (res.ok && resData.url) {
+                                                    setFormData(prev => ({ ...prev, profile_image_url: resData.url }))
+                                                } else {
+                                                    alert(resData.error || 'Erreur lors de l\'upload')
+                                                }
+                                            } catch (err) {
+                                                console.error('File upload error:', err)
+                                                alert('Erreur lors du téléchargement de l\'image')
+                                            } finally {
+                                                setUploadLoading(false)
+                                            }
+                                        }}
+                                    />
+                                    <Label
+                                        htmlFor="modal-avatar-upload"
+                                        className="flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-all cursor-pointer h-10 shadow-sm"
+                                    >
+                                        {uploadLoading ? (
+                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        ) : (
+                                            <Upload className="w-3.5 h-3.5" />
+                                        )}
+                                        Charger
+                                    </Label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="nni">NNI</Label>
