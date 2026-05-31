@@ -195,15 +195,15 @@ export default function VerificationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Documents en attente de vérification</h1>
-          <p className="text-gray-500 text-sm mt-1">{engineers.length} document{engineers.length !== 1 ? 's' : ''} à vérifier</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Documents en attente de vérification</h1>
+          <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">{engineers.length} document{engineers.length !== 1 ? 's' : ''} à vérifier</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 self-start sm:self-auto w-full sm:w-auto">
           <Button
             onClick={() => window.open('/admin/verifications/workspace', '_blank')}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-teal-600 hover:bg-teal-700 text-white w-full sm:w-auto"
           >
             <FileText className="w-4 h-4 mr-2" />
             Advanced Workspace
@@ -249,7 +249,7 @@ export default function VerificationsPage() {
               className="bg-white rounded-lg border border-gray-200 p-5"
             >
               {/* Header */}
-              <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b border-gray-100 dark:border-slate-800 pb-4">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <div className="flex-shrink-0">
                     <Avatar className="w-12 h-12 border border-blue-200">
@@ -260,25 +260,25 @@ export default function VerificationsPage() {
                     </Avatar>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900 text-lg truncate">{engineer.full_name || 'Utilisateur'}</h3>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-lg truncate">{engineer.full_name || 'Utilisateur'}</h3>
                       <Badge className="bg-[#139a9d]/20 text-[#139a9d] border-[#139a9d]/30 flex items-center gap-1">
                         <User className="w-3 h-3" />
                         Ingénieur
                       </Badge>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
                       En attente
                     </span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex flex-wrap gap-2 w-full md:w-auto">
                   <Button
                     onClick={() => handleApprove(engineer.id)}
                     disabled={actionLoading === engineer.id}
-                    className="h-10 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+                    className="h-10 px-4 rounded-lg bg-green-600 hover:bg-green-700 text-white flex-grow md:flex-grow-0"
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     {actionLoading === engineer.id ? 'Chargement...' : 'Approuver'}
@@ -288,7 +288,7 @@ export default function VerificationsPage() {
                     onClick={() => setRejectDialog({ isOpen: true, engineerId: engineer.id, engineerName: engineer.full_name })}
                     disabled={actionLoading === engineer.id}
                     variant="outline"
-                    className="h-10 px-4 rounded-lg border-red-300 text-red-600 hover:bg-red-50"
+                    className="h-10 px-4 rounded-lg border-red-300 text-red-600 hover:bg-red-50 flex-grow md:flex-grow-0"
                   >
                     <XCircle className="w-4 h-4 mr-2" />
                     Rejeter
@@ -298,7 +298,7 @@ export default function VerificationsPage() {
                     onClick={() => setDeleteDialog({ isOpen: true, engineerId: engineer.id, engineerName: engineer.full_name })}
                     disabled={actionLoading === engineer.id}
                     variant="outline"
-                    className="h-10 px-4 rounded-lg border-gray-300 text-gray-600 hover:bg-gray-50"
+                    className="h-10 px-4 rounded-lg border-gray-300 text-gray-600 hover:bg-gray-50 flex-shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

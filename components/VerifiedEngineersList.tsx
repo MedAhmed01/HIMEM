@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { 
   GraduationCap, 
   MapPin, 
@@ -59,6 +59,7 @@ const DOMAIN_ICONS: Record<string, string> = {
 }
 
 export default function VerifiedEngineersList() {
+  const sectionRef = useRef<HTMLElement>(null)
   const [engineers, setEngineers] = useState<Engineer[]>([])
   const [pagination, setPagination] = useState<PaginationData>({
     total: 0,
@@ -98,6 +99,9 @@ export default function VerifiedEngineersList() {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       setPagination(prev => ({ ...prev, page: newPage }))
+      if (sectionRef.current) {
+        sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
     }
   }
 
@@ -132,7 +136,7 @@ export default function VerifiedEngineersList() {
   }
 
   return (
-    <section className="py-24 bg-white dark:bg-slate-900 transition-colors duration-300">
+    <section ref={sectionRef} className="py-24 bg-white dark:bg-slate-900 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}

@@ -510,7 +510,7 @@ export default function AdminEntreprisesPage() {
         </div>
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/50 text-center sm:text-left">
           <div className="text-sm text-slate-500 dark:text-slate-400">
             Affichage de <span className="font-medium text-slate-900 dark:text-white">1</span> à{' '}
             <span className="font-medium text-slate-900 dark:text-white">{filteredEntreprises.length}</span> sur{' '}

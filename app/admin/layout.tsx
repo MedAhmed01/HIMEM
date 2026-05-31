@@ -19,7 +19,9 @@ import {
   Moon,
   Palette,
   Award,
-  UserCircle
+  UserCircle,
+  Menu,
+  X
 } from 'lucide-react'
 
 const navigation = [
@@ -42,6 +44,7 @@ export default function AdminLayout({
 }) {
   const [isDark, setIsDark] = useState(false)
   const [profile, setProfile] = useState<any>(null)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -54,6 +57,11 @@ export default function AdminLayout({
     }
     loadProfile()
   }, [])
+
+  // Auto-close sidebar on route change
+  useEffect(() => {
+    setIsSidebarOpen(false)
+  }, [pathname])
 
   const loadProfile = async () => {
     try {
@@ -91,52 +99,107 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-teal-600 dark:bg-teal-900 z-50 flex items-center justify-between px-6 shadow-md">
-        <div className="flex items-center gap-3">
+      <header className="fixed top-0 left-0 right-0 h-16 bg-teal-600 dark:bg-teal-900 z-50 flex items-center justify-between px-4 sm:px-6 shadow-md">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Hamburger Menu Toggle */}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="lg:hidden p-2 -ml-2 rounded-lg text-white hover:bg-white/10 focus:outline-none transition-colors"
+            aria-label="Toggle Navigation Menu"
+          >
+            {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          
           <img
             src="/Icon1.png"
             alt="OMIGEC Logo"
-            className="w-10 h-10 object-contain"
+            className="w-8 h-8 sm:w-10 sm:h-10 object-contain flex-shrink-0"
           />
-          <div>
-            <h1 className="text-white font-bold text-lg leading-tight">OMIGEC</h1>
-            <p className="text-teal-100 text-[10px] uppercase tracking-wider">Ordre Mauritanien des Ingénieurs en Génie Civil</p>
+          <div className="truncate">
+            <h1 className="text-white font-bold text-base sm:text-lg leading-tight">OMIGEC</h1>
+            <p className="text-teal-100 text-[9px] sm:text-[10px] uppercase tracking-wider hidden sm:block truncate max-w-[280px] md:max-w-md lg:max-w-none">
+              Ordre Mauritanien des Ingénieurs en Génie Civil
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full text-white text-sm">
+        <div className="flex items-center gap-3 sm:gap-6">
+          <div className="hidden md:flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full text-white text-sm">
             <UserCheck className="w-4 h-4" />
-            <span>{profile?.full_name || 'Mode Administrateur'}</span>
+            <span className="max-w-[150px] truncate">{profile?.full_name || 'Administrateur'}</span>
           </div>
 
           <Link
             href="/profil"
-            className="flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
+            className="hidden md:flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
           >
             <Palette className="w-4 h-4" />
-            <span>Modifier mon profil</span>
+            <span>Profil</span>
           </Link>
 
           <Link
             href="/tableau-de-bord"
-            className="flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
+            className="hidden lg:flex items-center gap-2 text-white hover:text-teal-200 transition-colors text-sm font-medium"
           >
             <UserCircle className="w-4 h-4" />
-            <span>Basculer vers Profil Ingénieur</span>
+            <span>Profil Ingénieur</span>
           </Link>
 
           <button
             onClick={toggleTheme}
             className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+            aria-label="Toggle Theme"
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
         </div>
       </header>
 
-      {/* Fixed Sidebar */}
-      <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-colors overflow-y-auto">
+      {/* Backdrop overlay for mobile sidebar */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-30 lg:hidden transition-opacity"
+        />
+      )}
+
+      {/* Sliding Sidebar */}
+      <aside className={`fixed left-0 top-16 bottom-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 overflow-y-auto z-40 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        {/* Mobile Profile Info Section */}
+        <div className="lg:hidden border-b border-slate-100 dark:border-slate-800 p-4">
+          <div className="flex items-center gap-3 px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl mb-3">
+            <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold flex-shrink-0 text-sm">
+              {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'A'}
+            </div>
+            <div className="truncate">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate">
+                {profile?.full_name || 'Mode Administrateur'}
+              </h4>
+              <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold uppercase tracking-wider">
+                Administrateur
+              </span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Link
+              href="/profil"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Palette className="w-4 h-4 text-slate-400" />
+              <span>Modifier mon profil</span>
+            </Link>
+            <Link
+              href="/tableau-de-bord"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <UserCircle className="w-4 h-4 text-slate-400" />
+              <span>Basculer vers Profil Ingénieur</span>
+            </Link>
+          </div>
+        </div>
+
         <nav className="mt-6 px-4 space-y-1">
           {navigation.map((item) => {
             const Icon = item.icon
@@ -165,29 +228,31 @@ export default function AdminLayout({
           <div className="pt-10 pb-4 border-t border-slate-100 dark:border-slate-800 mt-10">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all w-full"
+              className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all w-full text-left"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="text-rose-500">Déconnexion</span>
+              <LogOut className="w-5 h-5 text-rose-500" />
+              <span className="text-rose-500 font-medium">Déconnexion</span>
             </button>
           </div>
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 pt-16 p-8">
+      <main className="lg:ml-64 pt-16 p-4 sm:p-6 lg:p-8 transition-all duration-300">
         {children}
       </main>
 
-      {/* Floating Theme Toggle */}
+      {/* Floating Theme Toggle (Replaced icon to gear/settings for custom utility, or keep Palette) */}
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={toggleTheme}
-          className="w-14 h-14 bg-teal-600 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+          className="w-14 h-14 bg-teal-600 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-teal-200"
+          aria-label="Changer de thème"
         >
-          <Palette className="w-6 h-6" />
+          {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
         </button>
       </div>
     </div>
   )
 }
+
