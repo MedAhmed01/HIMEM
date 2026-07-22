@@ -18,8 +18,11 @@ export interface EngineerCardData {
   created_at: string
 }
 
+export type CardOrientation = 'vertical' | 'horizontal'
+
 interface EngineerIdCardProps {
   engineer: EngineerCardData
+  orientation?: CardOrientation
   className?: string
 }
 
@@ -57,16 +60,29 @@ function getInitials(name: string) {
     .toUpperCase()
 }
 
-function CardShell({ side, children }: { side: 'front' | 'back'; children: React.ReactNode }) {
+function CardShell({
+  side,
+  orientation,
+  children,
+}: {
+  side: 'front' | 'back'
+  orientation: CardOrientation
+  children: React.ReactNode
+}) {
   const shapeId = useId().replaceAll(':', '')
   const bottomGradientId = `id-card-bottom-gradient-${shapeId}`
   const topBarGradientId = `id-card-top-bar-gradient-${shapeId}`
   const topLeftGradientId = `id-card-top-left-gradient-${shapeId}`
   const topRightGradientId = `id-card-top-right-gradient-${shapeId}`
 
+  const orientationClass = orientation === 'horizontal' ? ' engineer-id-card-h' : ''
+
   return (
-    <section className={`engineer-id-card engineer-id-card-${side}`} aria-label={`Carte ${side === 'front' ? 'recto' : 'verso'}`}>
-      <svg className="id-card-top-shape" width="204" height="45" viewBox="0 0 204 45" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <section
+      className={`engineer-id-card engineer-id-card-${side}${orientationClass}`}
+      aria-label={`Carte ${side === 'front' ? 'recto' : 'verso'}`}
+    >
+      <svg className="id-card-top-shape" width="204" height="45" viewBox="0 0 204 45" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
         {side === 'back' && <rect x="19" width="164" height="15" fill={`url(#${topBarGradientId})`} />}
         <path d="M50 2.8072e-05H0V16.2715C3.12031e-06 28.569 8.31959e-06 42.4226 5.28213e-06 44.6812C0.0127281 39.56 23.0075 5.99834 50 2.8072e-05Z" fill={`url(#${topLeftGradientId})`} />
         <path d="M204 45V0L185.921 0L154.349 0C160.024 -9.70645e-06 197.333 20.7 204 45Z" fill={`url(#${topRightGradientId})`} />
@@ -86,7 +102,7 @@ function CardShell({ side, children }: { side: 'front' | 'back'; children: React
         </defs>
       </svg>
       {children}
-      <svg className="id-card-bottom-curve" width="204" height="67" viewBox="0 0 204 67" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg className="id-card-bottom-curve" width="204" height="67" viewBox="0 0 204 67" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
         <path d="M70.9565 29.1304C26.8225 14.7641 0 67 0 67H204V0C154.33 59.4261 128.925 48 70.9565 29.1304Z" fill={`url(#${bottomGradientId})`} />
         <defs>
           <linearGradient id={bottomGradientId} x1="-6" y1="67" x2="204" y2="67" gradientUnits="userSpaceOnUse">
@@ -99,7 +115,7 @@ function CardShell({ side, children }: { side: 'front' | 'back'; children: React
   )
 }
 
-export default function EngineerIdCard({ engineer, className = '' }: EngineerIdCardProps) {
+export default function EngineerIdCard({ engineer, orientation = 'vertical', className = '' }: EngineerIdCardProps) {
   const [qrCode, setQrCode] = useState('')
   const verificationUrl = useMemo(() => {
     if (typeof window === 'undefined') return `/recherche?nni=${encodeURIComponent(engineer.nni)}`
@@ -124,69 +140,127 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
   const domain = engineer.domain?.[0]
   const designation = domain ? DOMAIN_LABELS[domain] || domain.replaceAll('_', ' ') : 'Ingénieur en génie civil'
 
-  return (
-    <article className={`engineer-id-card-pair ${className}`.trim()}>
-      <CardShell side="front">
-        <div className="id-card-brand">
-          {/* eslint-disable-next-line @next/next/no-img-element -- Reuses the official transparent site logo. */}
-          <img className="id-card-logo" src="/Logo.png" alt="OMIGEC" />
-        </div>
+  // Shared design pieces reused by both orientations so the look stays identical.
+  const brand = (
+    <div className="id-card-brand">
+      {/* eslint-disable-next-line @next/next/no-img-element -- Reuses the official transparent site logo. */}
+      <img className="id-card-logo" src="/Logo.png" alt="OMIGEC" />
+    </div>
+  )
 
-        <div className="id-card-portrait-wrap">
-          {engineer.profile_image_url ? (
-            /* eslint-disable-next-line @next/next/no-img-element -- Remote profile photos must remain printable. */
-            <img className="id-card-portrait" src={engineer.profile_image_url} alt={`Portrait de ${engineer.full_name}`} />
-          ) : (
-            <div className="id-card-portrait id-card-portrait-fallback" aria-label={`Initiales de ${engineer.full_name}`}>
-              {getInitials(engineer.full_name)}
+  const portrait = (
+    <div className="id-card-portrait-wrap">
+      {engineer.profile_image_url ? (
+        /* eslint-disable-next-line @next/next/no-img-element -- Remote profile photos must remain printable. */
+        <img className="id-card-portrait" src={engineer.profile_image_url} alt={`Portrait de ${engineer.full_name}`} />
+      ) : (
+        <div className="id-card-portrait id-card-portrait-fallback" aria-label={`Initiales de ${engineer.full_name}`}>
+          {getInitials(engineer.full_name)}
+        </div>
+      )}
+    </div>
+  )
+
+  const identity = (
+    <div className="id-card-identity">
+      <h2>{engineer.full_name}</h2>
+      <p>{designation}</p>
+    </div>
+  )
+
+  const details = (
+    <dl className="id-card-details">
+      <div><dt>N° NNI</dt><dd>{engineer.nni}</dd></div>
+      <div><dt>Diplôme</dt><dd>{engineer.diploma || '—'}</dd></div>
+      <div><dt>Promotion</dt><dd>{engineer.grad_year || '—'}</dd></div>
+      <div><dt>Téléphone</dt><dd>{engineer.phone || '—'}</dd></div>
+      <div><dt>E-mail</dt><dd>{engineer.email || '—'}</dd></div>
+    </dl>
+  )
+
+  const backCopy = (
+    <div className="id-card-back-copy">
+      <p><span />Cette carte est personnelle et atteste de l&apos;inscription de son titulaire auprès de l&apos;OMIGEC.</p>
+      <p><span />Toute personne trouvant cette carte est priée de la remettre à l&apos;Ordre Mauritanien des Ingénieurs en Génie Civil.</p>
+    </div>
+  )
+
+  const qr = (
+    <>
+      <div className="id-card-qr-wrap">
+        {qrCode ? (
+          /* eslint-disable-next-line @next/next/no-img-element -- QR codes are generated as data URLs. */
+          <img src={qrCode} alt={`QR de vérification de ${engineer.full_name}`} />
+        ) : <div className="id-card-qr-placeholder" />}
+      </div>
+      <p className="id-card-qr-label">Scanner pour vérifier</p>
+    </>
+  )
+
+  const validity = (
+    <dl className="id-card-validity">
+      <div><dt>Date d&apos;adhésion</dt><dd>{formatCardDate(engineer.created_at)}</dd></div>
+      <div><dt>Date d&apos;expiration</dt><dd>{formatCardDate(engineer.subscription_expiry)}</dd></div>
+    </dl>
+  )
+
+  const backFooter = (
+    <div className="id-card-back-footer">
+      <strong>OMIGEC</strong>
+      <span>Nouakchott, Mauritanie</span>
+    </div>
+  )
+
+  const pairClass = `engineer-id-card-pair ${orientation === 'horizontal' ? 'engineer-id-card-pair-h' : ''} ${className}`.trim()
+
+  if (orientation === 'horizontal') {
+    return (
+      <article className={pairClass}>
+        <CardShell side="front" orientation="horizontal">
+          <div className="id-card-h-body">
+            <div className="id-card-h-left">
+              {brand}
+              {portrait}
             </div>
-          )}
-        </div>
+            <div className="id-card-h-right">
+              {identity}
+              {details}
+            </div>
+          </div>
+          <div className="id-card-front-footer">CARTE PROFESSIONNELLE</div>
+        </CardShell>
 
-        <div className="id-card-identity">
-          <h2>{engineer.full_name}</h2>
-          <p>{designation}</p>
-        </div>
+        <CardShell side="back" orientation="horizontal">
+          <div className="id-card-h-body id-card-h-body-back">
+            <div className="id-card-h-left">
+              {backCopy}
+              {validity}
+            </div>
+            <div className="id-card-h-right">
+              {qr}
+            </div>
+          </div>
+          {backFooter}
+        </CardShell>
+      </article>
+    )
+  }
 
-        <dl className="id-card-details">
-          <div><dt>N° NNI</dt><dd>{engineer.nni}</dd></div>
-          <div><dt>Diplôme</dt><dd>{engineer.diploma || '—'}</dd></div>
-          <div><dt>Promotion</dt><dd>{engineer.grad_year || '—'}</dd></div>
-          <div><dt>Téléphone</dt><dd>{engineer.phone || '—'}</dd></div>
-          <div><dt>E-mail</dt><dd>{engineer.email || '—'}</dd></div>
-        </dl>
-
+  return (
+    <article className={pairClass}>
+      <CardShell side="front" orientation="vertical">
+        {brand}
+        {portrait}
+        {identity}
+        {details}
         <div className="id-card-front-footer">CARTE PROFESSIONNELLE</div>
       </CardShell>
 
-      <CardShell side="back">
-        <div className="id-card-back-copy">
-          <p><span />Cette carte est personnelle et atteste de l&apos;inscription de son titulaire auprès de l&apos;OMIGEC.</p>
-          <p><span />Toute personne trouvant cette carte est priée de la remettre à l&apos;Ordre Mauritanien des Ingénieurs en Génie Civil.</p>
-        </div>
-
-        <div className="id-card-qr-wrap">
-          {qrCode ? (
-            /* eslint-disable-next-line @next/next/no-img-element -- QR codes are generated as data URLs. */
-            <img src={qrCode} alt={`QR de vérification de ${engineer.full_name}`} />
-          ) : <div className="id-card-qr-placeholder" />}
-        </div>
-        <p className="id-card-qr-label">Scanner pour vérifier</p>
-
-        <dl className="id-card-validity">
-          <div><dt>Date d&apos;adhésion</dt><dd>{formatCardDate(engineer.created_at)}</dd></div>
-          <div><dt>Date d&apos;expiration</dt><dd>{formatCardDate(engineer.subscription_expiry)}</dd></div>
-        </dl>
-
-        <div className="id-card-signature">
-          <span />
-          <strong>Signature autorisée</strong>
-        </div>
-
-        <div className="id-card-back-footer">
-          <strong>OMIGEC</strong>
-          <span>Nouakchott, Mauritanie</span>
-        </div>
+      <CardShell side="back" orientation="vertical">
+        {backCopy}
+        {qr}
+        {validity}
+        {backFooter}
       </CardShell>
     </article>
   )
