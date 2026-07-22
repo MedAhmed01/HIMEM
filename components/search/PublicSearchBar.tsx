@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Search, X, GraduationCap, MapPin, Building2, Calendar, CheckCircle, Briefcase, Award, Hammer, School, Landmark } from 'lucide-react'
+import { Search, X, GraduationCap, MapPin, Building2, Calendar, Award, Hammer, School, Landmark } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -27,15 +26,6 @@ interface SearchResponse {
   engineers: Engineer[]
 }
 
-const DOMAIN_COLORS: Record<string, string> = {
-  'Bâtiment & Constructions': 'from-orange-500 to-amber-500',
-  'Infrastructure de transport': 'from-blue-500 to-cyan-500',
-  'Hydraulique et Environnement': 'from-emerald-500 to-teal-500',
-  'Génie Civil': 'from-purple-500 to-pink-500',
-  'Électricité': 'from-yellow-500 to-orange-500',
-  'Mécanique': 'from-red-500 to-rose-500',
-}
-
 export function PublicSearchBar() {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Engineer[]>([])
@@ -43,6 +33,15 @@ export function PublicSearchBar() {
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const autoSelectNniRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    const nni = new URLSearchParams(window.location.search).get('nni')?.trim()
+    if (nni) {
+      autoSelectNniRef.current = nni
+      setQuery(nni)
+    }
+  }, [])
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -70,7 +69,17 @@ export function PublicSearchBar() {
         if (response.ok) {
           const data: SearchResponse = await response.json()
           setSuggestions(data.engineers || [])
-          setShowSuggestions(true)
+          const exactEngineer = autoSelectNniRef.current
+            ? data.engineers?.find((engineer) => engineer.nni === autoSelectNniRef.current)
+            : undefined
+          if (exactEngineer) {
+            setSelectedEngineer(exactEngineer)
+            setQuery(exactEngineer.full_name)
+            setShowSuggestions(false)
+            autoSelectNniRef.current = null
+          } else {
+            setShowSuggestions(true)
+          }
         }
       } catch (err) {
         console.error('Search error:', err)
@@ -96,10 +105,6 @@ export function PublicSearchBar() {
 
   const calculateExperience = (gradYear: number) => {
     return new Date().getFullYear() - gradYear
-  }
-
-  const getDomainColor = (domain: string) => {
-    return DOMAIN_COLORS[domain] || 'from-slate-500 to-slate-600'
   }
 
   return (
@@ -208,7 +213,7 @@ export function PublicSearchBar() {
       {/* Selected engineer details Modal */}
       <Dialog open={!!selectedEngineer} onOpenChange={(open) => !open && setSelectedEngineer(null)}>
         <DialogContent showCloseButton={false} className="max-w-6xl p-0 overflow-hidden border-0 bg-transparent shadow-none sm:rounded-3xl">
-          <DialogTitle className="sr-only">Détails de l'ingénieur</DialogTitle>
+          <DialogTitle className="sr-only">Détails de l&apos;ingénieur</DialogTitle>
 
           <div className="relative max-h-[85vh] overflow-y-auto">
             {/* Main Card with Glassmorphism */}
@@ -230,6 +235,7 @@ export function PublicSearchBar() {
                 <div className="relative">
                   <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl ring-4 ring-teal-500/20 ring-offset-2 ring-offset-white dark:ring-offset-slate-900">
                     {selectedEngineer?.profile_image_url ? (
+                      /* eslint-disable-next-line @next/next/no-img-element -- Profile images use remote user-provided URLs. */
                       <img
                         alt={`Portrait de ${selectedEngineer.full_name}`}
                         className="w-full h-full object-cover"
@@ -261,7 +267,7 @@ export function PublicSearchBar() {
                       Ingénieur Agréé
                     </span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                      • {selectedEngineer && calculateExperience(selectedEngineer.grad_year)} ans d'expérience
+                      • {selectedEngineer && calculateExperience(selectedEngineer.grad_year)} ans d&apos;expérience
                     </span>
                   </div>
                 </div>
@@ -336,7 +342,7 @@ export function PublicSearchBar() {
                     <div className="pt-4">
                       <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <span className="w-8 h-0.5 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"></span>
-                        Domaines d'expertise
+                        Domaines d&apos;expertise
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {selectedEngineer.domains.map((domain, i) => (

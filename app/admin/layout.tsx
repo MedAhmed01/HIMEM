@@ -238,8 +238,10 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="lg:ml-64 pt-16 p-4 sm:p-6 lg:p-8 transition-all duration-300">
-        {children}
+      <main className="lg:ml-64 pt-16 transition-all duration-300">
+        <div className="p-4 pt-6 sm:p-6 sm:pt-8 lg:p-8 lg:pt-8">
+          {children}
+        </div>
       </main>
 
       {/* Floating Theme Toggle (Replaced icon to gear/settings for custom utility, or keep Palette) */}

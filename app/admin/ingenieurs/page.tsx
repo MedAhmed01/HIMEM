@@ -2,10 +2,10 @@
 
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Users,
-  Check,
   X,
   Search,
   Filter,
@@ -21,10 +21,13 @@ import {
   GraduationCap,
   FileText,
   Eye,
-  CreditCard
+  CreditCard,
+  Printer,
+  Loader2
 } from 'lucide-react'
 import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
 import EditEngineerModal from '@/components/admin/EditEngineerModal'
+import EngineerIdCard from '@/components/admin/EngineerIdCard'
 
 interface Engineer {
   id: string
@@ -53,6 +56,10 @@ export default function IngenieursPage() {
   const [engineers, setEngineers] = useState<Engineer[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedEngineerIds, setSelectedEngineerIds] = useState<Set<string>>(new Set())
+  const [cardEngineers, setCardEngineers] = useState<Engineer[]>([])
+  const [isCardPreviewOpen, setIsCardPreviewOpen] = useState(false)
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [changePasswordModal, setChangePasswordModal] = useState<{
     isOpen: boolean
@@ -94,6 +101,8 @@ export default function IngenieursPage() {
       const data = await res.json()
       if (data.engineers) {
         setEngineers(data.engineers)
+        const availableIds = new Set<string>(data.engineers.map((engineer: Engineer) => engineer.id))
+        setSelectedEngineerIds((current) => new Set([...current].filter((id) => availableIds.has(id))))
       }
     } catch (error) {
       console.error('Error loading engineers:', error)
@@ -241,10 +250,156 @@ export default function IngenieursPage() {
     return colors[index]
   }
 
+  const toggleEngineerSelection = (engineerId: string) => {
+    setSelectedEngineerIds((current) => {
+      const next = new Set(current)
+      if (next.has(engineerId)) {
+        next.delete(engineerId)
+      } else {
+        next.add(engineerId)
+      }
+      return next
+    })
+  }
+
+  const openCardPreview = (items: Engineer[]) => {
+    if (items.length === 0) {
+      setMessage({ type: 'error', text: 'Sélectionnez au moins un ingénieur.' })
+      return
+    }
+    setCardEngineers(items)
+    setIsCardPreviewOpen(true)
+  }
+
+  const handleDownloadPdf = async () => {
+    const preview = document.querySelector<HTMLElement>('.id-card-print-root')
+    if (!preview) return
+    const cards = Array.from(preview.querySelectorAll<HTMLElement>('.engineer-id-card'))
+    if (cards.length === 0) return
+
+    setIsGeneratingPdf(true)
+    try {
+      // Wait for portraits and QR codes to be fully loaded before printing.
+      const images = Array.from(preview.querySelectorAll<HTMLImageElement>('img'))
+      await Promise.all(images.map((image) => image.complete
+        ? Promise.resolve()
+        : new Promise<void>((resolve) => {
+            image.addEventListener('load', () => resolve(), { once: true })
+            image.addEventListener('error', () => resolve(), { once: true })
+          })))
+      await document.fonts?.ready
+
+      // Collect the page's stylesheets so the cards keep their styling in the
+      // isolated print document. The browser renders vector text natively — no
+      // html2canvas, no oklch parsing issues, no main-thread freeze.
+      const styleHtml = Array.from(
+        document.querySelectorAll('style, link[rel="stylesheet"]')
+      )
+        .map((node) => node.outerHTML)
+        .join('\n')
+
+      const iframe = document.createElement('iframe')
+      iframe.setAttribute('aria-hidden', 'true')
+      iframe.style.position = 'fixed'
+      iframe.style.right = '0'
+      iframe.style.bottom = '0'
+      iframe.style.width = '0'
+      iframe.style.height = '0'
+      iframe.style.border = '0'
+      iframe.style.visibility = 'hidden'
+      document.body.appendChild(iframe)
+
+      const frameDoc = iframe.contentWindow?.document
+      if (!frameDoc) throw new Error('Impossible de créer le document d\'impression.')
+
+      // One page per individual card (front, then back), each page sized to the
+      // card itself so it can be printed and cut directly.
+      const pagesHtml = cards
+        .map((card) => `<div class="print-page">${card.outerHTML}</div>`)
+        .join('')
+
+      frameDoc.open()
+      frameDoc.write(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>cartes-omigec</title>
+${styleHtml}
+<style>
+  /* 204px x 322px card at 96dpi ≈ 54mm x 85.2mm (standard ID/credit-card). */
+  @page { size: 54mm 85.6mm; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  .print-page {
+    width: 54mm;
+    height: 85.6mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+  }
+  .print-page:last-child { page-break-after: auto; break-after: auto; }
+  .engineer-id-card {
+    box-shadow: none !important;
+    border: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+</style>
+</head>
+<body>${pagesHtml}</body>
+</html>`)
+      frameDoc.close()
+
+      const frameWindow = iframe.contentWindow
+      if (!frameWindow) throw new Error('Impossible de créer le document d\'impression.')
+
+      // Wait for the iframe document (and its images/fonts) to be ready.
+      await new Promise<void>((resolve) => {
+        if (frameDoc.readyState === 'complete') {
+          resolve()
+        } else {
+          iframe.addEventListener('load', () => resolve(), { once: true })
+        }
+      })
+      const frameImages = Array.from(frameDoc.querySelectorAll('img'))
+      await Promise.all(frameImages.map((image) => image.complete
+        ? Promise.resolve()
+        : new Promise<void>((resolve) => {
+            image.addEventListener('load', () => resolve(), { once: true })
+            image.addEventListener('error', () => resolve(), { once: true })
+          })))
+      await frameDoc.fonts?.ready
+
+      frameWindow.focus()
+      frameWindow.print()
+
+      // Clean up the iframe after the print dialog has been handled.
+      const cleanup = () => {
+        setTimeout(() => {
+          iframe.remove()
+        }, 500)
+      }
+      frameWindow.addEventListener('afterprint', cleanup, { once: true })
+      setTimeout(cleanup, 60000)
+
+      setMessage({
+        type: 'success',
+        text: 'Fenêtre d\'impression ouverte — choisissez « Enregistrer au format PDF ».',
+      })
+    } catch (error) {
+      console.error('PDF generation error:', error)
+      setMessage({ type: 'error', text: 'Impossible de générer le PDF.' })
+    } finally {
+      setIsGeneratingPdf(false)
+    }
+  }
+
   const filteredEngineers = engineers.filter(eng =>
-    eng.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    eng.nni.includes(searchQuery) ||
-    eng.email.toLowerCase().includes(searchQuery.toLowerCase())
+    eng.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    eng.nni?.includes(searchQuery) ||
+    eng.email?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   if (loading) {
@@ -261,26 +416,38 @@ export default function IngenieursPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Ingénieurs</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Gérer tous les ingénieurs inscrits</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Gérer les ingénieurs et générer leurs cartes professionnelles</p>
         </div>
 
-        {/* Search */}
-        <div className="relative w-full md:w-1/2 lg:w-1/3 group">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="text-slate-400 group-focus-within:text-teal-600 transition-colors w-5 h-5" />
-          </div>
-          <input
-            type="text"
-            placeholder="Rechercher par nom, NNI ou email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="glass-input w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent text-sm placeholder-slate-400 shadow-sm transition-all bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm"
-          />
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-teal-600 transition-colors text-slate-400">
-            <Filter className="w-5 h-5" />
+        <div className="flex w-full xl:w-auto flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={() => openCardPreview(engineers)}
+            disabled={engineers.length === 0}
+            className="inline-flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Générer toutes les cartes
+          </button>
+
+          {/* Search */}
+          <div className="relative w-full sm:w-96 group">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="text-slate-400 group-focus-within:text-teal-600 transition-colors w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher par nom, NNI ou email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="glass-input w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent text-sm placeholder-slate-400 shadow-sm transition-all bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm"
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400">
+              <Filter className="w-5 h-5" />
+            </div>
           </div>
         </div>
       </header>
@@ -300,10 +467,49 @@ export default function IngenieursPage() {
       )}
 
       {/* Stats */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
           {filteredEngineers.length} ingénieur{filteredEngineers.length !== 1 ? 's' : ''}
         </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const visibleIds = filteredEngineers.map((engineer) => engineer.id)
+              const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedEngineerIds.has(id))
+              setSelectedEngineerIds((current) => {
+                const next = new Set(current)
+                visibleIds.forEach((id) => allVisibleSelected ? next.delete(id) : next.add(id))
+                return next
+              })
+            }}
+            disabled={filteredEngineers.length === 0}
+            className="px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-teal-500 disabled:opacity-50 transition-colors"
+          >
+            {filteredEngineers.length > 0 && filteredEngineers.every((engineer) => selectedEngineerIds.has(engineer.id))
+              ? 'Désélectionner les résultats'
+              : 'Sélectionner les résultats'}
+          </button>
+          {selectedEngineerIds.size > 0 && (
+            <>
+              <button
+                type="button"
+                onClick={() => openCardPreview(engineers.filter((engineer) => selectedEngineerIds.has(engineer.id)))}
+                className="inline-flex items-center px-3 py-2 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                Générer la sélection ({selectedEngineerIds.size})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedEngineerIds(new Set())}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-red-600 transition-colors"
+              >
+                Effacer
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Grid */}
@@ -315,9 +521,18 @@ export default function IngenieursPage() {
           </div>
         ) : (
           filteredEngineers.map((engineer) => (
-            <div key={engineer.id} className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700">
+            <div key={engineer.id} className={`relative bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border transition-colors ${selectedEngineerIds.has(engineer.id) ? 'border-teal-500 ring-2 ring-teal-500/15' : 'border-slate-100 dark:border-slate-700'}`}>
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-shrink-0">
+                  <label className="mb-3 flex items-center gap-2 text-xs font-semibold text-slate-500 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedEngineerIds.has(engineer.id)}
+                      onChange={() => toggleEngineerSelection(engineer.id)}
+                      className="h-4 w-4 rounded border-slate-300 accent-teal-600"
+                    />
+                    Sélectionner
+                  </label>
                   <Avatar className="h-16 w-16 border-2 border-white shadow-md">
                     <AvatarImage src={engineer.profile_image_url} alt={engineer.full_name} className="object-cover" />
                     <AvatarFallback className={`${getAvatarColor(engineer.full_name)} text-white text-xl font-semibold`}>
@@ -363,6 +578,14 @@ export default function IngenieursPage() {
                       {isSubscriptionActive(engineer.subscription_expiry) ? <CheckCircle className="w-4 h-4 mr-1.5" /> : <X className="w-4 h-4 mr-1.5" />}
                       {isSubscriptionActive(engineer.subscription_expiry) ? 'À jour' : 'Expiré'}
                     </span>
+
+                    <button
+                      onClick={() => openCardPreview([engineer])}
+                      className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Générer la carte
+                    </button>
 
                     <button
                       onClick={() => handleChangePassword(engineer.id, engineer.full_name)}
@@ -439,10 +662,49 @@ export default function IngenieursPage() {
         onError={(err) => setMessage({ type: 'error', text: err })}
       />
 
+      {isCardPreviewOpen && typeof document !== 'undefined' && createPortal(
+        <div className="admin-id-card-modal fixed inset-0 z-[70] overflow-y-auto bg-slate-950/70 backdrop-blur-sm p-4 sm:p-8">
+          <div className="admin-id-card-modal-panel mx-auto max-w-7xl overflow-hidden rounded-2xl bg-slate-100 shadow-2xl dark:bg-slate-900">
+            <div className="sticky top-0 z-10 flex flex-col gap-4 border-b border-slate-200 bg-white/95 p-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:bg-slate-800/95">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Aperçu des cartes professionnelles</h3>
+                <p className="text-sm text-slate-500">{cardEngineers.length} carte{cardEngineers.length !== 1 ? 's' : ''} · recto et verso</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-wait transition-colors"
+                >
+                  {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
+                  {isGeneratingPdf ? 'Préparation...' : 'Imprimer / PDF'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCardPreviewOpen(false)}
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 transition-colors"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Fermer
+                </button>
+              </div>
+            </div>
+
+            <div className="id-card-print-root id-card-preview-grid p-5 sm:p-8">
+              {cardEngineers.map((engineer) => (
+                <EngineerIdCard key={engineer.id} engineer={engineer} />
+              ))}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {deleteDialog.isOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full shadow-xl border border-slate-200">
-            <h3 className="text-lg font-semibold mb-2">Supprimer l'ingénieur</h3>
+            <h3 className="text-lg font-semibold mb-2">Supprimer l&apos;ingénieur</h3>
             <p className="text-slate-600 mb-6">
               Voulez-vous supprimer <span className="font-bold">{deleteDialog.engineerName}</span> ?
             </p>
@@ -490,7 +752,7 @@ export default function IngenieursPage() {
               >
                 <div className="flex items-center gap-3">
                   <CreditCard className="w-5 h-5 text-teal-600" />
-                  <span className="font-semibold text-slate-700">Pièce d'Identité</span>
+                  <span className="font-semibold text-slate-700">Pièce d&apos;Identité</span>
                 </div>
                 {docsModal.engineer.cni_file_path ? <Eye className="w-5 h-5 text-slate-400" /> : <X className="w-5 h-5 text-red-400" />}
               </button>
