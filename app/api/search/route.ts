@@ -22,11 +22,15 @@ export async function GET(request: NextRequest) {
     const searchTerm = query.trim()
     const supabase = createAdminClient()
 
-    // Search by NNI, name, or phone (case insensitive)
+    // Search by matricule, NNI, name, or phone (case insensitive)
+    const matriculeTerm = /^\d{1,4}$/.test(searchTerm)
+      ? searchTerm.padStart(4, '0')
+      : searchTerm
+
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('nni, full_name, diploma, grad_year, university, country, domain, exercise_mode, status, subscription_expiry, profile_image_url, phone')
-      .or(`nni.eq.${searchTerm},full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`)
+      .select('nni, matricule, full_name, diploma, grad_year, university, country, domain, exercise_mode, status, subscription_expiry, profile_image_url, phone')
+      .or(`matricule.eq.${matriculeTerm},nni.eq.${searchTerm},full_name.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`)
 
     if (error) {
       console.error('Search error:', error)
@@ -70,6 +74,7 @@ export async function GET(request: NextRequest) {
 
     const engineers = activeEngineers.map(eng => ({
       nni: eng.nni,
+      matricule: eng.matricule,
       full_name: eng.full_name,
       diploma: eng.diploma,
       grad_year: eng.grad_year,

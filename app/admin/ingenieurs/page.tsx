@@ -34,6 +34,7 @@ import EngineerDirectoryDocument from '@/components/admin/EngineerDirectoryDocum
 interface Engineer {
   id: string
   nni: string
+  matricule?: string | null
   full_name: string
   email: string
   phone: string

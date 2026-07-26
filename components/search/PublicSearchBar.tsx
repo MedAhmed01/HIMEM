@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 interface Engineer {
   nni: string
+  matricule?: string | null
   full_name: string
   diploma: string
   grad_year: number
@@ -33,13 +34,15 @@ export function PublicSearchBar() {
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const autoSelectNniRef = useRef<string | null>(null)
+  // Terme exact venant de l'URL (QR code de la carte : ?nni=… ou ?matricule=…)
+  const autoSelectTermRef = useRef<string | null>(null)
 
   useEffect(() => {
-    const nni = new URLSearchParams(window.location.search).get('nni')?.trim()
-    if (nni) {
-      autoSelectNniRef.current = nni
-      setQuery(nni)
+    const params = new URLSearchParams(window.location.search)
+    const term = params.get('nni')?.trim() || params.get('matricule')?.trim()
+    if (term) {
+      autoSelectTermRef.current = term
+      setQuery(term)
     }
   }, [])
 
@@ -69,14 +72,17 @@ export function PublicSearchBar() {
         if (response.ok) {
           const data: SearchResponse = await response.json()
           setSuggestions(data.engineers || [])
-          const exactEngineer = autoSelectNniRef.current
-            ? data.engineers?.find((engineer) => engineer.nni === autoSelectNniRef.current)
+          const autoSelectTerm = autoSelectTermRef.current
+          const exactEngineer = autoSelectTerm
+            ? data.engineers?.find((engineer) =>
+                engineer.nni === autoSelectTerm ||
+                engineer.matricule === autoSelectTerm.padStart(4, '0'))
             : undefined
           if (exactEngineer) {
             setSelectedEngineer(exactEngineer)
             setQuery(exactEngineer.full_name)
             setShowSuggestions(false)
-            autoSelectNniRef.current = null
+            autoSelectTermRef.current = null
           } else {
             setShowSuggestions(true)
           }
@@ -114,7 +120,7 @@ export function PublicSearchBar() {
           <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
           <Input
             type="text"
-            placeholder="Rechercher par NNI, nom ou téléphone..."
+            placeholder="Rechercher par matricule, NNI, nom ou téléphone..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value)
@@ -173,6 +179,11 @@ export function PublicSearchBar() {
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3 text-xs text-slate-600 flex-wrap">
+                      {engineer.matricule && (
+                        <span className="font-mono font-semibold text-slate-500 flex-shrink-0">
+                          Mle {engineer.matricule}
+                        </span>
+                      )}
                       {engineer.diploma && (
                         <span className="truncate">{engineer.diploma}</span>
                       )}
@@ -204,7 +215,7 @@ export function PublicSearchBar() {
                 <Search className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
               </div>
               <p className="text-slate-600 font-medium text-xs sm:text-sm">Aucun ingénieur agréé trouvé</p>
-              <p className="text-xs text-slate-500 mt-1">Vérifiez le NNI, nom ou téléphone saisi</p>
+              <p className="text-xs text-slate-500 mt-1">Vérifiez le matricule, NNI, nom ou téléphone saisi</p>
             </div>
           </div>
         )}
@@ -266,6 +277,11 @@ export function PublicSearchBar() {
                       <Award className="w-3.5 h-3.5" />
                       Ingénieur Agréé
                     </span>
+                    {selectedEngineer?.matricule && (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold font-mono">
+                        Matricule {selectedEngineer.matricule}
+                      </span>
+                    )}
                     <span className="text-xs text-slate-500 dark:text-slate-400">
                       • {selectedEngineer && calculateExperience(selectedEngineer.grad_year)} ans d&apos;expérience
                     </span>

@@ -2132,15 +2132,18 @@ button, .button {
   flex: 1;
   margin: 0 42px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  /* Les fiches ne contiennent plus que 4 informations : on les laisse prendre
+     leur hauteur naturelle au lieu d'étirer 3 rangées sur toute la page. */
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: 14px;
 }
 
 .directory-engineer-entry {
   display: flex;
   min-width: 0;
   overflow: hidden;
-  padding: 16px;
+  padding: 13px 14px;
   flex-direction: column;
   border: 1px solid #dbe5e4;
   border-radius: 14px;
@@ -2156,8 +2159,8 @@ button, .button {
 }
 
 .directory-photo-frame {
-  width: 72px;
-  height: 72px;
+  width: 60px;
+  height: 60px;
   flex: 0 0 auto;
   padding: 3px;
   border: 2px solid #14b8a6;
@@ -2229,8 +2232,8 @@ button, .button {
 
 .directory-entry-details {
   display: grid;
-  margin: 14px 0 0;
-  gap: 6px;
+  margin: 10px 0 0;
+  gap: 5px;
 }
 
 .directory-entry-details div {

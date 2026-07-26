@@ -2,10 +2,12 @@
 
 import { useEffect, useId, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
+import { formatMatricule } from '@/lib/matricule'
 
 export interface EngineerCardData {
   id: string
   nni: string
+  matricule?: string | null
   full_name: string
   email: string
   phone: string
@@ -24,30 +26,6 @@ interface EngineerIdCardProps {
   engineer: EngineerCardData
   orientation?: CardOrientation
   className?: string
-}
-
-const DOMAIN_LABELS: Record<string, string> = {
-  batiment_constructions: 'Bâtiment & constructions',
-  genie_civil: 'Génie civil',
-  electricite: 'Électricité',
-  mecanique: 'Mécanique',
-  informatique: 'Informatique',
-  telecommunications: 'Télécommunications',
-  energie: 'Énergie',
-  environnement: 'Environnement',
-  mines: 'Mines',
-  petrole_gaz: 'Pétrole & gaz',
-}
-
-function formatCardDate(value: string | null) {
-  if (!value) return '—'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '—'
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date)
 }
 
 function getInitials(name: string) {
@@ -137,8 +115,7 @@ export default function EngineerIdCard({ engineer, orientation = 'vertical', cla
     }
   }, [verificationUrl])
 
-  const domain = engineer.domain?.[0]
-  const designation = domain ? DOMAIN_LABELS[domain] || domain.replaceAll('_', ' ') : 'Ingénieur en génie civil'
+  const matricule = formatMatricule(engineer.matricule)
 
   // Shared design pieces reused by both orientations so the look stays identical.
   const brand = (
@@ -164,17 +141,15 @@ export default function EngineerIdCard({ engineer, orientation = 'vertical', cla
   const identity = (
     <div className="id-card-identity">
       <h2>{engineer.full_name}</h2>
-      <p>{designation}</p>
     </div>
   )
 
   const details = (
     <dl className="id-card-details">
-      <div><dt>N° NNI</dt><dd>{engineer.nni}</dd></div>
-      <div><dt>Diplôme</dt><dd>{engineer.diploma || '—'}</dd></div>
+      <div><dt>Matricule</dt><dd>{matricule}</dd></div>
+      <div><dt>N° NNI</dt><dd>{engineer.nni || '—'}</dd></div>
       <div><dt>Promotion</dt><dd>{engineer.grad_year || '—'}</dd></div>
       <div><dt>Téléphone</dt><dd>{engineer.phone || '—'}</dd></div>
-      <div><dt>E-mail</dt><dd>{engineer.email || '—'}</dd></div>
     </dl>
   )
 
@@ -195,13 +170,6 @@ export default function EngineerIdCard({ engineer, orientation = 'vertical', cla
       </div>
       <p className="id-card-qr-label">Scanner pour vérifier</p>
     </>
-  )
-
-  const validity = (
-    <dl className="id-card-validity">
-      <div><dt>Date d&apos;adhésion</dt><dd>{formatCardDate(engineer.created_at)}</dd></div>
-      <div><dt>Date d&apos;expiration</dt><dd>{formatCardDate(engineer.subscription_expiry)}</dd></div>
-    </dl>
   )
 
   const backFooter = (
@@ -234,7 +202,6 @@ export default function EngineerIdCard({ engineer, orientation = 'vertical', cla
           <div className="id-card-h-body id-card-h-body-back">
             <div className="id-card-h-left">
               {backCopy}
-              {validity}
             </div>
             <div className="id-card-h-right">
               {qr}
@@ -259,7 +226,6 @@ export default function EngineerIdCard({ engineer, orientation = 'vertical', cla
       <CardShell side="back" orientation="vertical">
         {backCopy}
         {qr}
-        {validity}
         {backFooter}
       </CardShell>
     </article>

@@ -1,6 +1,9 @@
+import { formatMatricule } from '@/lib/matricule'
+
 interface DirectoryEngineer {
   id: string
   nni: string
+  matricule?: string | null
   full_name: string
   email: string
   phone: string
@@ -17,20 +20,8 @@ interface EngineerDirectoryDocumentProps {
   engineers: DirectoryEngineer[]
 }
 
-const ENGINEERS_PER_PAGE = 6
-
-const DOMAIN_LABELS: Record<string, string> = {
-  batiment_constructions: 'Bâtiment & constructions',
-  genie_civil: 'Génie civil',
-  electricite: 'Électricité',
-  mecanique: 'Mécanique',
-  informatique: 'Informatique',
-  telecommunications: 'Télécommunications',
-  energie: 'Énergie',
-  environnement: 'Environnement',
-  mines: 'Mines',
-  petrole_gaz: 'Pétrole & gaz',
-}
+// 2 colonnes × 5 rangées : les fiches raccourcies tiennent en ~750px de haut.
+const ENGINEERS_PER_PAGE = 10
 
 function getInitials(name: string) {
   return name
@@ -40,11 +31,6 @@ function getInitials(name: string) {
     .join('')
     .slice(0, 2)
     .toUpperCase()
-}
-
-function getDomainLabel(domains?: string[]) {
-  if (!domains?.length) return 'Génie civil'
-  return domains.map((domain) => DOMAIN_LABELS[domain] || domain.replaceAll('_', ' ')).join(', ')
 }
 
 function chunkEngineers(engineers: DirectoryEngineer[]) {
@@ -68,24 +54,16 @@ function EngineerEntry({ engineer }: { engineer: DirectoryEngineer }) {
           )}
         </div>
         <div className="directory-entry-identity">
-          <span className="directory-entry-number">OMIGEC · {engineer.nni || '—'}</span>
+          <span className="directory-entry-number">Matricule {formatMatricule(engineer.matricule)}</span>
           <h3>{engineer.full_name}</h3>
-          <p><span /> Ingénieur inscrit</p>
         </div>
       </div>
 
       <dl className="directory-entry-details">
-        <div><dt>Diplôme</dt><dd>{engineer.diploma || 'Non renseigné'}</dd></div>
-        <div><dt>Université</dt><dd>{engineer.university || 'Non renseignée'}</dd></div>
+        <div><dt>NNI</dt><dd>{engineer.nni || '—'}</dd></div>
         <div><dt>Promotion</dt><dd>{engineer.grad_year || '—'}</dd></div>
-        <div><dt>Domaine</dt><dd>{getDomainLabel(engineer.domain)}</dd></div>
-        <div><dt>Pays</dt><dd>{engineer.country || 'Mauritanie'}</dd></div>
+        <div><dt>Téléphone</dt><dd>{engineer.phone || '—'}</dd></div>
       </dl>
-
-      <div className="directory-entry-contact">
-        <span>{engineer.phone || 'Téléphone non renseigné'}</span>
-        <span>{engineer.email || 'E-mail non renseigné'}</span>
-      </div>
     </article>
   )
 }
