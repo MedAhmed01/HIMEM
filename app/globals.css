@@ -2136,7 +2136,15 @@ button, .button {
      leur hauteur naturelle au lieu d'étirer 3 rangées sur toute la page. */
   grid-auto-rows: max-content;
   align-content: start;
-  gap: 14px;
+  column-gap: 14px;
+  row-gap: 22px;
+  padding-bottom: 10px;
+}
+
+/* Page pleine : les rangées sont réparties sur toute la hauteur disponible,
+   ce qui supprime l'espace blanc en bas de page. */
+.directory-engineer-grid-full {
+  align-content: space-between;
 }
 
 .directory-engineer-entry {

@@ -131,7 +131,12 @@ export default function EngineerDirectoryDocument({ engineers }: EngineerDirecto
             <p>{engineers.length} profils</p>
           </div>
 
-          <div className="directory-engineer-grid">
+          {/* Une page complète répartit ses rangées sur toute la hauteur pour
+              éviter le grand vide en bas ; la dernière page (incomplète) garde
+              un espacement normal. */}
+          <div className={`directory-engineer-grid${
+            pageEngineers.length === ENGINEERS_PER_PAGE ? ' directory-engineer-grid-full' : ''
+          }`}>
             {pageEngineers.map((engineer) => (
               <EngineerEntry key={engineer.id} engineer={engineer} />
             ))}

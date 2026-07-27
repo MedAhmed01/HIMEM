@@ -62,7 +62,8 @@ export default function IngenieursPage() {
   const [selectedEngineerIds, setSelectedEngineerIds] = useState<Set<string>>(new Set())
   const [cardEngineers, setCardEngineers] = useState<Engineer[]>([])
   const [isCardPreviewOpen, setIsCardPreviewOpen] = useState(false)
-  const [cardOrientation, setCardOrientation] = useState<'vertical' | 'horizontal'>('vertical')
+  // L'orientation horizontale est le format par défaut des cartes OMIGEC.
+  const [cardOrientation, setCardOrientation] = useState<'vertical' | 'horizontal'>('horizontal')
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const [isDirectoryPreviewOpen, setIsDirectoryPreviewOpen] = useState(false)
   const [isGeneratingDirectoryPdf, setIsGeneratingDirectoryPdf] = useState(false)
@@ -554,9 +555,17 @@ ${styleHtml}
   // Engineers eligible for cards / annuaire once the subscription restriction is applied.
   const eligibleEngineers = getEligibleEngineers(engineers)
   const excludedCount = engineers.length - eligibleEngineers.length
-  const directoryEngineers = [...eligibleEngineers].sort((a, b) =>
-    a.full_name.localeCompare(b.full_name, 'fr')
-  )
+  // L'annuaire suit l'ordre des matricules (0001, 0002, ...). Les ingénieurs
+  // sans matricule sont placés à la fin, triés par nom.
+  const matriculeRank = (matricule?: string | null) => {
+    const digits = (matricule || '').replace(/\D/g, '')
+    return digits ? Number(digits) : Number.POSITIVE_INFINITY
+  }
+  const directoryEngineers = [...eligibleEngineers].sort((a, b) => {
+    const rankDiff = matriculeRank(a.matricule) - matriculeRank(b.matricule)
+    if (rankDiff !== 0 && Number.isFinite(rankDiff)) return rankDiff
+    return a.full_name.localeCompare(b.full_name, 'fr')
+  })
 
   if (loading) {
     return (
@@ -863,17 +872,17 @@ ${styleHtml}
                 <div className="inline-flex rounded-lg border border-slate-300 p-0.5 dark:border-slate-600">
                   <button
                     type="button"
-                    onClick={() => setCardOrientation('vertical')}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${cardOrientation === 'vertical' ? 'bg-teal-600 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'}`}
-                  >
-                    Verticale
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => setCardOrientation('horizontal')}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${cardOrientation === 'horizontal' ? 'bg-teal-600 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'}`}
                   >
                     Horizontale
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCardOrientation('vertical')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${cardOrientation === 'vertical' ? 'bg-teal-600 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'}`}
+                  >
+                    Verticale
                   </button>
                 </div>
                 <button
