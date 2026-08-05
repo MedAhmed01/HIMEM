@@ -210,13 +210,22 @@ export default function InscriptionPage() {
 
   const handleRegistration = async () => {
     setError(null)
+
+    // The wizard uses buttons instead of a native HTML form, so enforce this
+    // required field again at the final submission boundary.
+    if (!data.nni.trim()) {
+      setCurrentStep(1)
+      setError('Le NNI est obligatoire pour finaliser l\'inscription.')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       console.log('Starting registration submission... (DEBUG VER: 3)')
       const formData = new FormData()
       formData.append('fullName', data.fullName)
-      formData.append('nni', data.nni)
+      formData.append('nni', data.nni.trim())
       formData.append('phone', data.phone)
       formData.append('email', data.email)
       formData.append('password', data.password)

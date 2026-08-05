@@ -12,11 +12,11 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
 
     // Extract form fields
-    const fullName = formData.get('fullName') as string
-    const nni = formData.get('nni') as string
-    const phone = formData.get('phone') as string
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    const fullName = (formData.get('fullName') as string | null)?.trim()
+    const nni = (formData.get('nni') as string | null)?.trim()
+    const phone = (formData.get('phone') as string | null)?.trim()
+    const email = (formData.get('email') as string | null)?.trim()
+    const password = formData.get('password') as string | null
     const diplomaTitle = formData.get('diplomaTitle') as string
     const university = formData.get('university') as string
     const country = formData.get('country') as string
