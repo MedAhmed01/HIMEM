@@ -237,15 +237,6 @@ export default function VerifiedEngineersList() {
                             <span className="material-icons-outlined text-xs">verified</span>
                             Agréé
                           </Badge>
-                          {engineer.is_subscription_active ? (
-                            <Badge className="bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400 font-bold text-[10px] px-2 py-0.5 border-none shadow-none">
-                              Cotisation Active
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400 font-bold text-[10px] px-2 py-0.5 border-none shadow-none">
-                              Cotisation Expirée
-                            </Badge>
-                          )}
                         </div>
                       </div>
 
