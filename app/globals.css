@@ -1651,7 +1651,6 @@ button, .button {
   font-size: 15px;
   font-weight: 700;
   line-height: 18px;
-  text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
 }

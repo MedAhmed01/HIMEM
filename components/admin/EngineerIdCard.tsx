@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { formatMatricule } from '@/lib/matricule'
 
@@ -82,6 +82,7 @@ function BrandLogo({ tone }: { tone: 'light' | 'teal' }) {
 
 export default function EngineerIdCard({ engineer, className = '' }: EngineerIdCardProps) {
   const [qrCode, setQrCode] = useState('')
+  const engineerNameRef = useRef<HTMLHeadingElement>(null)
   const verificationUrl = useMemo(() => {
     if (typeof window === 'undefined') return `/recherche?nni=${encodeURIComponent(engineer.nni)}`
     return `${window.location.origin}/recherche?nni=${encodeURIComponent(engineer.nni)}`
@@ -102,6 +103,31 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
       active = false
     }
   }, [verificationUrl])
+
+  useLayoutEffect(() => {
+    const nameElement = engineerNameRef.current
+    if (!nameElement) return
+
+    const maximumFontSize = 15
+    const minimumFontSize = 5
+    const availableWidth = nameElement.clientWidth
+
+    // Measure from the approved design size, then reduce only as much as the
+    // current name needs. The inline result is retained by the print clone.
+    nameElement.style.fontSize = `${maximumFontSize}px`
+
+    if (nameElement.scrollWidth <= availableWidth) return
+
+    const proportionalSize = maximumFontSize * (availableWidth / nameElement.scrollWidth)
+    let fittedSize = Math.min(maximumFontSize, Math.max(minimumFontSize, proportionalSize * 0.98))
+    nameElement.style.fontSize = `${fittedSize}px`
+
+    // Account for fractional-pixel rounding so no final character is clipped.
+    while (nameElement.scrollWidth > availableWidth && fittedSize > minimumFontSize) {
+      fittedSize = Math.max(minimumFontSize, fittedSize - 0.1)
+      nameElement.style.fontSize = `${fittedSize}px`
+    }
+  }, [engineer.full_name])
 
   const matricule = formatMatricule(engineer.matricule)
   const pairClass = `engineer-id-card-pair ${className}`.trim()
@@ -131,7 +157,9 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
           )}
         </div>
 
-        <h2 className="id-card-engineer-name">{engineer.full_name}</h2>
+        <h2 ref={engineerNameRef} className="id-card-engineer-name" title={engineer.full_name}>
+          {engineer.full_name}
+        </h2>
 
         <dl className="id-card-front-details">
           <div>
