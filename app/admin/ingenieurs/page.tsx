@@ -32,6 +32,13 @@ import EditEngineerModal from '@/components/admin/EditEngineerModal'
 import EngineerIdCard from '@/components/admin/EngineerIdCard'
 import EngineerDirectoryDocument from '@/components/admin/EngineerDirectoryDocument'
 import { formatMatricule } from '@/lib/matricule'
+import {
+  canvasToPngBlob,
+  downloadBlob,
+  loadLogoSvg,
+  renderCardToCanvas,
+  waitForCardAssets,
+} from '@/lib/cardExport'
 
 type CardSide = 'front' | 'back'
 
@@ -289,6 +296,22 @@ export default function IngenieursPage() {
     setIsCardPreviewOpen(true)
   }
 
+  const getEngineerExportStem = (engineer: Engineer | undefined, index: number) => {
+    const matricule = formatMatricule(engineer?.matricule).replace(/[^a-z0-9]/gi, '') || 'sans-matricule'
+    const normalizedName = (engineer?.full_name || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase()
+    const engineerName = normalizedName || `ingenieur-${index + 1}`
+    return `carte-omigec-${matricule}-${engineerName}`
+  }
+
+  const yieldToBrowser = () => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => resolve())
+  })
+
   const handleDownloadPdf = async () => {
     const preview = document.querySelector<HTMLElement>('.id-card-print-root')
     if (!preview) return
@@ -297,116 +320,51 @@ export default function IngenieursPage() {
 
     setIsGeneratingPdf(true)
     try {
-      // Wait for portraits and QR codes to be fully loaded before printing.
-      const images = Array.from(preview.querySelectorAll<HTMLImageElement>('img'))
-      await Promise.all(images.map((image) => image.complete
-        ? Promise.resolve()
-        : new Promise<void>((resolve) => {
-            image.addEventListener('load', () => resolve(), { once: true })
-            image.addEventListener('error', () => resolve(), { once: true })
-          })))
-      await document.fonts?.ready
+      await waitForCardAssets(preview)
 
-      // Collect the page's stylesheets so the cards keep their styling in the
-      // isolated print document. The browser renders vector text natively — no
-      // html2canvas, no oklch parsing issues, no main-thread freeze.
-      const styleHtml = Array.from(
-        document.querySelectorAll('style, link[rel="stylesheet"]')
-      )
-        .map((node) => node.outerHTML)
-        .join('\n')
+      const [{ jsPDF }, { svg2pdf }] = await Promise.all([
+        import('jspdf'),
+        import('svg2pdf.js'),
+      ])
+      const [frontLogo, backLogo] = await Promise.all([
+        loadLogoSvg('/Logo.svg'),
+        loadLogoSvg('/Logo-teal.svg'),
+      ])
 
-      const iframe = document.createElement('iframe')
-      iframe.setAttribute('aria-hidden', 'true')
-      iframe.style.position = 'fixed'
-      iframe.style.right = '0'
-      iframe.style.bottom = '0'
-      iframe.style.width = '0'
-      iframe.style.height = '0'
-      iframe.style.border = '0'
-      iframe.style.visibility = 'hidden'
-      document.body.appendChild(iframe)
-
-      const frameDoc = iframe.contentWindow?.document
-      if (!frameDoc) throw new Error('Impossible de créer le document d\'impression.')
-
-      // One 84 mm x 48 mm page per individual side. This is the physical
-      // equivalent of the approved 336 px x 192 px card artwork.
-      const pageW = '84mm'
-      const pageH = '48mm'
-      const pagesHtml = cards
-        .map((card) => `<div class="print-page">${card.outerHTML}</div>`)
-        .join('')
-
-      frameDoc.open()
-      frameDoc.write(`<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8" />
-<title>cartes-omigec</title>
-${styleHtml}
-<style>
-  /* Standard ID/credit-card footprint (54mm x 85.6mm), portrait or landscape. */
-  @page { size: ${pageW} ${pageH}; margin: 0; }
-  html, body { margin: 0; padding: 0; background: #fff; }
-  .print-page {
-    width: ${pageW};
-    height: ${pageH};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    page-break-after: always;
-    break-after: page;
-  }
-  .print-page:last-child { page-break-after: auto; break-after: auto; }
-  .engineer-id-card {
-    box-shadow: none !important;
-    border: none !important;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-</style>
-</head>
-<body>${pagesHtml}</body>
-</html>`)
-      frameDoc.close()
-
-      const frameWindow = iframe.contentWindow
-      if (!frameWindow) throw new Error('Impossible de créer le document d\'impression.')
-
-      // Wait for the iframe document (and its images/fonts) to be ready.
-      await new Promise<void>((resolve) => {
-        if (frameDoc.readyState === 'complete') {
-          resolve()
-        } else {
-          iframe.addEventListener('load', () => resolve(), { once: true })
-        }
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: [84, 48],
+        compress: true,
+        putOnlyUsedFonts: true,
       })
-      const frameImages = Array.from(frameDoc.querySelectorAll('img'))
-      await Promise.all(frameImages.map((image) => image.complete
-        ? Promise.resolve()
-        : new Promise<void>((resolve) => {
-            image.addEventListener('load', () => resolve(), { once: true })
-            image.addEventListener('error', () => resolve(), { once: true })
-          })))
-      await frameDoc.fonts?.ready
 
-      frameWindow.focus()
-      frameWindow.print()
+      for (const [index, card] of cards.entries()) {
+        if (index > 0) pdf.addPage([84, 48], 'landscape')
 
-      // Clean up the iframe after the print dialog has been handled.
-      const cleanup = () => {
-        setTimeout(() => {
-          iframe.remove()
-        }, 500)
+        // The card body is rendered at roughly 400 DPI so the PDF matches the
+        // preview exactly. The logo is intentionally excluded here and added
+        // below as genuine SVG paths, preserving perfect sharpness at any zoom.
+        const canvas = await renderCardToCanvas(card, 4, { hideLogo: true })
+        pdf.addImage(canvas, 'PNG', 0, 0, 84, 48, undefined, 'FAST')
+
+        const isFront = card.classList.contains('engineer-id-card-front')
+        const vectorLogo = (isFront ? frontLogo : backLogo).cloneNode(true) as Element
+        await svg2pdf(vectorLogo, pdf, isFront
+          ? { x: 7.25, y: 2.75, width: 28, height: 6.75 }
+          : { x: 63, y: 9.75, width: 19, height: 4.75 })
+
+        if (index < cards.length - 1) await yieldToBrowser()
       }
-      frameWindow.addEventListener('afterprint', cleanup, { once: true })
-      setTimeout(cleanup, 60000)
+
+      const filename = cardEngineers.length === 1
+        ? `${getEngineerExportStem(cardEngineers[0], 0)}.pdf`
+        : `cartes-omigec-${cardEngineers.length}-ingenieurs.pdf`
+      pdf.save(filename)
 
       setMessage({
         type: 'success',
-        text: 'Fenêtre d\'impression ouverte — choisissez « Enregistrer au format PDF ».',
+        text: `PDF haute qualité téléchargé — ${cards.length} face${cards.length > 1 ? 's' : ''} avec logo vectoriel.`,
       })
     } catch (error) {
       console.error('PDF generation error:', error)
@@ -427,58 +385,22 @@ ${styleHtml}
 
     setIsGeneratingPng(side)
     try {
-      const images = Array.from(preview.querySelectorAll<HTMLImageElement>('img'))
-      await Promise.all(images.map((image) => image.complete
-        ? Promise.resolve()
-        : new Promise<void>((resolve) => {
-            image.addEventListener('load', () => resolve(), { once: true })
-            image.addEventListener('error', () => resolve(), { once: true })
-          })))
-      await document.fonts?.ready
-
-      const { default: html2canvas } = await import('html2canvas')
+      await waitForCardAssets(preview)
+      const sideLabel = side === 'front' ? 'recto' : 'verso'
 
       for (const [index, card] of cards.entries()) {
-        const canvas = await html2canvas(card, {
-          scale: 4,
-          width: 336,
-          height: 192,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: '#ffffff',
-          logging: false,
-          imageTimeout: 15000,
-        })
+        // Native SVG/foreignObject rendering is substantially faster and more
+        // faithful than walking and repainting the DOM with html2canvas.
+        const canvas = await renderCardToCanvas(card)
+        const blob = await canvasToPngBlob(canvas)
+        downloadBlob(
+          blob,
+          `${getEngineerExportStem(cardEngineers[index], index)}-${sideLabel}.png`,
+        )
 
-        const engineer = cardEngineers[index]
-        const matricule = formatMatricule(engineer?.matricule).replace(/[^a-z0-9]/gi, '') || 'sans-matricule'
-        const normalizedEngineerName = (engineer?.full_name || '')
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/gi, '-')
-          .replace(/^-+|-+$/g, '')
-          .toLowerCase()
-        const engineerName = normalizedEngineerName || `ingenieur-${index + 1}`
-        const sideLabel = side === 'front' ? 'recto' : 'verso'
-
-        const blob = await new Promise<Blob>((resolve, reject) => {
-          canvas.toBlob((value) => {
-            if (value) resolve(value)
-            else reject(new Error('Unable to create PNG blob.'))
-          }, 'image/png')
-        })
-
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `carte-omigec-${matricule}-${engineerName}-${sideLabel}.png`
-        document.body.appendChild(link)
-        link.click()
-        link.remove()
-        setTimeout(() => URL.revokeObjectURL(url), 1000)
+        if (index < cards.length - 1) await yieldToBrowser()
       }
 
-      const sideLabel = side === 'front' ? 'recto' : 'verso'
       setMessage({
         type: 'success',
         text: `${cards.length} PNG ${sideLabel}${cards.length > 1 ? 's' : ''} exporté${cards.length > 1 ? 's' : ''} en haute qualité.`,
@@ -973,8 +895,8 @@ ${styleHtml}
                   disabled={isGeneratingPdf || isGeneratingPng !== null}
                   className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-wait transition-colors"
                 >
-                  {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
-                  {isGeneratingPdf ? 'Préparation...' : 'Imprimer / PDF'}
+                  {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                  {isGeneratingPdf ? 'Préparation...' : 'Télécharger PDF'}
                 </button>
                 <button
                   type="button"

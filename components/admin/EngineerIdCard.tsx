@@ -138,6 +138,7 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
   return (
     <article className={pairClass}>
       <section className="engineer-id-card engineer-id-card-front" aria-label="Carte recto">
+        <div className="id-card-front-header" aria-hidden="true" />
         <FrontArtwork />
 
         <div className="id-card-front-logo">
@@ -186,6 +187,7 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
 
       <section className="engineer-id-card engineer-id-card-back" aria-label="Carte verso">
         <BackArtwork />
+        <div className="id-card-back-panel" aria-hidden="true" />
 
         <div className="id-card-back-copy">
           <h2>Note</h2>

@@ -1503,7 +1503,7 @@ button, .button {
   -webkit-print-color-adjust: exact;
 }
 
-.engineer-id-card-front::before {
+.id-card-front-header {
   position: absolute;
   z-index: 0;
   top: 0;
@@ -1511,14 +1511,13 @@ button, .button {
   left: 0;
   height: 49px;
   background: linear-gradient(90deg, #14aaaa 0%, #0d6f6f 100%);
-  content: '';
 }
 
 .engineer-id-card-back {
   background: linear-gradient(180deg, #14aaaa 0%, #136a73 100%);
 }
 
-.engineer-id-card-back::after {
+.id-card-back-panel {
   position: absolute;
   z-index: 0;
   top: 0;
@@ -1526,7 +1525,6 @@ button, .button {
   width: 93px;
   height: 192px;
   background: #fff;
-  content: '';
 }
 
 .id-card-artwork {
@@ -1572,7 +1570,6 @@ button, .button {
 
 .id-card-logo-light {
   object-fit: contain;
-  filter: drop-shadow(0 0 0.25px #fff);
 }
 
 .id-card-back-logo {
@@ -1584,7 +1581,6 @@ button, .button {
 
 .id-card-logo-teal {
   object-fit: contain;
-  filter: drop-shadow(0 0 0.2px #14919b);
 }
 
 .id-card-card-title {
