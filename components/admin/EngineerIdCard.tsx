@@ -145,6 +145,15 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
           <BrandLogo tone="light" />
         </div>
 
+        <div className="id-card-organization-name">
+          <p className="id-card-organization-name-ar" lang="ar" dir="rtl">
+            الهيئة الموريتانية للمهندسين المدنيين
+          </p>
+          <p className="id-card-organization-name-fr" lang="fr">
+            Ordre Mauritanien des Ingénieurs Génie Civil
+          </p>
+        </div>
+
         <div className="id-card-card-title">
           <strong>CARTE</strong>
           <span>PROFESSIONNELLE</span>

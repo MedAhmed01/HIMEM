@@ -1562,14 +1562,58 @@ button, .button {
 }
 
 .id-card-front-logo {
-  top: 11px;
-  left: 29px;
-  width: 112px;
-  height: 27px;
+  top: 8px;
+  left: 10px;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  justify-content: flex-start;
 }
 
-.id-card-logo-light {
-  object-fit: contain;
+.id-card-front-logo .id-card-logo-light {
+  width: 130.667px;
+  height: 32px;
+  max-width: none;
+  flex: 0 0 auto;
+  object-fit: fill;
+  object-position: left center;
+}
+
+.id-card-organization-name {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  left: 47px;
+  display: flex;
+  width: 194px;
+  height: 37px;
+  align-items: center;
+  color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.id-card-organization-name p {
+  width: 100%;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.id-card-organization-name-ar {
+  font-family: var(--font-cairo), Tahoma, Arial, sans-serif;
+  font-size: 7.5px;
+  font-weight: 700;
+  line-height: 12px;
+}
+
+.id-card-organization-name-fr {
+  margin-top: 1px !important;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 5.3px;
+  font-weight: 600;
+  letter-spacing: 0.05px;
+  line-height: 7px;
 }
 
 .id-card-back-logo {
@@ -1586,22 +1630,25 @@ button, .button {
 .id-card-card-title {
   position: absolute;
   z-index: 1;
-  top: 15px;
-  left: 239px;
+  top: 14px;
+  left: 250px;
   display: flex;
+  width: 78px;
+  align-items: center;
   color: #fff;
   flex-direction: column;
   line-height: 1;
+  text-align: center;
 }
 
 .id-card-card-title strong {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .id-card-card-title span {
   margin-top: 1px;
-  font-size: 7px;
+  font-size: 6.2px;
   font-weight: 700;
 }
 

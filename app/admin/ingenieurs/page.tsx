@@ -350,8 +350,15 @@ export default function IngenieursPage() {
 
         const isFront = card.classList.contains('engineer-id-card-front')
         const vectorLogo = (isFront ? frontLogo : backLogo).cloneNode(true) as Element
+        if (isFront) {
+          // Crop the supplied lockup SVG to its emblem for the redesigned
+          // header; the organization name is typeset separately for clarity.
+          vectorLogo.setAttribute('viewBox', '0 0 24 24')
+          vectorLogo.setAttribute('width', '24')
+          vectorLogo.setAttribute('height', '24')
+        }
         await svg2pdf(vectorLogo, pdf, isFront
-          ? { x: 7.25, y: 2.75, width: 28, height: 6.75 }
+          ? { x: 2.5, y: 2, width: 8, height: 8 }
           : { x: 63, y: 9.75, width: 19, height: 4.75 })
 
         if (index < cards.length - 1) await yieldToBrowser()
