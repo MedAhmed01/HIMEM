@@ -1561,9 +1561,23 @@ button, .button {
   height: 100%;
 }
 
-.id-card-front-logo {
+.id-card-header-content {
+  position: absolute;
+  z-index: 1;
   top: 8px;
   left: 10px;
+  display: grid;
+  width: 318px;
+  height: 32px;
+  grid-template-columns: 32px 194px 78px;
+  column-gap: 7px;
+}
+
+.id-card-front-logo {
+  position: relative;
+  z-index: auto;
+  top: auto;
+  left: auto;
   width: 32px;
   height: 32px;
   overflow: hidden;
@@ -1580,23 +1594,24 @@ button, .button {
 }
 
 .id-card-organization-name {
-  position: absolute;
-  z-index: 1;
-  top: 6px;
-  left: 47px;
-  display: flex;
-  width: 194px;
-  height: 37px;
-  align-items: center;
+  position: relative;
+  z-index: auto;
+  top: auto;
+  left: auto;
+  display: grid;
+  width: auto;
+  height: 32px;
   color: #fff;
-  flex-direction: column;
-  justify-content: center;
+  grid-template-rows: 19px 13px;
   text-align: center;
 }
 
 .id-card-organization-name p {
+  display: flex;
   width: 100%;
   margin: 0;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
 }
 
@@ -1604,16 +1619,15 @@ button, .button {
   font-family: var(--font-cairo), Tahoma, Arial, sans-serif;
   font-size: 7.5px;
   font-weight: 700;
-  line-height: 12px;
+  line-height: 1;
 }
 
 .id-card-organization-name-fr {
-  margin-top: 1px !important;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 5.3px;
   font-weight: 600;
   letter-spacing: 0.05px;
-  line-height: 7px;
+  line-height: 1;
 }
 
 .id-card-back-logo {
@@ -1628,17 +1642,24 @@ button, .button {
 }
 
 .id-card-card-title {
-  position: absolute;
-  z-index: 1;
-  top: 14px;
-  left: 250px;
-  display: flex;
-  width: 78px;
-  align-items: center;
+  position: relative;
+  z-index: auto;
+  top: auto;
+  left: auto;
+  display: grid;
+  width: auto;
+  height: 32px;
   color: #fff;
-  flex-direction: column;
-  line-height: 1;
+  grid-template-rows: 19px 13px;
   text-align: center;
+}
+
+.id-card-card-title strong,
+.id-card-card-title span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .id-card-card-title strong {
@@ -1647,7 +1668,7 @@ button, .button {
 }
 
 .id-card-card-title span {
-  margin-top: 1px;
+  margin: 0;
   font-size: 6.2px;
   font-weight: 700;
 }
