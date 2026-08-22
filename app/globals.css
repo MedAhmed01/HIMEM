@@ -1564,27 +1564,29 @@ button, .button {
 }
 
 .id-card-front-logo {
-  top: 7px;
-  left: 27px;
-  width: 126px;
-  height: 34px;
+  top: 11px;
+  left: 29px;
+  width: 112px;
+  height: 27px;
 }
 
 .id-card-logo-light {
   object-fit: contain;
+  filter: drop-shadow(0 0 0.25px #fff);
 }
 
 .id-card-back-logo {
-  top: 37px;
-  left: 248px;
-  width: 82px;
-  height: 22px;
+  top: 39px;
+  left: 252px;
+  width: 76px;
+  height: 19px;
 }
 
 .id-card-logo-teal {
   background: #14919b;
-  mask: url('/Logo.png') center / contain no-repeat;
-  -webkit-mask: url('/Logo.png') center / contain no-repeat;
+  filter: drop-shadow(0 0 0.2px #14919b);
+  mask: url('/Logo.svg') center / contain no-repeat;
+  -webkit-mask: url('/Logo.svg') center / contain no-repeat;
 }
 
 .id-card-card-title {

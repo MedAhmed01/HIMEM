@@ -75,8 +75,8 @@ function BrandLogo({ tone }: { tone: 'light' | 'teal' }) {
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- The transparent source logo must remain printable.
-    <img className="id-card-logo id-card-logo-light" src="/Logo.png" alt="OMIGEC" />
+    // eslint-disable-next-line @next/next/no-img-element -- The vector source logo must remain printable.
+    <img className="id-card-logo id-card-logo-light" src="/Logo.svg" alt="OMIGEC" />
   )
 }
 
