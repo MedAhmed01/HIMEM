@@ -1564,10 +1564,10 @@ button, .button {
 }
 
 .id-card-front-logo {
-  top: 12px;
-  left: 30px;
-  width: 100px;
-  height: 23px;
+  top: 7px;
+  left: 27px;
+  width: 126px;
+  height: 34px;
 }
 
 .id-card-logo-light {
@@ -1575,10 +1575,10 @@ button, .button {
 }
 
 .id-card-back-logo {
-  top: 39px;
-  left: 253px;
-  width: 67px;
-  height: 18px;
+  top: 37px;
+  left: 248px;
+  width: 82px;
+  height: 22px;
 }
 
 .id-card-logo-teal {
