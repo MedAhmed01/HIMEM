@@ -71,7 +71,10 @@ function BackArtwork() {
 
 function BrandLogo({ tone }: { tone: 'light' | 'teal' }) {
   if (tone === 'teal') {
-    return <span className="id-card-logo id-card-logo-teal" role="img" aria-label="OMIGEC" />
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- The vector source logo must remain printable.
+      <img className="id-card-logo id-card-logo-teal" src="/Logo-teal.svg" alt="OMIGEC" />
+    )
   }
 
   return (

@@ -1583,10 +1583,8 @@ button, .button {
 }
 
 .id-card-logo-teal {
-  background: #14919b;
+  object-fit: contain;
   filter: drop-shadow(0 0 0.2px #14919b);
-  mask: url('/Logo.svg') center / contain no-repeat;
-  -webkit-mask: url('/Logo.svg') center / contain no-repeat;
 }
 
 .id-card-card-title {

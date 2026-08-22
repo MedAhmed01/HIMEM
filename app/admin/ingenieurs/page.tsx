@@ -23,6 +23,7 @@ import {
   Eye,
   CreditCard,
   Printer,
+  Download,
   Loader2,
   BookOpen
 } from 'lucide-react'
@@ -30,6 +31,9 @@ import ChangePasswordModal from '@/components/admin/ChangePasswordModal'
 import EditEngineerModal from '@/components/admin/EditEngineerModal'
 import EngineerIdCard from '@/components/admin/EngineerIdCard'
 import EngineerDirectoryDocument from '@/components/admin/EngineerDirectoryDocument'
+import { formatMatricule } from '@/lib/matricule'
+
+type CardSide = 'front' | 'back'
 
 interface Engineer {
   id: string
@@ -63,6 +67,7 @@ export default function IngenieursPage() {
   const [cardEngineers, setCardEngineers] = useState<Engineer[]>([])
   const [isCardPreviewOpen, setIsCardPreviewOpen] = useState(false)
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+  const [isGeneratingPng, setIsGeneratingPng] = useState<CardSide | null>(null)
   const [isDirectoryPreviewOpen, setIsDirectoryPreviewOpen] = useState(false)
   const [isGeneratingDirectoryPdf, setIsGeneratingDirectoryPdf] = useState(false)
   const [restrictToActiveSubscription, setRestrictToActiveSubscription] = useState(false)
@@ -408,6 +413,81 @@ ${styleHtml}
       setMessage({ type: 'error', text: 'Impossible de générer le PDF.' })
     } finally {
       setIsGeneratingPdf(false)
+    }
+  }
+
+  const handleDownloadPng = async (side: CardSide) => {
+    const preview = document.querySelector<HTMLElement>('.id-card-print-root')
+    if (!preview) return
+
+    const cards = Array.from(
+      preview.querySelectorAll<HTMLElement>(`.engineer-id-card-${side}`)
+    )
+    if (cards.length === 0) return
+
+    setIsGeneratingPng(side)
+    try {
+      const images = Array.from(preview.querySelectorAll<HTMLImageElement>('img'))
+      await Promise.all(images.map((image) => image.complete
+        ? Promise.resolve()
+        : new Promise<void>((resolve) => {
+            image.addEventListener('load', () => resolve(), { once: true })
+            image.addEventListener('error', () => resolve(), { once: true })
+          })))
+      await document.fonts?.ready
+
+      const { default: html2canvas } = await import('html2canvas')
+
+      for (const [index, card] of cards.entries()) {
+        const canvas = await html2canvas(card, {
+          scale: 4,
+          width: 336,
+          height: 192,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          logging: false,
+          imageTimeout: 15000,
+        })
+
+        const engineer = cardEngineers[index]
+        const matricule = formatMatricule(engineer?.matricule).replace(/[^a-z0-9]/gi, '') || 'sans-matricule'
+        const normalizedEngineerName = (engineer?.full_name || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/gi, '-')
+          .replace(/^-+|-+$/g, '')
+          .toLowerCase()
+        const engineerName = normalizedEngineerName || `ingenieur-${index + 1}`
+        const sideLabel = side === 'front' ? 'recto' : 'verso'
+
+        const blob = await new Promise<Blob>((resolve, reject) => {
+          canvas.toBlob((value) => {
+            if (value) resolve(value)
+            else reject(new Error('Unable to create PNG blob.'))
+          }, 'image/png')
+        })
+
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `carte-omigec-${matricule}-${engineerName}-${sideLabel}.png`
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+      }
+
+      const sideLabel = side === 'front' ? 'recto' : 'verso'
+      setMessage({
+        type: 'success',
+        text: `${cards.length} PNG ${sideLabel}${cards.length > 1 ? 's' : ''} exporté${cards.length > 1 ? 's' : ''} en haute qualité.`,
+      })
+    } catch (error) {
+      console.error('PNG generation error:', error)
+      setMessage({ type: 'error', text: 'Impossible de générer le PNG.' })
+    } finally {
+      setIsGeneratingPng(null)
     }
   }
 
@@ -867,8 +947,30 @@ ${styleHtml}
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
+                  onClick={() => handleDownloadPng('front')}
+                  disabled={isGeneratingPdf || isGeneratingPng !== null}
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold text-teal-700 bg-white border border-teal-200 hover:bg-teal-50 disabled:opacity-60 disabled:cursor-wait transition-colors"
+                >
+                  {isGeneratingPng === 'front'
+                    ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    : <Download className="w-4 h-4 mr-2" />}
+                  {isGeneratingPng === 'front' ? 'Export recto...' : 'PNG recto'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadPng('back')}
+                  disabled={isGeneratingPdf || isGeneratingPng !== null}
+                  className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold text-teal-700 bg-white border border-teal-200 hover:bg-teal-50 disabled:opacity-60 disabled:cursor-wait transition-colors"
+                >
+                  {isGeneratingPng === 'back'
+                    ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    : <Download className="w-4 h-4 mr-2" />}
+                  {isGeneratingPng === 'back' ? 'Export verso...' : 'PNG verso'}
+                </button>
+                <button
+                  type="button"
                   onClick={handleDownloadPdf}
-                  disabled={isGeneratingPdf}
+                  disabled={isGeneratingPdf || isGeneratingPng !== null}
                   className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-wait transition-colors"
                 >
                   {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
