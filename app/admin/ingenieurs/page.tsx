@@ -62,8 +62,6 @@ export default function IngenieursPage() {
   const [selectedEngineerIds, setSelectedEngineerIds] = useState<Set<string>>(new Set())
   const [cardEngineers, setCardEngineers] = useState<Engineer[]>([])
   const [isCardPreviewOpen, setIsCardPreviewOpen] = useState(false)
-  // L'orientation horizontale est le format par défaut des cartes OMIGEC.
-  const [cardOrientation, setCardOrientation] = useState<'vertical' | 'horizontal'>('horizontal')
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const [isDirectoryPreviewOpen, setIsDirectoryPreviewOpen] = useState(false)
   const [isGeneratingDirectoryPdf, setIsGeneratingDirectoryPdf] = useState(false)
@@ -327,12 +325,10 @@ export default function IngenieursPage() {
       const frameDoc = iframe.contentWindow?.document
       if (!frameDoc) throw new Error('Impossible de créer le document d\'impression.')
 
-      // One page per individual card (front, then back), each page sized to the
-      // card itself so it can be printed and cut directly. Landscape cards use
-      // the same standard ID-card footprint, rotated.
-      const isHorizontal = cardOrientation === 'horizontal'
-      const pageW = isHorizontal ? '85.6mm' : '54mm'
-      const pageH = isHorizontal ? '54mm' : '85.6mm'
+      // One 84 mm x 48 mm page per individual side. This is the physical
+      // equivalent of the approved 336 px x 192 px card artwork.
+      const pageW = '84mm'
+      const pageH = '48mm'
       const pagesHtml = cards
         .map((card) => `<div class="print-page">${card.outerHTML}</div>`)
         .join('')
@@ -869,22 +865,6 @@ ${styleHtml}
                 <p className="text-sm text-slate-500">{cardEngineers.length} carte{cardEngineers.length !== 1 ? 's' : ''} · recto et verso</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex rounded-lg border border-slate-300 p-0.5 dark:border-slate-600">
-                  <button
-                    type="button"
-                    onClick={() => setCardOrientation('horizontal')}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${cardOrientation === 'horizontal' ? 'bg-teal-600 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'}`}
-                  >
-                    Horizontale
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCardOrientation('vertical')}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${cardOrientation === 'vertical' ? 'bg-teal-600 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'}`}
-                  >
-                    Verticale
-                  </button>
-                </div>
                 <button
                   type="button"
                   onClick={handleDownloadPdf}
@@ -905,9 +885,9 @@ ${styleHtml}
               </div>
             </div>
 
-            <div className={`id-card-print-root id-card-preview-grid ${cardOrientation === 'horizontal' ? 'id-card-preview-grid-h' : ''} p-5 sm:p-8`}>
+            <div className="id-card-print-root id-card-preview-grid p-5 sm:p-8">
               {cardEngineers.map((engineer) => (
-                <EngineerIdCard key={engineer.id} engineer={engineer} orientation={cardOrientation} />
+                <EngineerIdCard key={engineer.id} engineer={engineer} />
               ))}
             </div>
           </div>

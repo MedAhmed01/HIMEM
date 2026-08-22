@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { formatMatricule } from '@/lib/matricule'
 
@@ -20,11 +20,8 @@ export interface EngineerCardData {
   created_at: string
 }
 
-export type CardOrientation = 'vertical' | 'horizontal'
-
 interface EngineerIdCardProps {
   engineer: EngineerCardData
-  orientation?: CardOrientation
   className?: string
 }
 
@@ -38,62 +35,52 @@ function getInitials(name: string) {
     .toUpperCase()
 }
 
-function CardShell({
-  side,
-  orientation,
-  children,
-}: {
-  side: 'front' | 'back'
-  orientation: CardOrientation
-  children: React.ReactNode
-}) {
-  const shapeId = useId().replaceAll(':', '')
-  const bottomGradientId = `id-card-bottom-gradient-${shapeId}`
-  const topBarGradientId = `id-card-top-bar-gradient-${shapeId}`
-  const topLeftGradientId = `id-card-top-left-gradient-${shapeId}`
-  const topRightGradientId = `id-card-top-right-gradient-${shapeId}`
-
-  const orientationClass = orientation === 'horizontal' ? ' engineer-id-card-h' : ''
-
+function FrontArtwork() {
   return (
-    <section
-      className={`engineer-id-card engineer-id-card-${side}${orientationClass}`}
-      aria-label={`Carte ${side === 'front' ? 'recto' : 'verso'}`}
-    >
-      <svg className="id-card-top-shape" width="204" height="45" viewBox="0 0 204 45" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
-        {side === 'back' && <rect x="19" width="164" height="15" fill={`url(#${topBarGradientId})`} />}
-        <path d="M50 2.8072e-05H0V16.2715C3.12031e-06 28.569 8.31959e-06 42.4226 5.28213e-06 44.6812C0.0127281 39.56 23.0075 5.99834 50 2.8072e-05Z" fill={`url(#${topLeftGradientId})`} />
-        <path d="M204 45V0L185.921 0L154.349 0C160.024 -9.70645e-06 197.333 20.7 204 45Z" fill={`url(#${topRightGradientId})`} />
-        <defs>
-          <linearGradient id={topBarGradientId} x1="183" y1="7" x2="21.8137" y2="7" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#0F766E" />
-            <stop offset="1" stopColor="#2DD4BF" />
-          </linearGradient>
-          <linearGradient id={topLeftGradientId} x1="-1.5" y1="45" x2="53.8867" y2="10.107" gradientUnits="userSpaceOnUse">
-            <stop offset="0.378592" stopColor="#2DD4BF" />
-            <stop offset="1" stopColor="#0F766E" />
-          </linearGradient>
-          <linearGradient id={topRightGradientId} x1="154" y1="-1.35" x2="182.192" y2="53.8961" gradientUnits="userSpaceOnUse">
-            <stop offset="0.378592" stopColor="#2DD4BF" />
-            <stop offset="1" stopColor="#0F766E" />
-          </linearGradient>
-        </defs>
-      </svg>
-      {children}
-      <svg className="id-card-bottom-curve" width="204" height="67" viewBox="0 0 204 67" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
-        <path d="M70.9565 29.1304C26.8225 14.7641 0 67 0 67H204V0C154.33 59.4261 128.925 48 70.9565 29.1304Z" fill={`url(#${bottomGradientId})`} />
-        <defs>
-          <linearGradient id={bottomGradientId} x1="-6" y1="67" x2="204" y2="67" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#2DD4BF" />
-            <stop offset="1" stopColor="#0F766E" />
-          </linearGradient>
-        </defs>
-      </svg>
-    </section>
+    <svg className="id-card-artwork id-card-front-artwork" viewBox="0 0 336 192" aria-hidden="true">
+      <g fill="#f4f8f9">
+        <path d="M0 183 31 164v-34l16 9v34l16 10v-34l16 9v34l17 10H63L47 183l-16 9H0Z" />
+        <path d="m104 87 32-19 31 18-16 9-15-9-16 9 16 9v36l-16 9v-36l-32-18 16-8Z" />
+        <path d="m176 87 32-19 32 19-16 9-16-9-16 9v36l-16 9V87Z" />
+        <path d="m176 132 16-9v27l32 19v23h-16v-14l-32-19-32 19v14h-32v-9l48-28v-27l16 9v-5Z" />
+        <path d="m240 96 16 9v54l16 9v-54l16 9v36l16 9v-36l32 19v18l-16-9v18l16 9v5h-16l-32-19v18h-16v-5l-32-18V96Z" />
+      </g>
+    </svg>
   )
 }
 
-export default function EngineerIdCard({ engineer, orientation = 'vertical', className = '' }: EngineerIdCardProps) {
+function BackArtwork() {
+  return (
+    <svg className="id-card-artwork id-card-back-artwork" viewBox="0 0 243 192" aria-hidden="true">
+      <g fill="rgba(255,255,255,.075)">
+        <path d="m192 0 51 30v27l-51-30-42 25-24-14 66-38Z" />
+        <path d="m109 48 42 25-24 14-18-11v34l-24 14V62l24-14Z" />
+        <path d="m192 48 51 30v28l-51-30-42 25-24-14 66-39Z" />
+        <path d="m64 111 43 25-24 14-19-11-42 25v28H0v-41l64-40Z" />
+        <path d="m149 101 43 25-24 14-19-11-42 25 42 25 43-25 24 14-67 40-66-40 66-39v-28Z" />
+        <path d="m243 133-51 30-24-14 75-44v28Z" />
+      </g>
+      <g fill="rgba(0,45,52,.08)">
+        <path d="m109 76 18 11-18 11V76Z" />
+        <path d="m149 129 19 11-19 11-19-11 19-11Z" />
+        <path d="m192 76 51 30v27l-51-30-24 14-18-11 42-30Z" />
+      </g>
+    </svg>
+  )
+}
+
+function BrandLogo({ tone }: { tone: 'light' | 'teal' }) {
+  if (tone === 'teal') {
+    return <span className="id-card-logo id-card-logo-teal" role="img" aria-label="OMIGEC" />
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- The transparent source logo must remain printable.
+    <img className="id-card-logo id-card-logo-light" src="/Logo.png" alt="OMIGEC" />
+  )
+}
+
+export default function EngineerIdCard({ engineer, className = '' }: EngineerIdCardProps) {
   const [qrCode, setQrCode] = useState('')
   const verificationUrl = useMemo(() => {
     if (typeof window === 'undefined') return `/recherche?nni=${encodeURIComponent(engineer.nni)}`
@@ -103,131 +90,97 @@ export default function EngineerIdCard({ engineer, orientation = 'vertical', cla
   useEffect(() => {
     let active = true
     QRCode.toDataURL(verificationUrl, {
-      width: 220,
-      margin: 1,
+      width: 240,
+      margin: 0,
       errorCorrectionLevel: 'M',
-      color: { dark: '#0f172a', light: '#ffffff' },
+      color: { dark: '#14727a', light: '#ffffff' },
     })
       .then((value) => active && setQrCode(value))
       .catch((error) => console.error('Unable to generate engineer QR code:', error))
+
     return () => {
       active = false
     }
   }, [verificationUrl])
 
   const matricule = formatMatricule(engineer.matricule)
-
-  // Shared design pieces reused by both orientations so the look stays identical.
-  const brand = (
-    <div className="id-card-brand">
-      {/* eslint-disable-next-line @next/next/no-img-element -- Reuses the official transparent site logo. */}
-      <img className="id-card-logo" src="/Logo.png" alt="OMIGEC" />
-    </div>
-  )
-
-  const portrait = (
-    <div className="id-card-portrait-wrap">
-      {engineer.profile_image_url ? (
-        /* eslint-disable-next-line @next/next/no-img-element -- Remote profile photos must remain printable. */
-        <img className="id-card-portrait" src={engineer.profile_image_url} alt={`Portrait de ${engineer.full_name}`} />
-      ) : (
-        <div className="id-card-portrait id-card-portrait-fallback" aria-label={`Initiales de ${engineer.full_name}`}>
-          {getInitials(engineer.full_name)}
-        </div>
-      )}
-    </div>
-  )
-
-  const identity = (
-    <div className="id-card-identity">
-      <h2>{engineer.full_name}</h2>
-    </div>
-  )
-
-  const details = (
-    <dl className="id-card-details">
-      <div><dt>Matricule</dt><dd>{matricule}</dd></div>
-      <div><dt>N° NNI</dt><dd>{engineer.nni || '—'}</dd></div>
-      <div><dt>Promotion</dt><dd>{engineer.grad_year || '—'}</dd></div>
-      <div><dt>Téléphone</dt><dd>{engineer.phone || '—'}</dd></div>
-    </dl>
-  )
-
-  const backCopy = (
-    <div className="id-card-back-copy">
-      <p><span />Cette carte est personnelle et atteste de l&apos;inscription de son titulaire auprès de l&apos;OMIGEC.</p>
-      <p><span />Toute personne trouvant cette carte est priée de la remettre à l&apos;Ordre Mauritanien des Ingénieurs en Génie Civil.</p>
-    </div>
-  )
-
-  const qr = (
-    <>
-      <div className="id-card-qr-wrap">
-        {qrCode ? (
-          /* eslint-disable-next-line @next/next/no-img-element -- QR codes are generated as data URLs. */
-          <img src={qrCode} alt={`QR de vérification de ${engineer.full_name}`} />
-        ) : <div className="id-card-qr-placeholder" />}
-      </div>
-      <p className="id-card-qr-label">Scanner pour vérifier</p>
-    </>
-  )
-
-  const backFooter = (
-    <div className="id-card-back-footer">
-      <strong>OMIGEC</strong>
-      <span>Nouakchott, Mauritanie</span>
-    </div>
-  )
-
-  const pairClass = `engineer-id-card-pair ${orientation === 'horizontal' ? 'engineer-id-card-pair-h' : ''} ${className}`.trim()
-
-  if (orientation === 'horizontal') {
-    return (
-      <article className={pairClass}>
-        <CardShell side="front" orientation="horizontal">
-          <div className="id-card-h-body">
-            <div className="id-card-h-left">
-              {brand}
-              {portrait}
-            </div>
-            <div className="id-card-h-right">
-              {identity}
-              {details}
-            </div>
-          </div>
-          <div className="id-card-front-footer">CARTE PROFESSIONNELLE</div>
-        </CardShell>
-
-        <CardShell side="back" orientation="horizontal">
-          <div className="id-card-h-body id-card-h-body-back">
-            <div className="id-card-h-left">
-              {backCopy}
-            </div>
-            <div className="id-card-h-right">
-              {qr}
-            </div>
-          </div>
-          {backFooter}
-        </CardShell>
-      </article>
-    )
-  }
+  const pairClass = `engineer-id-card-pair ${className}`.trim()
 
   return (
     <article className={pairClass}>
-      <CardShell side="front" orientation="vertical">
-        {brand}
-        {portrait}
-        {identity}
-        {details}
-        <div className="id-card-front-footer">CARTE PROFESSIONNELLE</div>
-      </CardShell>
+      <section className="engineer-id-card engineer-id-card-front" aria-label="Carte recto">
+        <FrontArtwork />
 
-      <CardShell side="back" orientation="vertical">
-        {backCopy}
-        {qr}
-        {backFooter}
-      </CardShell>
+        <div className="id-card-front-logo">
+          <BrandLogo tone="light" />
+        </div>
+
+        <div className="id-card-card-title">
+          <strong>CARTE</strong>
+          <span>PROFESSIONNELLE</span>
+        </div>
+
+        <div className="id-card-portrait-frame">
+          {engineer.profile_image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Remote profile photos must remain printable.
+            <img className="id-card-portrait" src={engineer.profile_image_url} alt={`Portrait de ${engineer.full_name}`} />
+          ) : (
+            <div className="id-card-portrait id-card-portrait-fallback" aria-label={`Initiales de ${engineer.full_name}`}>
+              {getInitials(engineer.full_name)}
+            </div>
+          )}
+        </div>
+
+        <h2 className="id-card-engineer-name">{engineer.full_name}</h2>
+
+        <dl className="id-card-front-details">
+          <div>
+            <dt>Matricule :</dt>
+            <dd>{matricule}</dd>
+          </div>
+          <div>
+            <dt>N° NNI:</dt>
+            <dd>{engineer.nni || '—'}</dd>
+          </div>
+          <div>
+            <dt>Promotion:</dt>
+            <dd>{engineer.grad_year || '—'}</dd>
+          </div>
+          <div>
+            <dt>Téléphone:</dt>
+            <dd>{engineer.phone || '—'}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="engineer-id-card engineer-id-card-back" aria-label="Carte verso">
+        <BackArtwork />
+
+        <div className="id-card-back-copy">
+          <h2>Note</h2>
+          <p>Cette carte est personnelle et atteste de l&apos;inscription de son titulaire auprès de l&apos;OMIGEC.</p>
+          <p>Toute personne trouvant cette carte est priée de la remettre à l&apos;Ordre Mauritanien des Ingénieurs en Génie Civil.</p>
+        </div>
+
+        <div className="id-card-back-footer">
+          <strong>OMIGEC</strong>
+          <span>Nouakchott, Mauritanie</span>
+        </div>
+
+        <div className="id-card-back-logo">
+          <BrandLogo tone="teal" />
+        </div>
+
+        <div className="id-card-qr-wrap">
+          {qrCode ? (
+            // eslint-disable-next-line @next/next/no-img-element -- QR codes are generated as data URLs.
+            <img src={qrCode} alt={`QR de vérification de ${engineer.full_name}`} />
+          ) : (
+            <div className="id-card-qr-placeholder" />
+          )}
+        </div>
+        <p className="id-card-qr-label">SCANNER POUR VÉRIFIER</p>
+      </section>
     </article>
   )
 }
