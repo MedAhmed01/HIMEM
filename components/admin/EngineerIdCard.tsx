@@ -172,9 +172,12 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
           )}
         </div>
 
-        <h2 ref={engineerNameRef} className="id-card-engineer-name" title={engineer.full_name}>
-          {engineer.full_name}
-        </h2>
+        <div className="id-card-engineer-identity">
+          <span className="id-card-engineer-label" lang="fr">INGÉNIEUR</span>
+          <h2 ref={engineerNameRef} className="id-card-engineer-name" title={engineer.full_name}>
+            {engineer.full_name}
+          </h2>
+        </div>
 
         <dl className="id-card-front-details">
           <div>
