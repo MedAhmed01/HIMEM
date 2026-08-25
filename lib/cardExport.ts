@@ -1,5 +1,6 @@
-const CARD_WIDTH = 336
-const CARD_HEIGHT = 192
+// Four CSS pixels per millimetre keeps the card at the printer's 86 × 54 mm ratio.
+const CARD_WIDTH = 344
+const CARD_HEIGHT = 216
 export const CARD_EXPORT_SCALE = 4
 
 const imageDataUrlCache = new Map<string, Promise<string>>()

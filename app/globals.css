@@ -1490,8 +1490,8 @@ button, .button {
 
 .engineer-id-card {
   position: relative;
-  width: 336px;
-  height: 192px;
+  width: 344px;
+  height: 216px;
   flex: 0 0 auto;
   overflow: hidden;
   box-sizing: border-box;
@@ -1523,7 +1523,7 @@ button, .button {
   top: 0;
   right: 0;
   width: 93px;
-  height: 192px;
+  height: 216px;
   background: #fff;
 }
 
@@ -1536,14 +1536,14 @@ button, .button {
 
 .id-card-front-artwork {
   inset: 0;
-  width: 336px;
-  height: 192px;
+  width: 344px;
+  height: 216px;
 }
 
 .id-card-back-artwork {
   inset: 0 auto 0 0;
-  width: 243px;
-  height: 192px;
+  width: 251px;
+  height: 216px;
 }
 
 .id-card-front-logo,
@@ -1567,9 +1567,9 @@ button, .button {
   top: 8px;
   left: 10px;
   display: grid;
-  width: 318px;
+  width: 326px;
   height: 32px;
-  grid-template-columns: 32px 194px 78px;
+  grid-template-columns: 32px 202px 78px;
   column-gap: 7px;
 }
 
@@ -1676,7 +1676,7 @@ button, .button {
 .id-card-portrait-frame {
   position: absolute;
   z-index: 1;
-  top: 72px;
+  top: 84px;
   left: 30px;
   width: 86px;
   height: 86px;
@@ -1706,9 +1706,9 @@ button, .button {
 .id-card-engineer-identity {
   position: absolute;
   z-index: 1;
-  top: 64px;
+  top: 76px;
   left: 137px;
-  width: 184px;
+  width: 192px;
   color: #14727a;
 }
 
@@ -1722,7 +1722,7 @@ button, .button {
 }
 
 .id-card-engineer-name {
-  width: 184px;
+  width: 192px;
   overflow: hidden;
   margin: 0;
   font-size: 15px;
@@ -1735,7 +1735,7 @@ button, .button {
 .id-card-front-details {
   position: absolute;
   z-index: 1;
-  top: 101px;
+  top: 113px;
   left: 137px;
   display: grid;
   width: 163px;
@@ -1797,7 +1797,7 @@ button, .button {
 .id-card-qr-wrap {
   position: absolute;
   z-index: 1;
-  top: 72px;
+  top: 84px;
   left: 260px;
   width: 61px;
   height: 61px;
@@ -1818,7 +1818,7 @@ button, .button {
 .id-card-qr-label {
   position: absolute;
   z-index: 1;
-  top: 151px;
+  top: 163px;
   left: 253px;
   width: 75px;
   margin: 0;
@@ -1832,7 +1832,7 @@ button, .button {
 .id-card-back-footer {
   position: absolute;
   z-index: 1;
-  top: 147px;
+  top: 159px;
   left: 28px;
   display: flex;
   color: #fff;

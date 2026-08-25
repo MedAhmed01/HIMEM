@@ -334,19 +334,19 @@ export default function IngenieursPage() {
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: [84, 48],
+        format: [86, 54],
         compress: true,
         putOnlyUsedFonts: true,
       })
 
       for (const [index, card] of cards.entries()) {
-        if (index > 0) pdf.addPage([84, 48], 'landscape')
+        if (index > 0) pdf.addPage([86, 54], 'landscape')
 
         // The card body is rendered at roughly 400 DPI so the PDF matches the
         // preview exactly. The logo is intentionally excluded here and added
         // below as genuine SVG paths, preserving perfect sharpness at any zoom.
         const canvas = await renderCardToCanvas(card, 4, { hideLogo: true })
-        pdf.addImage(canvas, 'PNG', 0, 0, 84, 48, undefined, 'FAST')
+        pdf.addImage(canvas, 'PNG', 0, 0, 86, 54, undefined, 'FAST')
 
         const isFront = card.classList.contains('engineer-id-card-front')
         const vectorLogo = (isFront ? frontLogo : backLogo).cloneNode(true) as Element

@@ -37,7 +37,7 @@ function getInitials(name: string) {
 
 function FrontArtwork() {
   return (
-    <svg className="id-card-artwork id-card-front-artwork" viewBox="0 0 336 192" aria-hidden="true">
+    <svg className="id-card-artwork id-card-front-artwork" viewBox="0 0 336 192" preserveAspectRatio="none" aria-hidden="true">
       <g fill="#f4f8f9">
         <path d="M0 183 31 164v-34l16 9v34l16 10v-34l16 9v34l17 10H63L47 183l-16 9H0Z" />
         <path d="m104 87 32-19 31 18-16 9-15-9-16 9 16 9v36l-16 9v-36l-32-18 16-8Z" />
@@ -51,7 +51,7 @@ function FrontArtwork() {
 
 function BackArtwork() {
   return (
-    <svg className="id-card-artwork id-card-back-artwork" viewBox="0 0 243 192" aria-hidden="true">
+    <svg className="id-card-artwork id-card-back-artwork" viewBox="0 0 243 192" preserveAspectRatio="none" aria-hidden="true">
       <g fill="rgba(255,255,255,.075)">
         <path d="m192 0 51 30v27l-51-30-42 25-24-14 66-38Z" />
         <path d="m109 48 42 25-24 14-18-11v34l-24 14V62l24-14Z" />
