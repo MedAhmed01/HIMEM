@@ -1706,7 +1706,7 @@ button, .button {
 .id-card-engineer-identity {
   position: absolute;
   z-index: 1;
-  top: 76px;
+  top: 86px;
   left: 137px;
   width: 192px;
   color: #14727a;
@@ -1735,7 +1735,7 @@ button, .button {
 .id-card-front-details {
   position: absolute;
   z-index: 1;
-  top: 113px;
+  top: 123px;
   left: 137px;
   display: grid;
   width: 163px;

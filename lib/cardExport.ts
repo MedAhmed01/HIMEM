@@ -1,6 +1,10 @@
-// Four CSS pixels per millimetre keeps the card at the printer's 86 × 54 mm ratio.
-const CARD_WIDTH = 344
-const CARD_HEIGHT = 216
+export const CARD_WIDTH_MM = 86
+export const CARD_HEIGHT_MM = 54
+
+// Four CSS pixels per millimetre keeps PNG and PDF exports at one shared ratio.
+const CARD_CSS_PIXELS_PER_MM = 4
+const CARD_WIDTH = CARD_WIDTH_MM * CARD_CSS_PIXELS_PER_MM
+const CARD_HEIGHT = CARD_HEIGHT_MM * CARD_CSS_PIXELS_PER_MM
 export const CARD_EXPORT_SCALE = 4
 
 const imageDataUrlCache = new Map<string, Promise<string>>()
@@ -191,7 +195,78 @@ export function canvasToPngBlob(canvas: HTMLCanvasElement) {
       if (blob) resolve(blob)
       else reject(new Error('Unable to create PNG blob.'))
     }, 'image/png')
-  })
+  }).then((blob) => addPngPhysicalSize(blob, canvas.width, canvas.height))
+}
+
+function calculateCrc32(bytes: Uint8Array) {
+  let crc = 0xffffffff
+
+  for (const byte of bytes) {
+    crc ^= byte
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0)
+    }
+  }
+
+  return (crc ^ 0xffffffff) >>> 0
+}
+
+async function addPngPhysicalSize(blob: Blob, pixelWidth: number, pixelHeight: number) {
+  const source = new Uint8Array(await blob.arrayBuffer())
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10]
+  const hasPngSignature = signature.every((byte, index) => source[index] === byte)
+  if (!hasPngSignature || source.length < 33) return blob
+
+  const sourceView = new DataView(source.buffer, source.byteOffset, source.byteLength)
+  const ihdrLength = sourceView.getUint32(8, false)
+  const ihdrType = String.fromCharCode(...source.subarray(12, 16))
+  if (ihdrType !== 'IHDR') return blob
+
+  const pixelsPerMetreX = Math.round(pixelWidth / (CARD_WIDTH_MM / 1000))
+  const pixelsPerMetreY = Math.round(pixelHeight / (CARD_HEIGHT_MM / 1000))
+
+  let chunkOffset = 8
+  while (chunkOffset + 12 <= source.length) {
+    const chunkLength = sourceView.getUint32(chunkOffset, false)
+    const nextChunkOffset = chunkOffset + 12 + chunkLength
+    if (nextChunkOffset > source.length) return blob
+
+    const chunkType = String.fromCharCode(...source.subarray(chunkOffset + 4, chunkOffset + 8))
+    if (chunkType === 'pHYs' && chunkLength === 9) {
+      sourceView.setUint32(chunkOffset + 8, pixelsPerMetreX, false)
+      sourceView.setUint32(chunkOffset + 12, pixelsPerMetreY, false)
+      source[chunkOffset + 16] = 1
+      sourceView.setUint32(
+        chunkOffset + 17,
+        calculateCrc32(source.subarray(chunkOffset + 4, chunkOffset + 17)),
+        false,
+      )
+      return new Blob([source], { type: 'image/png' })
+    }
+
+    chunkOffset = nextChunkOffset
+  }
+
+  const physicalSizeChunk = new Uint8Array(21)
+  const chunkView = new DataView(
+    physicalSizeChunk.buffer,
+    physicalSizeChunk.byteOffset,
+    physicalSizeChunk.byteLength,
+  )
+
+  chunkView.setUint32(0, 9, false)
+  physicalSizeChunk.set([112, 72, 89, 115], 4) // pHYs
+  chunkView.setUint32(8, pixelsPerMetreX, false)
+  chunkView.setUint32(12, pixelsPerMetreY, false)
+  physicalSizeChunk[16] = 1 // Unit: metre
+  chunkView.setUint32(17, calculateCrc32(physicalSizeChunk.subarray(4, 17)), false)
+
+  const insertionOffset = 8 + 12 + ihdrLength
+  const output = new Uint8Array(source.length + physicalSizeChunk.length)
+  output.set(source.subarray(0, insertionOffset), 0)
+  output.set(physicalSizeChunk, insertionOffset)
+  output.set(source.subarray(insertionOffset), insertionOffset + physicalSizeChunk.length)
+  return new Blob([output], { type: 'image/png' })
 }
 
 export function downloadBlob(blob: Blob, filename: string) {

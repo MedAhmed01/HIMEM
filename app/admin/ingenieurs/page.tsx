@@ -33,6 +33,8 @@ import EngineerIdCard from '@/components/admin/EngineerIdCard'
 import EngineerDirectoryDocument from '@/components/admin/EngineerDirectoryDocument'
 import { formatMatricule } from '@/lib/matricule'
 import {
+  CARD_HEIGHT_MM,
+  CARD_WIDTH_MM,
   canvasToPngBlob,
   downloadBlob,
   loadLogoSvg,
@@ -334,19 +336,19 @@ export default function IngenieursPage() {
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: [86, 54],
+        format: [CARD_WIDTH_MM, CARD_HEIGHT_MM],
         compress: true,
         putOnlyUsedFonts: true,
       })
 
       for (const [index, card] of cards.entries()) {
-        if (index > 0) pdf.addPage([86, 54], 'landscape')
+        if (index > 0) pdf.addPage([CARD_WIDTH_MM, CARD_HEIGHT_MM], 'landscape')
 
         // The card body is rendered at roughly 400 DPI so the PDF matches the
         // preview exactly. The logo is intentionally excluded here and added
         // below as genuine SVG paths, preserving perfect sharpness at any zoom.
         const canvas = await renderCardToCanvas(card, 4, { hideLogo: true })
-        pdf.addImage(canvas, 'PNG', 0, 0, 86, 54, undefined, 'FAST')
+        pdf.addImage(canvas, 'PNG', 0, 0, CARD_WIDTH_MM, CARD_HEIGHT_MM, undefined, 'FAST')
 
         const isFront = card.classList.contains('engineer-id-card-front')
         const vectorLogo = (isFront ? frontLogo : backLogo).cloneNode(true) as Element
