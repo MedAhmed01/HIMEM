@@ -1617,14 +1617,14 @@ button, .button {
 
 .id-card-organization-name-ar {
   font-family: var(--font-cairo), Tahoma, Arial, sans-serif;
-  font-size: 7.5px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1;
 }
 
 .id-card-organization-name-fr {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 5.3px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.05px;
   line-height: 1;
