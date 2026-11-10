@@ -1508,7 +1508,7 @@ button, .button {
 }
 
 .engineer-id-card-back {
-  background: linear-gradient(180deg, #0b7a3b 0%, #075a2b 100%);
+  background: linear-gradient(180deg, #14919b 0%, #0d6f73 100%);
 }
 
 .id-card-back-panel {
@@ -1572,7 +1572,7 @@ button, .button {
   align-items: center;
   justify-content: space-between;
   color: #fff;
-  background: #c8963a;
+  background: #0d6f73;
   font-size: 10px;
   font-weight: 700;
   line-height: 1;
@@ -1590,7 +1590,7 @@ button, .button {
   width: 86px;
   height: 94px;
   box-sizing: border-box;
-  border: 2px solid #f2c14e;
+  border: 2px solid #7fd1d0;
   background: #fff;
 }
 
@@ -1605,7 +1605,7 @@ button, .button {
 
 .id-card-portrait-fallback {
   color: #fff;
-  background: linear-gradient(145deg, #0b7a3b, #075a2b);
+  background: linear-gradient(145deg, #14919b, #0d6f73);
   font-size: 23px;
   font-weight: 700;
 }
@@ -1643,7 +1643,7 @@ button, .button {
 }
 
 .id-card-row b {
-  color: #0b7a3b;
+  color: #14919b;
 }
 
 .id-card-footer-bars {
@@ -1653,8 +1653,8 @@ button, .button {
   bottom: 0;
   left: 0;
   height: 8px;
-  border-top: 3px solid #c8963a;
-  background: #0b7a3b;
+  border-top: 3px solid #0d6f73;
+  background: #14919b;
 }
 
 .id-card-back-copy {
@@ -1715,7 +1715,7 @@ button, .button {
 }
 
 .id-card-qr-placeholder {
-  background: repeating-linear-gradient(45deg, #d6ece0 0 3px, #fff 3px 6px);
+  background: repeating-linear-gradient(45deg, #d8eeee 0 3px, #fff 3px 6px);
 }
 
 .id-card-qr-label {
@@ -1727,7 +1727,7 @@ button, .button {
   width: 75px;
   margin: 0;
   flex-direction: column;
-  color: #0b7a3b;
+  color: #14919b;
   font-size: 4.5px;
   font-weight: 700;
   line-height: 6px;

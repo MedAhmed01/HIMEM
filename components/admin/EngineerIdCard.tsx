@@ -73,7 +73,7 @@ function BackArtwork() {
 function GreenLogo() {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- The vector source logo must remain printable.
-    <img className="id-card-logo" src="/Logo-green.svg" alt="OMIGEC" />
+    <img className="id-card-logo" src="/Logo-teal.svg" alt="OMIGEC" />
   )
 }
 
@@ -104,7 +104,7 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
       width: 240,
       margin: 0,
       errorCorrectionLevel: 'M',
-      color: { dark: '#0b7a3b', light: '#ffffff' },
+      color: { dark: '#14919b', light: '#ffffff' },
     })
       .then((value) => active && setQrCode(value))
       .catch((error) => console.error('Unable to generate engineer QR code:', error))
