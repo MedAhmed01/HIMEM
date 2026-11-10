@@ -122,6 +122,7 @@ export async function PATCH(
     const body = await request.json()
     const {
       full_name,
+      full_name_ar,
       phone,
       diploma,
       grad_year,
@@ -162,6 +163,7 @@ export async function PATCH(
       .from('profiles')
       .update({
         full_name: full_name?.trim(),
+        full_name_ar: full_name_ar?.trim() || null,
         phone: phone?.trim(),
         diploma: diploma?.trim(),
         grad_year: grad_year,

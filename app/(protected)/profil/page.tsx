@@ -47,6 +47,7 @@ interface ProfileData {
   id: string
   nni: string
   full_name: string
+  full_name_ar?: string | null
   phone: string
   email: string
   diploma: string
@@ -285,6 +286,7 @@ export default function ProfilPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           full_name: profile.full_name,
+          full_name_ar: profile.full_name_ar,
           phone: profile.phone,
           diploma: profile.diploma,
           university: profile.university,
@@ -633,6 +635,19 @@ export default function ProfilPage() {
                     id="full_name"
                     value={profile.full_name}
                     onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                    disabled={!isEditing}
+                    className="h-12 rounded-xl border-2 disabled:bg-slate-50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="full_name_ar" className="text-sm font-semibold text-slate-700">Nom complet en arabe</Label>
+                  <Input
+                    id="full_name_ar"
+                    dir="rtl"
+                    lang="ar"
+                    value={profile.full_name_ar || ''}
+                    onChange={(e) => setProfile({ ...profile, full_name_ar: e.target.value })}
                     disabled={!isEditing}
                     className="h-12 rounded-xl border-2 disabled:bg-slate-50"
                   />

@@ -9,6 +9,7 @@ export interface EngineerCardData {
   nni: string
   matricule?: string | null
   full_name: string
+  full_name_ar?: string | null
   email: string
   phone: string
   diploma: string
@@ -69,23 +70,29 @@ function BackArtwork() {
   )
 }
 
-function BrandLogo({ tone }: { tone: 'light' | 'teal' }) {
-  if (tone === 'teal') {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element -- The vector source logo must remain printable.
-      <img className="id-card-logo id-card-logo-teal" src="/Logo-teal.svg" alt="OMIGEC" />
-    )
-  }
-
+function GreenLogo() {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- The vector source logo must remain printable.
-    <img className="id-card-logo id-card-logo-light" src="/Logo.svg" alt="OMIGEC" />
+    <img className="id-card-logo" src="/Logo-green.svg" alt="OMIGEC" />
   )
+}
+
+// Shrinks a single-line field until it fits its box. The inline font size is
+// kept by the print/export clone.
+function fitText(element: HTMLElement | null, maximumFontSize: number, minimumFontSize = 4) {
+  if (!element) return
+  element.style.fontSize = `${maximumFontSize}px`
+  let size = maximumFontSize
+  while (element.scrollWidth > element.clientWidth && size > minimumFontSize) {
+    size = Math.max(minimumFontSize, size - 0.2)
+    element.style.fontSize = `${size}px`
+  }
 }
 
 export default function EngineerIdCard({ engineer, className = '' }: EngineerIdCardProps) {
   const [qrCode, setQrCode] = useState('')
-  const engineerNameRef = useRef<HTMLHeadingElement>(null)
+  const nameFrRef = useRef<HTMLDivElement>(null)
+  const nameArRef = useRef<HTMLDivElement>(null)
   const verificationUrl = useMemo(() => {
     if (typeof window === 'undefined') return `/recherche?nni=${encodeURIComponent(engineer.nni)}`
     return `${window.location.origin}/recherche?nni=${encodeURIComponent(engineer.nni)}`
@@ -97,7 +104,7 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
       width: 240,
       margin: 0,
       errorCorrectionLevel: 'M',
-      color: { dark: '#14727a', light: '#ffffff' },
+      color: { dark: '#0b7a3b', light: '#ffffff' },
     })
       .then((value) => active && setQrCode(value))
       .catch((error) => console.error('Unable to generate engineer QR code:', error))
@@ -108,29 +115,9 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
   }, [verificationUrl])
 
   useLayoutEffect(() => {
-    const nameElement = engineerNameRef.current
-    if (!nameElement) return
-
-    const maximumFontSize = 15
-    const minimumFontSize = 5
-    const availableWidth = nameElement.clientWidth
-
-    // Measure from the approved design size, then reduce only as much as the
-    // current name needs. The inline result is retained by the print clone.
-    nameElement.style.fontSize = `${maximumFontSize}px`
-
-    if (nameElement.scrollWidth <= availableWidth) return
-
-    const proportionalSize = maximumFontSize * (availableWidth / nameElement.scrollWidth)
-    let fittedSize = Math.min(maximumFontSize, Math.max(minimumFontSize, proportionalSize * 0.98))
-    nameElement.style.fontSize = `${fittedSize}px`
-
-    // Account for fractional-pixel rounding so no final character is clipped.
-    while (nameElement.scrollWidth > availableWidth && fittedSize > minimumFontSize) {
-      fittedSize = Math.max(minimumFontSize, fittedSize - 0.1)
-      nameElement.style.fontSize = `${fittedSize}px`
-    }
-  }, [engineer.full_name])
+    fitText(nameFrRef.current, 7.5)
+    fitText(nameArRef.current, 8)
+  }, [engineer.full_name, engineer.full_name_ar])
 
   const matricule = formatMatricule(engineer.matricule)
   const pairClass = `engineer-id-card-pair ${className}`.trim()
@@ -138,27 +125,17 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
   return (
     <article className={pairClass}>
       <section className="engineer-id-card engineer-id-card-front" aria-label="Carte recto">
-        <div className="id-card-front-header" aria-hidden="true" />
         <FrontArtwork />
 
-        <div className="id-card-header-content">
+        <div className="id-card-brand">
           <div className="id-card-front-logo">
-            <BrandLogo tone="light" />
+            <GreenLogo />
           </div>
+        </div>
 
-          <div className="id-card-organization-name">
-            <p className="id-card-organization-name-ar" lang="ar" dir="rtl">
-              الهيئة الموريتانية للمهندسين المدنيين
-            </p>
-            <p className="id-card-organization-name-fr" lang="fr">
-              Ordre Mauritanien des Ingénieurs Génie Civil
-            </p>
-          </div>
-
-          <div className="id-card-card-title">
-            <strong>CARTE</strong>
-            <span>PROFESSIONNELLE</span>
-          </div>
+        <div className="id-card-band">
+          <span lang="fr">Ingénieur</span>
+          <span lang="ar" dir="rtl">مهندس</span>
         </div>
 
         <div className="id-card-portrait-frame">
@@ -172,31 +149,26 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
           )}
         </div>
 
-        <div className="id-card-engineer-identity">
-          <span className="id-card-engineer-label" lang="fr">INGÉNIEUR</span>
-          <h2 ref={engineerNameRef} className="id-card-engineer-name" title={engineer.full_name}>
-            {engineer.full_name}
-          </h2>
+        <div className="id-card-rows">
+          <div className="id-card-row">
+            <div lang="fr"><b>CARTE PROFESSIONNELLE N°:</b> {matricule}</div>
+            <div lang="ar" dir="rtl"><b>بطاقة مهنية رقم:</b> {matricule}</div>
+          </div>
+          <div className="id-card-row">
+            <div ref={nameFrRef} lang="fr" title={engineer.full_name}><b>Nom complet :</b> {engineer.full_name}</div>
+            <div ref={nameArRef} lang="ar" dir="rtl" title={engineer.full_name_ar || ''}><b>الاسم الكامل:</b> {engineer.full_name_ar || '—'}</div>
+          </div>
+          <div className="id-card-row">
+            <div lang="fr"><b>NNI :</b> {engineer.nni || '—'}</div>
+            <div lang="ar" dir="rtl"><b>ر.و.ت:</b> <bdi>{engineer.nni || '—'}</bdi></div>
+          </div>
+          <div className="id-card-row">
+            <div lang="fr"><b>Téléphone :</b> {engineer.phone || '—'}</div>
+            <div lang="ar" dir="rtl"><b>الهاتف:</b> <bdi>{engineer.phone || '—'}</bdi></div>
+          </div>
         </div>
 
-        <dl className="id-card-front-details">
-          <div>
-            <dt>Matricule :</dt>
-            <dd>{matricule}</dd>
-          </div>
-          <div>
-            <dt>N° NNI:</dt>
-            <dd>{engineer.nni || '—'}</dd>
-          </div>
-          <div>
-            <dt>Promotion:</dt>
-            <dd>{engineer.grad_year || '—'}</dd>
-          </div>
-          <div>
-            <dt>Téléphone:</dt>
-            <dd>{engineer.phone || '—'}</dd>
-          </div>
-        </dl>
+        <div className="id-card-footer-bars" aria-hidden="true" />
       </section>
 
       <section className="engineer-id-card engineer-id-card-back" aria-label="Carte verso">
@@ -204,18 +176,25 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
         <div className="id-card-back-panel" aria-hidden="true" />
 
         <div className="id-card-back-copy">
-          <h2>Note</h2>
-          <p>Cette carte est personnelle et atteste de l&apos;inscription de son titulaire auprès de l&apos;OMIGEC.</p>
-          <p>Toute personne trouvant cette carte est priée de la remettre à l&apos;Ordre Mauritanien des Ingénieurs en Génie Civil.</p>
+          <div lang="fr">
+            <h2>Note</h2>
+            <p>Cette carte est personnelle et atteste de l&apos;inscription de son titulaire auprès de l&apos;OMIGEC.</p>
+            <p>Toute personne trouvant cette carte est priée de la remettre à l&apos;Ordre Mauritanien des Ingénieurs en Génie Civil.</p>
+          </div>
+          <div lang="ar" dir="rtl" className="id-card-back-copy-ar">
+            <h2>ملاحظة</h2>
+            <p>هذه البطاقة شخصية وتثبت تسجيل حاملها لدى الهيئة.</p>
+            <p>يُرجى ممن يعثر على هذه البطاقة تسليمها إلى الهيئة الموريتانية للمهندسين المدنيين.</p>
+          </div>
         </div>
 
         <div className="id-card-back-footer">
           <strong>OMIGEC</strong>
-          <span>Nouakchott, Mauritanie</span>
+          <span>Nouakchott, Mauritanie — <span lang="ar" dir="rtl">نواكشوط، موريتانيا</span></span>
         </div>
 
         <div className="id-card-back-logo">
-          <BrandLogo tone="teal" />
+          <GreenLogo />
         </div>
 
         <div className="id-card-qr-wrap">
@@ -226,7 +205,10 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
             <div className="id-card-qr-placeholder" />
           )}
         </div>
-        <p className="id-card-qr-label">SCANNER POUR VÉRIFIER</p>
+        <p className="id-card-qr-label">
+          SCANNER POUR VÉRIFIER
+          <span lang="ar" dir="rtl">امسح للتحقق</span>
+        </p>
       </section>
     </article>
   )

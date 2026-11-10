@@ -85,6 +85,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const {
       full_name,
+      full_name_ar,
       phone,
       domain,
       exercise_mode
@@ -126,6 +127,7 @@ export async function PUT(request: NextRequest) {
       .from('profiles')
       .update({
         full_name: full_name.trim(),
+        full_name_ar: full_name_ar?.trim() || null,
         phone: phone.trim(),
         domain: domain,
         exercise_mode: exercise_mode,

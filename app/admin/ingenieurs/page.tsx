@@ -328,10 +328,7 @@ export default function IngenieursPage() {
         import('jspdf'),
         import('svg2pdf.js'),
       ])
-      const [frontLogo, backLogo] = await Promise.all([
-        loadLogoSvg('/Logo.svg'),
-        loadLogoSvg('/Logo-teal.svg'),
-      ])
+      const vectorLogoSource = await loadLogoSvg('/Logo-green.svg')
 
       const pdf = new jsPDF({
         orientation: 'landscape',
@@ -350,18 +347,19 @@ export default function IngenieursPage() {
         const canvas = await renderCardToCanvas(card, 4, { hideLogo: true })
         pdf.addImage(canvas, 'PNG', 0, 0, CARD_WIDTH_MM, CARD_HEIGHT_MM, undefined, 'FAST')
 
-        const isFront = card.classList.contains('engineer-id-card-front')
-        const vectorLogo = (isFront ? frontLogo : backLogo).cloneNode(true) as Element
-        if (isFront) {
-          // Crop the supplied lockup SVG to its emblem for the redesigned
-          // header; the organization name is typeset separately for clarity.
-          vectorLogo.setAttribute('viewBox', '0 0 24 24')
-          vectorLogo.setAttribute('width', '24')
-          vectorLogo.setAttribute('height', '24')
+        // Place the vector logo exactly where the preview draws it.
+        const logo = card.querySelector('.id-card-logo')
+        if (logo) {
+          const cardBox = card.getBoundingClientRect()
+          const logoBox = logo.getBoundingClientRect()
+          const mmPerPx = CARD_WIDTH_MM / cardBox.width
+          await svg2pdf(vectorLogoSource.cloneNode(true) as Element, pdf, {
+            x: (logoBox.left - cardBox.left) * mmPerPx,
+            y: (logoBox.top - cardBox.top) * mmPerPx,
+            width: logoBox.width * mmPerPx,
+            height: logoBox.height * mmPerPx,
+          })
         }
-        await svg2pdf(vectorLogo, pdf, isFront
-          ? { x: 2.5, y: 2, width: 8, height: 8 }
-          : { x: 63, y: 9.75, width: 19, height: 4.75 })
 
         if (index < cards.length - 1) await yieldToBrowser()
       }

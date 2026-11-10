@@ -23,6 +23,7 @@ interface EditEngineerModalProps {
     engineer: {
         id: string
         full_name: string
+        full_name_ar?: string | null
         phone: string
         diploma: string
         grad_year: number
@@ -47,6 +48,7 @@ export default function EditEngineerModal({
 }: EditEngineerModalProps) {
     const [formData, setFormData] = useState({
         full_name: '',
+        full_name_ar: '',
         phone: '',
         diploma: '',
         grad_year: 0,
@@ -65,6 +67,7 @@ export default function EditEngineerModal({
         if (engineer) {
             setFormData({
                 full_name: engineer.full_name || '',
+                full_name_ar: engineer.full_name_ar || '',
                 phone: engineer.phone || '',
                 diploma: engineer.diploma || '',
                 grad_year: engineer.grad_year || 0,
@@ -245,6 +248,16 @@ export default function EditEngineerModal({
                                 value={formData.full_name}
                                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                                 required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="full_name_ar">Nom complet en arabe</Label>
+                            <Input
+                                id="full_name_ar"
+                                dir="rtl"
+                                lang="ar"
+                                value={formData.full_name_ar}
+                                onChange={(e) => setFormData({ ...formData, full_name_ar: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
