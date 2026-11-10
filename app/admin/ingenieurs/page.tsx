@@ -328,7 +328,7 @@ export default function IngenieursPage() {
         import('jspdf'),
         import('svg2pdf.js'),
       ])
-      const vectorLogoSource = await loadLogoSvg('/Logo-teal.svg')
+      const vectorLogoSource = await loadLogoSvg('/Logo-green.svg')
 
       const pdf = new jsPDF({
         orientation: 'landscape',

@@ -73,7 +73,7 @@ function BackArtwork() {
 function GreenLogo() {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- The vector source logo must remain printable.
-    <img className="id-card-logo" src="/Logo-teal.svg" alt="OMIGEC" />
+    <img className="id-card-logo" src="/Logo-green.svg" alt="OMIGEC" />
   )
 }
 
@@ -104,7 +104,7 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
       width: 240,
       margin: 0,
       errorCorrectionLevel: 'M',
-      color: { dark: '#14919b', light: '#ffffff' },
+      color: { dark: '#0b7a3b', light: '#ffffff' },
     })
       .then((value) => active && setQrCode(value))
       .catch((error) => console.error('Unable to generate engineer QR code:', error))
@@ -116,7 +116,7 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
 
   useLayoutEffect(() => {
     fitText(nameFrRef.current, 7.5)
-    fitText(nameArRef.current, 8)
+    fitText(nameArRef.current, 9)
   }, [engineer.full_name, engineer.full_name_ar])
 
   const matricule = formatMatricule(engineer.matricule)
@@ -134,8 +134,8 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
         </div>
 
         <div className="id-card-band">
-          <span lang="fr">Ingénieur</span>
-          <span lang="ar" dir="rtl">مهندس</span>
+          <span lang="fr">Ingénieur GC</span>
+          <span lang="ar" dir="rtl">مهندس مدني</span>
         </div>
 
         <div className="id-card-portrait-frame">
@@ -161,10 +161,6 @@ export default function EngineerIdCard({ engineer, className = '' }: EngineerIdC
           <div className="id-card-row">
             <div lang="fr"><b>NNI :</b> {engineer.nni || '—'}</div>
             <div lang="ar" dir="rtl"><b>ر.و.ت:</b> <bdi>{engineer.nni || '—'}</bdi></div>
-          </div>
-          <div className="id-card-row">
-            <div lang="fr"><b>Téléphone :</b> {engineer.phone || '—'}</div>
-            <div lang="ar" dir="rtl"><b>الهاتف:</b> <bdi>{engineer.phone || '—'}</bdi></div>
           </div>
         </div>
 
