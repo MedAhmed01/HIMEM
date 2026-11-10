@@ -1559,6 +1559,10 @@ button, .button {
   height: 52.9px;
 }
 
+.id-card-band span {
+  white-space: nowrap;
+}
+
 .id-card-band {
   position: absolute;
   z-index: 1;
@@ -1579,7 +1583,7 @@ button, .button {
 }
 
 .id-card-band [lang="ar"] {
-  font-size: 12px;
+  font-size: 10.5px;
 }
 
 .id-card-portrait-frame {
